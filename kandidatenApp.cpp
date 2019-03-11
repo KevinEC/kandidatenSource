@@ -16,6 +16,7 @@ class kandidatenApp : public App {
 
 void kandidatenApp::setup()
 {
+	// load xml-file
 }
 
 void kandidatenApp::mouseDown( MouseEvent event )
