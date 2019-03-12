@@ -1,6 +1,5 @@
 #include "Story.h"
 
-
 // default constructor
 Story::Story()
 {
