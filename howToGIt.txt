@@ -1,0 +1,24 @@
+﻿﻿cd //Ändra plats i filstruktur
+
+﻿-- START UP new computer --
+cd //Ändra plats i filstruktur till där du vill spara filerna
+
+git clone url //Kopiera ner till lokalt
+
+-------------------
+
+// hitta in till master-mappen så du kan pusha/pulla
+cd kandidaten/src 
+cd ../include 		cd ../ = upp en nivå i filstruktur
+
+git pull // uppdatera alla filer innan ni kodar 
+
+=> Koda 
+
+git add . // ALTERNATIVT -p // Lägg till alla filer som redigerats
+
+git commit -m "kommentar" //Lägg till kommentar om filen
+
+git push // Ladda upp
+
+esc: WQ
