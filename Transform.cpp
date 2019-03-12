@@ -18,8 +18,14 @@ void Transform::rotate()
 {
 }
 
-void Transform::translate()
+void Transform::translate(Card &kort)
 {
 	Animate animation = Animate();
 	animation.newPage();
+	kort.x = 500;
+	kort.y = 100;
+	
+	kort.setpos(500, 100);
+	
 }
+

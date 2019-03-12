@@ -10,20 +10,12 @@ using namespace ci::app;
 using namespace std;
 
 
+
 Card::Card()
 {
-	x = 0;
-	y = 0;
-	/*
-string rubrik
-string brödtext
-substring brödtext; (ta 10 första orden i brödtext;)
-img img1
-img img2
-
-taget från xml
-*/
-
+	x = 100;
+	y = 200;
+	title = "detta är ett test";
 }
 
 
@@ -31,21 +23,18 @@ Card::~Card()
 {
 }
 
-Card::Card(float n, float m) {
+Card::Card(int n, int m) {
 	x = n;
 	y = m;
-	string s; 
+	title = "test"; 
 
 
-	/*
-string rubrik
-string brödtext
-img img1
-img img2
 
-taget från xml
-*/
 
+}
+void Card::setpos(int n, int m) {
+	x = n;
+	y = m;
 }
 
 /*

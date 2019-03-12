@@ -1,9 +1,24 @@
 #include "Cards.h"
+#include "Path.h"
+#include "Transform.h"
 
 
 
 Cards::Cards()
 {
+
+	//Card();
+	testkort = Card();
+	//Transform.translate(testkort);
+	//Transform tr;
+	//tr.translate(testkort);
+	//Transform.translate(testkort);
+	Transform::translate(testkort);
+
+	
+	//translate(testkort);
+
+
 }
 
 
@@ -25,6 +40,7 @@ void Cards::collision()
 
 void Cards::setPath(Card inst)
 {
+
 }
 
 void Cards::search()

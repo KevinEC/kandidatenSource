@@ -13,6 +13,7 @@ Animate::~Animate()
 
 void Animate::newPage()
 {
+	CI_LOG_I("nu är vi i newpage");
 }
 
 void Animate::turnCard()
