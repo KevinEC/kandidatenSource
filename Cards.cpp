@@ -23,7 +23,7 @@ void Cards::collision()
 {
 }
 
-void Cards::setPath(Card inst)
+void Cards::setPath(Card &inst)
 {
 }
 

@@ -9,6 +9,7 @@
 #include <vector>
 #include <map>
 #include <list>
+#include <iostream>
 
 //Controller-app
 
@@ -28,7 +29,7 @@ struct TouchPoint {
 	void draw() const
 	{
 		if (mTimeOfDeath > 0) // are we dying? then fade out
-			gl::color(ColorA(mColor, (mTimeOfDeath - getElapsedSeconds()) / 2.0f));
+			gl::color(ColorA(mColor, (double(mTimeOfDeath) - getElapsedSeconds()) / 2.0));
 		else
 			gl::color(mColor);
 
@@ -118,6 +119,7 @@ void kandidatenApp::mouseDown(MouseEvent event)
 {
 	//mMouseLoc = event.getPos();
 	lastclick = event.getPos();
+
 }
 
 void kandidatenApp::update()
