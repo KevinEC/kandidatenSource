@@ -1,9 +1,13 @@
 #include "Cards.h"
-
+#include "Path.h"
+#include "Transform.h"
 
 
 Cards::Cards()
 {
+	testkort = Card();
+
+	Transform::translate(testkort);
 }
 
 

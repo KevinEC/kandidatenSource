@@ -61,6 +61,7 @@ public:
 	vector<Rectf> test;
 	bool test2 = false;
 	Card card1;
+	Cards kort;
 	int i;
 
 
@@ -83,6 +84,8 @@ void kandidatenApp::setup()
 	CI_LOG_I("MT: " << System::hasMultiTouch() << " Max points: " << System::getMaxMultiTouchPoints());
 	//Cards allakort = databasecaller();
 	i = 0;
+	kort = Cards(); 
+	
 }
 
 void kandidatenApp::touchesBegan(TouchEvent event)
@@ -120,10 +123,15 @@ void kandidatenApp::mouseDown(MouseEvent event)
 	//mMouseLoc = event.getPos();
 	lastclick = event.getPos();
 
+	CI_LOG_I(kort.testkort.title);
+	CI_LOG_I(kort.testkort.x);
+	CI_LOG_I(kort.testkort.y);
+
 }
 
 void kandidatenApp::update()
 {
+
 }
 
 void kandidatenApp::mouseDrag(MouseEvent event) {
@@ -131,8 +139,6 @@ void kandidatenApp::mouseDrag(MouseEvent event) {
 	test2 = true;
 
 	mActivePoints[i++].addPoint(event.getPos());
-
-
 }
 
 

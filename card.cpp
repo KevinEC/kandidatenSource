@@ -12,8 +12,9 @@ using namespace std;
 
 Card::Card()
 {
-	x = 0;
-	y = 0;
+	x = 200;
+	y = 100;
+	title = "Hej Hilma";
 	/*
 string rubrik
 string brödtext
@@ -31,7 +32,7 @@ Card::~Card()
 {
 }
 
-Card::Card(float n, float m) {
+Card::Card(int n, int m) {
 	x = n;
 	y = m;
 	string s; 
@@ -59,3 +60,9 @@ State getcurrentstate() {
 
 
 */
+
+void Card::setpos(int m, int n)
+{
+	x = m;
+	y = n;
+}
