@@ -61,7 +61,7 @@ public:
 	bool test2 = false;
 	Card card1;
 	int i;
-	
+
 
 
 private:
@@ -80,9 +80,9 @@ void prepareSettings(kandidatenApp::Settings *settings)
 void kandidatenApp::setup()
 {
 	CI_LOG_I("MT: " << System::hasMultiTouch() << " Max points: " << System::getMaxMultiTouchPoints());
-	//Cards allakort = databasecaller(); 
+	//Cards allakort = databasecaller();
 	i = 0;
-	
+
 
 
 }
@@ -95,6 +95,7 @@ void kandidatenApp::touchesBegan(TouchEvent event)
 		Color newColor(CM_HSV, Rand::randFloat(), 1, 1);
 		mActivePoints.insert(make_pair(touch.getId(), TouchPoint(touch.getPos(), newColor)));
 	}
+
 }
 
 void kandidatenApp::touchesMoved(TouchEvent event)
@@ -131,7 +132,7 @@ void kandidatenApp::mouseDrag(MouseEvent event) {
 	test2 = true;
 
 	mActivePoints[i++].addPoint(event.getPos());
-	
+
 
 }
 
