@@ -17,7 +17,7 @@ using namespace ci::app;
 using namespace std;
 
 struct TouchPoint {
-	TouchPoint() {}
+	TouchPoint() {} //default constructor
 	TouchPoint(const vec2 &initialPt, const Color &color) : mColor(color), mTimeOfDeath(-1.0)
 	{
 		mLine.push_back(initialPt);
@@ -35,7 +35,7 @@ struct TouchPoint {
 		gl::draw(mLine);
 	}
 
-	void startDying() { mTimeOfDeath = getElapsedSeconds() + 2.0f; } // two seconds til dead
+	void startDying() { mTimeOfDeath = getElapsedSeconds() + 2.0f; } // two seconds 'til dead
 
 	bool isDead() const { return getElapsedSeconds() > mTimeOfDeath; }
 
@@ -82,9 +82,6 @@ void kandidatenApp::setup()
 	CI_LOG_I("MT: " << System::hasMultiTouch() << " Max points: " << System::getMaxMultiTouchPoints());
 	//Cards allakort = databasecaller();
 	i = 0;
-
-
-
 }
 
 void kandidatenApp::touchesBegan(TouchEvent event)
@@ -135,8 +132,6 @@ void kandidatenApp::mouseDrag(MouseEvent event) {
 
 
 }
-
-
 
 
 void kandidatenApp::draw()

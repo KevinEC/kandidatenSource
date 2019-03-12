@@ -20,7 +20,6 @@ void Transform::rotate()
 
 void Transform::translate()
 {
+	Animate animation = Animate();
+	animation.newPage();
 }
-
-Animate animation = Animate();
-//animation.newPage();
