@@ -169,13 +169,17 @@ void kandidatenApp::draw()
 
 	if (test2) {
 		Rectf rect(mMouseLoc.x, mMouseLoc.y, mMouseLoc.x + 50, mMouseLoc.y - 50);
+		CI_LOG_I("mouse: " << mMouseLoc);
 
 		//Rectf rect2(mMouseLoc.x -100, mMouseLoc.y - 100, mMouseLoc.x - 50, mMouseLoc.y - 50);
 		test[0] = rect;
 		//test[1] = rect2;
 
 		//gl::drawSolidRect(test[i]);
-		//gl::drawSolidRect(rect);
+		CI_LOG_I("rectKort rect x: " << kort.rectKort.rect.getX1()<< "rectKort y: " << kort.rectKort.rect.getX1()); 
+		CI_LOG_I("rect: " << kort.rectKort.rect);
+		gl::drawSolidRect(kort.rectKort.rect);
+		//gl::drawSolidRect(test[0]);
 		//i++;
 		//gl::drawSolidRect(rect2);
 	}

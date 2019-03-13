@@ -1,5 +1,4 @@
 #include "Card.h"
-#include "cinder/app/App.h"
 #include "cinder/app/RendererGl.h"
 #include "cinder/gl/gl.h"
 #include <string>
@@ -32,10 +31,16 @@ Card::~Card()
 {
 }
 
-Card::Card(int n, int m) {
+Card::Card(int n, int m, const int width, const int height) {
 	x = n;
 	y = m;
-	string s; 
+	this->width = width;
+	this->height = height;
+	title = "hej kevin";
+	string s;
+	isClicked = false;
+
+	rect = Rectf(n, m, width, height);
 
 
 	/*
@@ -65,4 +70,15 @@ void Card::setpos(int m, int n)
 {
 	x = m;
 	y = n;
+}
+
+
+void Card::mouseDrag(MouseEvent event)
+{
+	
+	//CI_LOG_I(event.getX);
+}
+void Card::mouseDown(MouseEvent event)
+{
+
 }
