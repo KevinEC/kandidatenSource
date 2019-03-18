@@ -5,6 +5,7 @@
 #include "cinder/System.h"
 #include "cinder/Rand.h"
 #include "cinder/Log.h"
+#include "cinder/Xml.h"
 
 #include <vector>
 #include <map>
@@ -84,6 +85,13 @@ void kandidatenApp::setup()
 	//Cards allakort = databasecaller();
 	i = 0;
 	kort = Cards(); 
+
+	std::vector<std::string> categories;
+	//ci::XmlTree test(ci::app::loadAsset("write.xml"));
+
+
+	
+
 	
 	
 }
@@ -166,6 +174,8 @@ void kandidatenApp::draw()
 	gl::color(Color(1, 1, 0));
 	for (const auto &touch : getActiveTouches())
 		gl::drawStrokedCircle(touch.getPos(), 20);
+
+	//gl::drawSolidRect(kort.testkort.getrect());
 
 	if (test2) {
 		Rectf rect(mMouseLoc.x, mMouseLoc.y, mMouseLoc.x + 50, mMouseLoc.y - 50);

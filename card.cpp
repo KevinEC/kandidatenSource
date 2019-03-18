@@ -9,13 +9,14 @@ using namespace ci;
 using namespace ci::app;
 using namespace std;
 
-
+Rectf rect;
 
 Card::Card()
 {
 	x = 100;
 	y = 200;
 	title = "detta är ett test";
+	rect = Rectf(x, y, x + 100, y + 100);
 }
 
 
@@ -23,7 +24,7 @@ Card::~Card()
 {
 }
 
-Card::Card(int n, int m) {
+Card::Card(float n, float m) {
 	x = n;
 	y = m;
 	title = "test"; 
@@ -32,10 +33,18 @@ Card::Card(int n, int m) {
 
 
 }
-void Card::setpos(int n, int m) {
+/*
+Rectf Card::getrect(float x, float y)
+{
+	Rectf rect = Rectf(x, y, x + 50, y + 50);
+	return rect;
+}
+*/
+void Card::setpos(float n, float m) {
 	x = n;
 	y = m;
 }
+
 
 /*
 State getcurrentstate() {
