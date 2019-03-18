@@ -30,7 +30,7 @@ Card::~Card()
 {
 }
 
-Card::Card(int n, int m, const int width, const int height) {
+Card::Card(float n, float m, const float width, const float height) {
 	x = n;
 	y = m;
 	this->width = width;
@@ -60,7 +60,7 @@ State getcurrentstate() {
 }
 */
 
-void Card::setpos(int m, int n)
+void Card::setpos(float m, float n)
 {
 	x = m;
 	y = n;
@@ -69,14 +69,18 @@ void Card::setpos(int m, int n)
 
 void Card::mouseDrag(MouseEvent event)
 {
+	
 	if (rect.contains(event.getPos())) {
 		this->isClicked = true;
 		this->title = "du har dragit på rektangeln";
+		CI_LOG_I(this->title);
 		CI_LOG_I(event.getPos() );
 
-		x = event.getX();
-		y = event.getY();
-		transform.translate(*this, x, y);
+		float mx = event.getX();
+		float my = event.getY();
+		float *coords =  transform.translate(this->rect.getX1(), this->rect.getY1(), mx, my, isDragged);
+		this->setpos(coords[0], coords[1]);
+		this->rect.set(coords[0], coords[1], coords[0] + rect.getWidth(), coords[1] + rect.getHeight());
 		//CI_LOG_I("rect: " << title);
 		isDragged = true;
 	}
@@ -99,6 +103,9 @@ void Card::mouseDown(MouseEvent event)
 		//y += 20;
 		//Transform::translate(*this, x, y);
 		//CI_LOG_I("rect: " << title);
+	}
+	else {
+		this->isClicked = false;
 	}
 
 }
