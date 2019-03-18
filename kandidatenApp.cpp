@@ -93,7 +93,8 @@ void kandidatenApp::setup()
 	std::vector<std::string> categories;
 	//ci::XmlTree test(ci::app::loadAsset("write.xml"));
 
-
+	disableFrameRate();
+	gl::enableVerticalSync(false);
 	
 
 	
@@ -133,10 +134,6 @@ void kandidatenApp::mouseDown(MouseEvent event)
 {
 	//mMouseLoc = event.getPos();
 	lastclick = event.getPos();
-
-	//CI_LOG_I(kort.testkort.title);
-	//CI_LOG_I(kort.testkort.x);
-	//CI_LOG_I(kort.testkort.y);
 	kort.rectKort.mouseDown(event);
 	kort2.rectKort.mouseDown(event);
 

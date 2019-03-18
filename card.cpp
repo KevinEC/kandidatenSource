@@ -35,8 +35,6 @@ Card::Card(float n, float m, const float width, const float height) {
 	y = m;
 	this->width = width;
 	this->height = height;
-	//title = "hej kevin";
-	string s;
 	isClicked = false;
 	isDragged = false;
 
@@ -69,26 +67,20 @@ void Card::setpos(float m, float n)
 
 void Card::mouseDrag(MouseEvent event)
 {
-	
-	if (rect.contains(event.getPos())) {
-		this->isClicked = true;
+	//set a bool to true when rect.contains is true once. Dont set to false until mouseUp to avoid mouse getting outside the rect
+	if (isClicked) {
 		this->title = "du har dragit på rektangeln";
-		CI_LOG_I(this->title);
-		CI_LOG_I(event.getPos() );
 
 		float mx = event.getX();
 		float my = event.getY();
 		float *coords =  transform.translate(this->rect.getX1(), this->rect.getY1(), mx, my, isDragged);
 		this->setpos(coords[0], coords[1]);
 		this->rect.set(coords[0], coords[1], coords[0] + rect.getWidth(), coords[1] + rect.getHeight());
-		//CI_LOG_I("rect: " << title);
 		isDragged = true;
 	}
 	else {
 		isDragged = false;
 	}
-	
-	//CI_LOG_I(event.getX);
 }
 void Card::mouseDown(MouseEvent event)
 {
@@ -96,13 +88,9 @@ void Card::mouseDown(MouseEvent event)
 
 	if (rect.contains(event.getPos())) {
 		this->isClicked = true;
+		this->isFront = true;
 		this->title = "du har klickat på rektangeln";
 		CI_LOG_I("title: " << title);
-		//this->title = "du har klickat på rektangeln";
-		//x += 20;
-		//y += 20;
-		//Transform::translate(*this, x, y);
-		//CI_LOG_I("rect: " << title);
 	}
 	else {
 		this->isClicked = false;
