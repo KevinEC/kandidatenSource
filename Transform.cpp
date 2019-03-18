@@ -18,26 +18,25 @@ void Transform::rotate()
 {
 }
 
-void Transform::translate(Card & kort)
+void Transform::translate()
 {
 	Animate animation = Animate();
 	animation.newPage();
-	kort.x = 500;
-	kort.y = 100;
-
-	kort.setpos(500, 100);
-
-	//för att rect kort ska funka
 
 }
 
-void Transform::translate(Card & kort, const int x, const int y)
+//Calculate the new coordinates for card taking into consideration the relative position to the top left corner
+float * Transform::translate(const float x, const float y, const float mx, const float my, const bool isDragged)
 {
-	kort.x = x;
-	kort.y = y;
-	kort.setpos(x, y);
-	float widthX = kort.x + kort.width;
-	float heightY = kort.y + kort.height;
-	kort.rect.set(kort.x, kort.y, widthX, heightY);
+	if(!isDragged) {
+		this->deltaX = mx - x;
+		this->deltaY = my - y;
+		CI_LOG_I("updated delta var");
+	}
+
+	float newx = mx - this->deltaX;
+	float newy = my - this->deltaY;
+
+	return new float[2]{ newx, newy };
 	
 }

@@ -1,7 +1,6 @@
 #include "Card.h"
 #include "cinder/app/RendererGl.h"
 #include "cinder/gl/gl.h"
-#include "Transform.h"
 #include <string>
 #include <iostream>
 
@@ -31,16 +30,16 @@ Card::~Card()
 {
 }
 
-Card::Card(int n, int m, const int width, const int height) {
+Card::Card(float n, float m, const float width, const float height) {
 	x = n;
 	y = m;
 	this->width = width;
 	this->height = height;
-	//title = "hej kevin";
-	string s;
 	isClicked = false;
+	isDragged = false;
 
 	rect = Rectf(n, m, width, height);
+	transform = Transform();
 
 
 	/*
@@ -59,7 +58,7 @@ State getcurrentstate() {
 }
 */
 
-void Card::setpos(int m, int n)
+void Card::setpos(float m, float n)
 {
 	x = m;
 	y = n;
@@ -68,24 +67,20 @@ void Card::setpos(int m, int n)
 
 void Card::mouseDrag(MouseEvent event)
 {
-	if (rect.contains(event.getPos())) {
-		this->isClicked = true;
+	//set a bool to true when rect.contains is true once. Dont set to false until mouseUp to avoid mouse getting outside the rect
+	if (isClicked) {
 		this->title = "du har dragit på rektangeln";
-		CI_LOG_I("title: " << title);
-		//this->title = "du har klickat på rektangeln";
-		//x += 20;
-		//y += 20;
-		x = event.getX();
-		y = event.getY();
-		float deltax = x - rect.getX1() ;
-		float deltay = y - rect.getY1();
-		float newx = x - deltax;
-		float newy = y - deltay;
-		Transform::translate(*this, newx, newy);
-		//CI_LOG_I("rect: " << title);
-	}
 
-	//CI_LOG_I(event.getX);
+		float mx = event.getX();
+		float my = event.getY();
+		float *coords =  transform.translate(this->rect.getX1(), this->rect.getY1(), mx, my, isDragged);
+		this->setpos(coords[0], coords[1]);
+		this->rect.set(coords[0], coords[1], coords[0] + rect.getWidth(), coords[1] + rect.getHeight());
+		isDragged = true;
+	}
+	else {
+		isDragged = false;
+	}
 }
 void Card::mouseDown(MouseEvent event)
 {
@@ -93,13 +88,12 @@ void Card::mouseDown(MouseEvent event)
 
 	if (rect.contains(event.getPos())) {
 		this->isClicked = true;
+		this->isFront = true;
 		this->title = "du har klickat på rektangeln";
 		CI_LOG_I("title: " << title);
-		//this->title = "du har klickat på rektangeln";
-		//x += 20;
-		//y += 20;
-		//Transform::translate(*this, x, y);
-		//CI_LOG_I("rect: " << title);
+	}
+	else {
+		this->isClicked = false;
 	}
 
 }

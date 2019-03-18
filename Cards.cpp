@@ -1,16 +1,12 @@
 #include "Cards.h"
-#include "Path.h"
-#include "Transform.h"
 
 using namespace ci;
 
 Cards::Cards()
 {
 	testkort = Card();
-	rectKort = Card(rand() %300, rand() %300, rand()% 200, rand() %400);
+	rectKort = Card(100, 100, 150, 200);
 
-	Transform::translate(testkort);
-	Transform::translate(rectKort, 100, 100);
 }
 
 

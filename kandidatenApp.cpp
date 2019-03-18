@@ -1,4 +1,5 @@
 #include "Cards.h"
+
 #include "cinder/app/App.h"
 #include "cinder/app/RendererGl.h"
 #include "cinder/gl/gl.h"
@@ -96,7 +97,10 @@ void kandidatenApp::setup()
 
 	db = dataBaseController("meh", "ble");
 	//db.establishConnection("http://rss.news.yahoo.com/rss/tech");
-	
+
+	disableFrameRate();
+	gl::enableVerticalSync(false);
+
 }
 
 void kandidatenApp::touchesBegan(TouchEvent event)
@@ -133,10 +137,6 @@ void kandidatenApp::mouseDown(MouseEvent event)
 {
 	//mMouseLoc = event.getPos();
 	lastclick = event.getPos();
-
-	//CI_LOG_I(kort.testkort.title);
-	//CI_LOG_I(kort.testkort.x);
-	//CI_LOG_I(kort.testkort.y);
 	kort.rectKort.mouseDown(event);
 	kort2.rectKort.mouseDown(event);
 
