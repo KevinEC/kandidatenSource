@@ -178,21 +178,17 @@ void kandidatenApp::draw()
 
 	// draw yellow circles at the active touch points
 	gl::color(Color(1, 1, 0));
-	for (const auto &touch : getActiveTouches())
+	for (const auto &touch : getActiveTouches()){
 		gl::drawStrokedCircle(touch.getPos(), 20);
+	}
 
 
-
-	if (test2) {
-		Rectf rect(mMouseLoc.x, mMouseLoc.y, mMouseLoc.x + 50, mMouseLoc.y - 50);
-		
-		test[0] = rect;
+	
 		
 
 		gl::drawSolidRect(kort.rectKort.rect);
 		gl::drawSolidRect(kort2.rectKort.rect);
 		
-	}
 
 
 }

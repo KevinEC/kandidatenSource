@@ -71,17 +71,17 @@ void Card::mouseDrag(MouseEvent event)
 	if (rect.contains(event.getPos())) {
 		this->isClicked = true;
 		this->title = "du har dragit på rektangeln";
-		CI_LOG_I("title: " << title);
+		
 		//this->title = "du har klickat på rektangeln";
 		//x += 20;
 		//y += 20;
 		x = event.getX();
 		y = event.getY();
 		float deltax = x - rect.getX1() ;
-		float deltay = y - rect.getY1();
-		float newx = x - deltax;
-		float newy = y - deltay;
-		Transform::translate(*this, newx, newy);
+		float deltay = y + rect.getY1();
+		CI_LOG_I("title: " << title);
+		
+		Transform::translate(*this, x, y);
 		//CI_LOG_I("rect: " << title);
 	}
 
