@@ -2,23 +2,15 @@
 #include "Path.h"
 #include "Transform.h"
 
-
+using namespace ci;
 
 Cards::Cards()
 {
-
-	//Card();
 	testkort = Card();
-	//Transform.translate(testkort);
-	//Transform tr;
-	//tr.translate(testkort);
-	//Transform.translate(testkort);
+	rectKort = Card(rand() %300, rand() %300, rand()% 200, rand() %400);
+
 	Transform::translate(testkort);
-
-	
-	//translate(testkort);
-
-
+	Transform::translate(rectKort, 100, 100);
 }
 
 
@@ -38,9 +30,8 @@ void Cards::collision()
 {
 }
 
-void Cards::setPath(Card inst)
+void Cards::setPath(Card &inst)
 {
-
 }
 
 void Cards::search()

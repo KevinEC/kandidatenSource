@@ -10,6 +10,7 @@
 #include <vector>
 #include <map>
 #include <list>
+#include <iostream>
 
 //Controller-app
 
@@ -29,7 +30,7 @@ struct TouchPoint {
 	void draw() const
 	{
 		if (mTimeOfDeath > 0) // are we dying? then fade out
-			gl::color(ColorA(mColor, (mTimeOfDeath - getElapsedSeconds()) / 2.0f));
+			gl::color(ColorA(mColor, (double(mTimeOfDeath) - getElapsedSeconds()) / 2.0));
 		else
 			gl::color(mColor);
 
@@ -62,6 +63,7 @@ public:
 	bool test2 = false;
 	Card card1;
 	Cards kort;
+	Cards kort2;
 	int i;
 
 
@@ -84,7 +86,8 @@ void kandidatenApp::setup()
 	CI_LOG_I("MT: " << System::hasMultiTouch() << " Max points: " << System::getMaxMultiTouchPoints());
 	//Cards allakort = databasecaller();
 	i = 0;
-	kort = Cards(); 
+	kort = Cards();
+	kort2 = Cards();
 
 	std::vector<std::string> categories;
 	//ci::XmlTree test(ci::app::loadAsset("write.xml"));
@@ -92,7 +95,6 @@ void kandidatenApp::setup()
 
 	
 
-	
 	
 }
 
@@ -130,9 +132,13 @@ void kandidatenApp::mouseDown(MouseEvent event)
 {
 	//mMouseLoc = event.getPos();
 	lastclick = event.getPos();
-	CI_LOG_I(kort.testkort.title);
-	CI_LOG_I(kort.testkort.x);
-	CI_LOG_I(kort.testkort.y);
+
+	//CI_LOG_I(kort.testkort.title);
+	//CI_LOG_I(kort.testkort.x);
+	//CI_LOG_I(kort.testkort.y);
+	kort.rectKort.mouseDown(event);
+	kort2.rectKort.mouseDown(event);
+
 }
 
 void kandidatenApp::update()
@@ -145,8 +151,8 @@ void kandidatenApp::mouseDrag(MouseEvent event) {
 	test2 = true;
 
 	mActivePoints[i++].addPoint(event.getPos());
-
-
+	kort.rectKort.mouseDrag(event);
+	kort2.rectKort.mouseDrag(event);
 }
 
 
@@ -175,19 +181,17 @@ void kandidatenApp::draw()
 	for (const auto &touch : getActiveTouches())
 		gl::drawStrokedCircle(touch.getPos(), 20);
 
-	//gl::drawSolidRect(kort.testkort.getrect());
+
 
 	if (test2) {
 		Rectf rect(mMouseLoc.x, mMouseLoc.y, mMouseLoc.x + 50, mMouseLoc.y - 50);
-
-		//Rectf rect2(mMouseLoc.x -100, mMouseLoc.y - 100, mMouseLoc.x - 50, mMouseLoc.y - 50);
+		
 		test[0] = rect;
-		//test[1] = rect2;
+		
 
-		//gl::drawSolidRect(test[i]);
-		//gl::drawSolidRect(rect);
-		//i++;
-		//gl::drawSolidRect(rect2);
+		gl::drawSolidRect(kort.rectKort.rect);
+		gl::drawSolidRect(kort2.rectKort.rect);
+		
 	}
 
 
