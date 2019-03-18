@@ -1,7 +1,6 @@
 #include "Card.h"
 #include "cinder/app/RendererGl.h"
 #include "cinder/gl/gl.h"
-#include "Transform.h"
 #include <string>
 #include <iostream>
 
@@ -39,8 +38,10 @@ Card::Card(int n, int m, const int width, const int height) {
 	//title = "hej kevin";
 	string s;
 	isClicked = false;
+	isDragged = false;
 
 	rect = Rectf(n, m, width, height);
+	transform = Transform();
 
 
 	/*
@@ -71,20 +72,18 @@ void Card::mouseDrag(MouseEvent event)
 	if (rect.contains(event.getPos())) {
 		this->isClicked = true;
 		this->title = "du har dragit på rektangeln";
-		CI_LOG_I("title: " << title);
-		//this->title = "du har klickat på rektangeln";
-		//x += 20;
-		//y += 20;
+		CI_LOG_I(event.getPos() );
+
 		x = event.getX();
 		y = event.getY();
-		float deltax = x - rect.getX1() ;
-		float deltay = y - rect.getY1();
-		float newx = x - deltax;
-		float newy = y - deltay;
-		Transform::translate(*this, newx, newy);
+		transform.translate(*this, x, y);
 		//CI_LOG_I("rect: " << title);
+		isDragged = true;
 	}
-
+	else {
+		isDragged = false;
+	}
+	
 	//CI_LOG_I(event.getX);
 }
 void Card::mouseDown(MouseEvent event)

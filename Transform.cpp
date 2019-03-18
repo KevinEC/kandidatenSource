@@ -33,11 +33,18 @@ void Transform::translate(Card & kort)
 
 void Transform::translate(Card & kort, const int x, const int y)
 {
-	kort.x = x;
-	kort.y = y;
-	kort.setpos(x, y);
-	float widthX = kort.x + kort.width;
-	float heightY = kort.y + kort.height;
-	kort.rect.set(kort.x, kort.y, widthX, heightY);
+	if(!kort.isDragged) {
+		this->deltaX = x - kort.rect.getX1();
+		this->deltaY = y - kort.rect.getY1();
+	}
+
+	float newx = x - deltaX;
+	float newy = y - deltaY;
+
+	float widthX = newx + kort.width;
+	float heightY = newy + kort.height;
+
+	kort.setpos(newx, newy);
+	kort.rect.set(newx, newy, widthX, heightY);
 	
 }
