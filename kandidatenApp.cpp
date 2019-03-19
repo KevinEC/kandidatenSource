@@ -68,8 +68,7 @@ public:
 	int i;
 	dataBaseController db;
 
-
-
+	
 private:
 	map<uint32_t, TouchPoint>	mActivePoints;
 	list<TouchPoint>			mDyingPoints;
@@ -81,7 +80,6 @@ void prepareSettings(kandidatenApp::Settings *settings)
 	settings->setMultiTouchEnabled(true);
 
 }
-
 
 void kandidatenApp::setup()
 {
@@ -98,11 +96,27 @@ void kandidatenApp::setup()
 	/*- extract categories -*/
 	std::vector<std::string> categories;
 	db.extractCategories(categories);
+
+	/*- extract card titles -*/
+	std::vector<std::string> titles;
+	db.extractTitles(titles);
 	
-	for (std::string n : categories) 
+	/*- extract bodytexts -*/
+	std::vector<std::string> bodyText;
+	db.extractBodies(bodyText);
+
+	/*- extract image paths -*/
+	std::vector<std::string> imgPath;
+	db.extractImgPaths(imgPath);
+
+	/*- extract card categories -*/
+	std::vector<std::string> cardCategory;
+	db.extractCardCats(cardCategory);
+	for (std::string n : cardCategory)
 	{
 		CI_LOG_I(n);
 	}
+
 
 
 	disableFrameRate();
