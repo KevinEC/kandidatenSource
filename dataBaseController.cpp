@@ -70,6 +70,23 @@ void dataBaseController::extractCategories(std::vector<std::string> & categories
 
 }
 
+
+void dataBaseController::extractCategories(std::vector<std::string> & categories)
+{
+	XmlTree branch = tree->getChild("content");
+	//categories = new std::vector <std::string>;
+
+	for (XmlTree::Iter iter = branch.begin(); iter != branch.end(); ++iter) 
+	{
+		if (iter->hasAttribute("name")) 
+		{
+			categories.push_back(iter->getAttributeValue<std::string>("name"));
+		}
+	}
+
+}
+
+
 void dataBaseController::extractTitles(std::vector<std::string> & titles)
 {
 	XmlTree headertree = tree->getChild("content");
@@ -114,4 +131,7 @@ void dataBaseController::extractCardCats(std::vector<std::string> & cardCategory
 			cardCategory.push_back(iter2->getChild("category").getAttributeValue<std::string>("name"));
 		}
 	}
+
 }
+
+
