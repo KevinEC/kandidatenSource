@@ -85,6 +85,8 @@ void prepareSettings(kandidatenApp::Settings *settings)
 
 }
 
+
+
 void kandidatenApp::setup()
 {
 	CI_LOG_I("MT: " << System::hasMultiTouch() << " Max points: " << System::getMaxMultiTouchPoints());
@@ -93,15 +95,19 @@ void kandidatenApp::setup()
 	kort = Cards();
 	kort2 = Cards();
 
-	std::vector<std::string> categories;
-
-	//ci::XmlTree test(ci::app::loadAsset("write.xml"));
-	
-
-	
-
+	/*- connect to data base -*/
 	db = dataBaseController("online", "xml", "http://www.student.itn.liu.se/~chrad171/databas/databas/media/write.xml");
 	CI_LOG_I("db: " << db.tree);
+	
+	/*- extract categories -*/
+	std::vector<std::string> categories;
+	db.extractCategories(categories);
+	
+	for (std::string n : categories) 
+	{
+		CI_LOG_I(n);
+	}
+
 
 	disableFrameRate();
 	gl::enableVerticalSync(false);

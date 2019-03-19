@@ -14,26 +14,6 @@ dataBaseController::dataBaseController(std::string fileLocation, std::string inF
 		tree = establishConnection(url);
 	}
 
-	XmlTree mediatree = tree->getChild("content");
-	
-	for (XmlTree::Iter iter = mediatree.begin(); iter != mediatree.end(); ++iter) {
-		if (iter->hasAttribute("name")) {
-			CI_LOG_I("Tag: " + iter->getTag() + " Value: " + iter->getAttributeValue<std::string>("name"));
-		}
-		
-		
-	}	
-	/*
-	for (XmlTree::Iter iter = mediatree.begin(); iter != mediatree.end(); ++iter) {
-		CI_LOG_I("Tag: " + iter->getTag() + "  Value: " + iter->getValue());
-		for (XmlTree::Iter iter2 = iter->begin(); iter2 != iter->end(); ++iter2) {
-			CI_LOG_I("Tag: " + iter2->getTag() + "  Value: " + iter2->getValue());
-		}
-
-	}
-	*/
-
-
 }
 
 
@@ -77,4 +57,20 @@ ci::XmlTree * dataBaseController::establishConnection(std::string url)
 		return nullptr;
 	}
 	
+}
+
+
+void dataBaseController::extractCategories(std::vector<std::string> & categories)
+{
+	XmlTree branch = tree->getChild("content");
+	//categories = new std::vector <std::string>;
+
+	for (XmlTree::Iter iter = branch.begin(); iter != branch.end(); ++iter) 
+	{
+		if (iter->hasAttribute("name")) 
+		{
+			categories.push_back(iter->getAttributeValue<std::string>("name"));
+		}
+	}
+
 }
