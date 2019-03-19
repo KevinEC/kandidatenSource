@@ -88,7 +88,7 @@ void prepareSettings(kandidatenApp::Settings *settings)
 void kandidatenApp::setup()
 {
 	CI_LOG_I("MT: " << System::hasMultiTouch() << " Max points: " << System::getMaxMultiTouchPoints());
-	//Cards allakort = databasecaller();
+	
 	i = 0;
 	kort = Cards();
 	kort2 = Cards();
@@ -205,11 +205,3 @@ void kandidatenApp::draw()
 }
 
 CINDER_APP(kandidatenApp, RendererGl, prepareSettings)
-
-/*
-card databasecaller() {
-	return all cards;
-}
-
-
-*/
