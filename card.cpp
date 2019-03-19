@@ -97,6 +97,12 @@ void Card::mouseDown(MouseEvent event)
 	}
 
 }
+void Card::mouseUp(MouseEvent event)
+{
+	CI_LOG_I("mouseUp");
+	this->isClicked = false;
+	this->isDragged = false;
+}
 void Card::update() {
 	if (isClicked) {
 		title = "du har klickat på rektangeln";
