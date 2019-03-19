@@ -1,24 +1,22 @@
 #include "Cards.h"
-
+#include "dataBaseController.h"
 #include "cinder/app/App.h"
 #include "cinder/app/RendererGl.h"
 #include "cinder/gl/gl.h"
 #include "cinder/System.h"
 #include "cinder/Rand.h"
 #include "cinder/Log.h"
-#include "cinder/Xml.h" //XmlTree
-#include "dataBaseController.h"
 
 #include <vector>
 #include <map>
 #include <list>
 #include <iostream>
 
-//Controller-app
-
 using namespace ci;
 using namespace ci::app;
 using namespace std;
+
+//Controller-app
 
 struct TouchPoint {
 	TouchPoint() {} //default constructor
@@ -75,8 +73,7 @@ public:
 private:
 	map<uint32_t, TouchPoint>	mActivePoints;
 	list<TouchPoint>			mDyingPoints;
-	//p = C:\Users\chris\Downloads\kort;
-   //ImageSourceRef img = loadImage(fs::path("C:\Users\chris\Downloads\kort"), "png", "");
+
 };
 
 void prepareSettings(kandidatenApp::Settings *settings)
@@ -85,20 +82,29 @@ void prepareSettings(kandidatenApp::Settings *settings)
 
 }
 
+
 void kandidatenApp::setup()
 {
 	CI_LOG_I("MT: " << System::hasMultiTouch() << " Max points: " << System::getMaxMultiTouchPoints());
-	//Cards allakort = databasecaller();
+	
 	i = 0;
 	kort = Cards();
 	kort2 = Cards();
 	kort2.rectKort.renderTexture();
 
+	/*- connect to data base -*/
+	db = dataBaseController("online", "xml", "http://www.student.itn.liu.se/~chrad171/databas/databas/media/write.xml");
+	CI_LOG_I("db: " << db.tree);
+	
+	/*- extract categories -*/
 	std::vector<std::string> categories;
-	//ci::XmlTree test(ci::app::loadAsset("write.xml"));
+	db.extractCategories(categories);
+	
+	for (std::string n : categories) 
+	{
+		CI_LOG_I(n);
+	}
 
-	db = dataBaseController("meh", "ble");
-	//db.establishConnection("http://rss.news.yahoo.com/rss/tech");
 
 	disableFrameRate();
 	gl::enableVerticalSync(false);
@@ -144,7 +150,6 @@ void kandidatenApp::mouseDown(MouseEvent event)
 
 }
 
-
 void kandidatenApp::mouseDrag(MouseEvent event) {
 	mMouseLoc = event.getPos();
 	test2 = true;
@@ -187,32 +192,20 @@ void kandidatenApp::draw()
 
 	// draw yellow circles at the active touch points
 	gl::color(Color(1, 1, 0));
-	for (const auto &touch : getActiveTouches())
+	for (const auto &touch : getActiveTouches()){
 		gl::drawStrokedCircle(touch.getPos(), 20);
+	}
 
 
-
-	if (test2) {
-		Rectf rect(mMouseLoc.x, mMouseLoc.y, mMouseLoc.x + 50, mMouseLoc.y - 50);
-		
-		test[0] = rect;
+	
 		
 
 		gl::drawSolidRect(kort.rectKort.rect);
 		gl::drawSolidRect(kort2.rectKort.rect);
 		gl::draw(kort2.rectKort.text, vec2(50, 50));
 		
-	}
 
 
 }
 
 CINDER_APP(kandidatenApp, RendererGl, prepareSettings)
-
-/*
-card databasecaller() {
-	return all cards;
-}
-
-
-*/

@@ -5,7 +5,6 @@ Transform::Transform()
 {
 }
 
-
 Transform::~Transform()
 {
 }
@@ -38,5 +37,5 @@ float * Transform::translate(const float x, const float y, const float mx, const
 	float newy = my - this->deltaY;
 
 	return new float[2]{ newx, newy };
-	
+
 }

@@ -26,7 +26,6 @@ taget från xml
 
 }
 
-
 Card::~Card()
 {
 }
@@ -81,15 +80,15 @@ void Card::initSvg()
 	//Surface srf = svgCardBg.render();
 	//this->cardBg = srf;
 }
+
 void Card::mouseDrag(MouseEvent event)
 {
 	//set a bool to true when rect.contains is true once. Dont set to false until mouseUp to avoid mouse getting outside the rect
 	if (isClicked) {
 		this->title = "du har dragit på rektangeln";
-
 		float mx = event.getX();
 		float my = event.getY();
-		float *coords =  transform.translate(this->rect.getX1(), this->rect.getY1(), mx, my, isDragged);
+		float *coords = transform.translate(this->rect.getX1(), this->rect.getY1(), mx, my, isDragged);
 		this->setpos(coords[0], coords[1]);
 		this->rect.set(coords[0], coords[1], coords[0] + rect.getWidth(), coords[1] + rect.getHeight());
 		delete coords;
@@ -98,11 +97,11 @@ void Card::mouseDrag(MouseEvent event)
 	else {
 		isDragged = false;
 	}
+	
 }
+
 void Card::mouseDown(MouseEvent event)
 {
-	
-
 	if (rect.contains(event.getPos())) {
 		this->isClicked = true;
 		this->isFront = true;
@@ -112,17 +111,18 @@ void Card::mouseDown(MouseEvent event)
 	else {
 		this->isClicked = false;
 	}
-
 }
+
 void Card::mouseUp(MouseEvent event)
 {
 	CI_LOG_I("mouseUp");
 	this->isClicked = false;
 	this->isDragged = false;
 }
-void Card::update() {
+
+void Card::update() 
+{
 	if (isClicked) {
 		title = "du har klickat på rektangeln";
 	}
-
 }
