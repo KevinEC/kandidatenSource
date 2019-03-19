@@ -5,15 +5,14 @@ dataBaseController::dataBaseController()
 {
 }
 
+
 dataBaseController::dataBaseController(std::string fileLocation, std::string inFileType, std::string url)
 	: fileLocation(fileLocation), fileType(inFileType)
 {
-
 	if (fileType == "xml")
 	{
 		tree = establishConnection(url);
 	}
-
 }
 
 
