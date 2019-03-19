@@ -97,7 +97,10 @@ void kandidatenApp::setup()
 
 	//ci::XmlTree test(ci::app::loadAsset("write.xml"));
 	
-	db = dataBaseController("online", "type", "http://www.student.itn.liu.se/~chrad171/databas/databas/media/write.xml");
+
+	
+
+	db = dataBaseController("online", "xml", "http://www.student.itn.liu.se/~chrad171/databas/databas/media/write.xml");
 	CI_LOG_I("db: " << db.tree);
 
 	disableFrameRate();
@@ -143,7 +146,6 @@ void kandidatenApp::mouseDown(MouseEvent event)
 	kort2.rectKort.mouseDown(event);
 
 }
-
 
 void kandidatenApp::mouseDrag(MouseEvent event) {
 	mMouseLoc = event.getPos();
