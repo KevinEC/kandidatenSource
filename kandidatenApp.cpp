@@ -93,10 +93,9 @@ void kandidatenApp::setup()
 	kort2 = Cards();
 
 	std::vector<std::string> categories;
-	//ci::XmlTree test(ci::app::loadAsset("write.xml"));
-
-	db = dataBaseController("meh", "ble");
-	//db.establishConnection("http://rss.news.yahoo.com/rss/tech");
+	
+	db = dataBaseController("local", "type", "name");
+	//CI_LOG_I("db: " << db.tree);
 
 	disableFrameRate();
 	gl::enableVerticalSync(false);
