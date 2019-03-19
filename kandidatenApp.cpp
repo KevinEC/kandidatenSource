@@ -95,7 +95,7 @@ void kandidatenApp::setup()
 
 	std::vector<std::string> categories;
 	
-	db = dataBaseController("local", "type", "name");
+	db = dataBaseController("online", "xml", "http://www.student.itn.liu.se/~chrad171/databas/databas/media/write.xml");
 	//CI_LOG_I("db: " << db.tree);
 
 	disableFrameRate();
@@ -141,7 +141,6 @@ void kandidatenApp::mouseDown(MouseEvent event)
 	kort2.rectKort.mouseDown(event);
 
 }
-
 
 void kandidatenApp::mouseDrag(MouseEvent event) {
 	mMouseLoc = event.getPos();
