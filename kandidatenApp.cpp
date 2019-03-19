@@ -68,11 +68,8 @@ public:
 	int i;
 	dataBaseController db;
 
-<<<<<<< HEAD
 
-=======
-	
->>>>>>> 2fa22fd4ae6928f439966f90f59a69bbf1d364b5
+
 private:
 	map<uint32_t, TouchPoint>	mActivePoints;
 	list<TouchPoint>			mDyingPoints;
@@ -97,11 +94,7 @@ void kandidatenApp::setup()
 	/*- connect to data base -*/
 	db = dataBaseController("online", "xml", "http://www.student.itn.liu.se/~chrad171/databas/databas/media/write.xml");
 	CI_LOG_I("db: " << db.tree);
-<<<<<<< HEAD
 
-=======
-	
->>>>>>> 2fa22fd4ae6928f439966f90f59a69bbf1d364b5
 	/*- extract categories -*/
 	std::vector<std::string> categories;
 	db.extractCategories(categories);
@@ -109,11 +102,7 @@ void kandidatenApp::setup()
 	/*- extract card titles -*/
 	std::vector<std::string> titles;
 	db.extractTitles(titles);
-<<<<<<< HEAD
 
-=======
-	
->>>>>>> 2fa22fd4ae6928f439966f90f59a69bbf1d364b5
 	/*- extract bodytexts -*/
 	std::vector<std::string> bodyText;
 	db.extractBodies(bodyText);
@@ -121,14 +110,24 @@ void kandidatenApp::setup()
 	/*- extract image paths -*/
 	std::vector<std::string> imgPath;
 	db.extractImgPaths(imgPath);
+	/*for (std::string n : imgPath)
+	{
+		CI_LOG_I(n);
+	}*/
 
 	/*- extract card categories -*/
-	std::vector<std::string> cardCategory;
+	std::vector<std::vector<std::string> > cardCategory;
 	db.extractCardCats(cardCategory);
-	for (std::string n : cardCategory)
+	int counter = 0;
+	for(int i = 0; i < cardCategory.size() - 1; ++i){
+		CI_LOG_I("Här är kategori för kort på plats: " << i);
+		
+	for (std::string n : cardCategory[i])
 	{
 		CI_LOG_I(n);
 	}
+	}
+	
 
 
 
@@ -224,19 +223,18 @@ void kandidatenApp::draw()
 
 
 
-<<<<<<< HEAD
+
 
 
 	gl::drawSolidRect(kort.rectKort.rect);
 	gl::drawSolidRect(kort2.rectKort.rect);
 	gl::draw(kort2.rectKort.text, vec2(50, 50));
 
-=======
+
 		gl::drawSolidRect(kort.rectKort.rect);
 		gl::drawSolidRect(kort2.rectKort.rect);
 		gl::draw(kort2.rectKort.text, vec2(50, 50));
 		
->>>>>>> 2fa22fd4ae6928f439966f90f59a69bbf1d364b5
 
 
 }
