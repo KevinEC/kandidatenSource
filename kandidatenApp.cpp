@@ -92,6 +92,7 @@ void kandidatenApp::setup()
 	i = 0;
 	kort = Cards();
 	kort2 = Cards();
+	kort2.rectKort.renderTexture();
 
 	std::vector<std::string> categories;
 	//ci::XmlTree test(ci::app::loadAsset("write.xml"));
@@ -199,6 +200,7 @@ void kandidatenApp::draw()
 
 		gl::drawSolidRect(kort.rectKort.rect);
 		gl::drawSolidRect(kort2.rectKort.rect);
+		gl::draw(kort2.rectKort.text, vec2(50, 50));
 		
 	}
 
