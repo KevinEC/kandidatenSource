@@ -45,6 +45,8 @@ void Transform::translate(Card & kort, const int x, const int y)
 	float widthX = kort.x + kort.width;
 	float heightY = kort.y + kort.height;
 	
+	//scalea, offset är kort.x - mouseclickx, kort.y - mouseclick.y.  
+	//kort.rect.set(kort.x + offset.x, kort.y + offset.y, widthX, heightY);
 	kort.rect.set(kort.x + offset.x, kort.y + offset.y, widthX, heightY);
 	//kort.rect.offset(offset);
 	//kort.rect.offsetCenterTo(offset);
