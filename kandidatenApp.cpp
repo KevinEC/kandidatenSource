@@ -88,6 +88,7 @@ void kandidatenApp::setup()
 	i = 0;
 	kort = Cards();
 	kort2 = Cards();
+	kort2.rectKort.renderTexture();
 
 	/*- connect to data base -*/
 	db = dataBaseController("online", "xml", "http://www.student.itn.liu.se/~chrad171/databas/databas/media/write.xml");
@@ -215,6 +216,7 @@ void kandidatenApp::draw()
 
 		gl::drawSolidRect(kort.rectKort.rect);
 		gl::drawSolidRect(kort2.rectKort.rect);
+		gl::draw(kort2.rectKort.text, vec2(50, 50));
 		
 
 

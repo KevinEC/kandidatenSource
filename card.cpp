@@ -8,6 +8,7 @@ using namespace ci;
 using namespace ci::app;
 using namespace std;
 
+const static svg::DocRef svgDoc = svg::Doc::create(loadAsset("card.svg"));
 
 Card::Card()
 {
@@ -39,6 +40,7 @@ Card::Card(float n, float m, const float width, const float height) {
 
 	rect = Rectf(n, m, width, height);
 	transform = Transform();
+	this->initSvg();
 
 
 	/*
@@ -63,6 +65,22 @@ void Card::setpos(float m, float n)
 	y = n;
 }
 
+void Card::renderTexture()
+{
+	TextBox text = TextBox().text("testing").color(ColorA::white());
+	
+	Surface srf = text.render();
+	this->text =  gl::Texture::create(srf);
+}
+
+void Card::initSvg()
+{
+	svg::Rect svgCardBg = svgDoc->find<svg::Rect>("cardBg");
+	//in order to render properly and to be able to scale easier we should probably use Cairo
+	//Surface srf = svgCardBg.render();
+	//this->cardBg = srf;
+}
+
 void Card::mouseDrag(MouseEvent event)
 {
 	//set a bool to true when rect.contains is true once. Dont set to false until mouseUp to avoid mouse getting outside the rect
@@ -73,6 +91,7 @@ void Card::mouseDrag(MouseEvent event)
 		float *coords = transform.translate(this->rect.getX1(), this->rect.getY1(), mx, my, isDragged);
 		this->setpos(coords[0], coords[1]);
 		this->rect.set(coords[0], coords[1], coords[0] + rect.getWidth(), coords[1] + rect.getHeight());
+		delete coords;
 		isDragged = true;
 	}
 	else {
