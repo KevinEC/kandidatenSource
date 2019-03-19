@@ -18,36 +18,32 @@ void Transform::rotate()
 {
 }
 
-void Transform::translate(Card & kort)
+void Transform::translate()
 {
 	Animate animation = Animate();
 	animation.newPage();
-	kort.x = 500;
-	kort.y = 100;
-
-	kort.setpos(500, 100);
-
-	//för att rect kort ska funka
 
 }
 
-void Transform::translate(Card & kort, const int x, const int y)
+//Calculate the new coordinates for card taking into consideration the relative position to the top left corner
+float * Transform::translate(const float x, const float y, const float mx, const float my, const bool isDragged)
 {
-	//float deltax = x - kort.x;
-	vec2 pos = kort.rect.getUpperLeft();
-	vec2 offset = pos - vec2(x, y);
-	kort.x = x;
-	kort.y = y;
 
-	//float value = ci::math<float>::clamp(kort.x);
-	
-	kort.setpos(kort.x, kort.y);
-	float widthX = kort.x + kort.width;
-	float heightY = kort.y + kort.height;
+	if(!isDragged) {
+		this->deltaX = mx - x;
+		this->deltaY = my - y;
+		CI_LOG_I("updated delta var");
+	}
+
+	float newx = mx - this->deltaX;
+	float newy = my - this->deltaY;
+
+	return new float[2]{ newx, newy };
+
 	
 	//scalea, offset är kort.x - mouseclickx, kort.y - mouseclick.y.  
 	//kort.rect.set(kort.x + offset.x, kort.y + offset.y, widthX, heightY);
-	kort.rect.set(kort.x + offset.x, kort.y + offset.y, widthX, heightY);
+	//kort.rect.set(kort.x + offset.x, kort.y + offset.y, widthX, heightY);
 	//kort.rect.offset(offset);
 	//kort.rect.offsetCenterTo(offset);
 	//kort.rect.offsetCenterTo(vec2(x, y) - offset);
