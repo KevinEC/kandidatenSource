@@ -87,7 +87,6 @@ void Card::mouseDrag(MouseEvent event)
 void Card::mouseDown(MouseEvent event)
 {
 	
-
 	if (rect.contains(event.getPos())) {
 		this->isClicked = true;
 		this->isFront = true;
