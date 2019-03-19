@@ -1,24 +1,22 @@
 #include "Cards.h"
-
+#include "dataBaseController.h"
 #include "cinder/app/App.h"
 #include "cinder/app/RendererGl.h"
 #include "cinder/gl/gl.h"
 #include "cinder/System.h"
 #include "cinder/Rand.h"
 #include "cinder/Log.h"
-#include "cinder/Xml.h" //XmlTree
-#include "dataBaseController.h"
 
 #include <vector>
 #include <map>
 #include <list>
 #include <iostream>
 
-//Controller-app
-
 using namespace ci;
 using namespace ci::app;
 using namespace std;
+
+//Controller-app
 
 struct TouchPoint {
 	TouchPoint() {} //default constructor
@@ -75,8 +73,7 @@ public:
 private:
 	map<uint32_t, TouchPoint>	mActivePoints;
 	list<TouchPoint>			mDyingPoints;
-	//p = C:\Users\chris\Downloads\kort;
-   //ImageSourceRef img = loadImage(fs::path("C:\Users\chris\Downloads\kort"), "png", "");
+
 };
 
 void prepareSettings(kandidatenApp::Settings *settings)
@@ -84,7 +81,6 @@ void prepareSettings(kandidatenApp::Settings *settings)
 	settings->setMultiTouchEnabled(true);
 
 }
-
 
 
 void kandidatenApp::setup()

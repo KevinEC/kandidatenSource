@@ -25,7 +25,6 @@ taget från xml
 
 }
 
-
 Card::~Card()
 {
 }
@@ -64,7 +63,6 @@ void Card::setpos(float m, float n)
 	y = n;
 }
 
-
 void Card::mouseDrag(MouseEvent event)
 {
 	//set a bool to true when rect.contains is true once. Dont set to false until mouseUp to avoid mouse getting outside the rect
@@ -80,13 +78,11 @@ void Card::mouseDrag(MouseEvent event)
 	else {
 		isDragged = false;
 	}
-
-
 	
 }
+
 void Card::mouseDown(MouseEvent event)
 {
-	
 	if (rect.contains(event.getPos())) {
 		this->isClicked = true;
 		this->isFront = true;
@@ -96,17 +92,18 @@ void Card::mouseDown(MouseEvent event)
 	else {
 		this->isClicked = false;
 	}
-
 }
+
 void Card::mouseUp(MouseEvent event)
 {
 	CI_LOG_I("mouseUp");
 	this->isClicked = false;
 	this->isDragged = false;
 }
-void Card::update() {
+
+void Card::update() 
+{
 	if (isClicked) {
 		title = "du har klickat på rektangeln";
 	}
-
 }

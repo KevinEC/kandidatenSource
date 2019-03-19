@@ -5,7 +5,6 @@ Transform::Transform()
 {
 }
 
-
 Transform::~Transform()
 {
 }
@@ -28,7 +27,6 @@ void Transform::translate()
 //Calculate the new coordinates for card taking into consideration the relative position to the top left corner
 float * Transform::translate(const float x, const float y, const float mx, const float my, const bool isDragged)
 {
-
 	if(!isDragged) {
 		this->deltaX = mx - x;
 		this->deltaY = my - y;
@@ -39,16 +37,5 @@ float * Transform::translate(const float x, const float y, const float mx, const
 	float newy = my - this->deltaY;
 
 	return new float[2]{ newx, newy };
-
-	
-	//scalea, offset är kort.x - mouseclickx, kort.y - mouseclick.y.  
-	//kort.rect.set(kort.x + offset.x, kort.y + offset.y, widthX, heightY);
-	//kort.rect.set(kort.x + offset.x, kort.y + offset.y, widthX, heightY);
-	//kort.rect.offset(offset);
-	//kort.rect.offsetCenterTo(offset);
-	//kort.rect.offsetCenterTo(vec2(x, y) - offset);
-	
-
-	
 
 }

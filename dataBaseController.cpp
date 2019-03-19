@@ -5,7 +5,6 @@ dataBaseController::dataBaseController()
 {
 }
 
-
 dataBaseController::dataBaseController(std::string fileLocation, std::string inFileType, std::string url)
 	: fileLocation(fileLocation), fileType(inFileType)
 {
@@ -15,11 +14,9 @@ dataBaseController::dataBaseController(std::string fileLocation, std::string inF
 	}
 }
 
-
 dataBaseController::~dataBaseController()
 {
 }
-
 
 ci::XmlTree * dataBaseController::establishConnection(std::string url)
 {	
@@ -57,7 +54,6 @@ ci::XmlTree * dataBaseController::establishConnection(std::string url)
 	}
 	
 }
-
 
 void dataBaseController::extractCategories(std::vector<std::string> & categories)
 {
