@@ -9,11 +9,11 @@ dataBaseController::dataBaseController(std::string fileLocation, std::string inF
 	: fileLocation(fileLocation), fileType(inFileType)
 {
 
-	tree = establishConnection(url);
+	if (fileType == "xml")
+	{
+		tree = establishConnection(url);
+	}
 
-	
-
-	
 	XmlTree mediatree = tree->getChild("content");
 	
 	for (XmlTree::Iter iter = mediatree.begin(); iter != mediatree.end(); ++iter) {
@@ -33,10 +33,6 @@ dataBaseController::dataBaseController(std::string fileLocation, std::string inF
 	}
 	*/
 
-	if (fileType == "xml") 
-	{
-		tree = establishConnection(url);
-	}
 
 }
 
