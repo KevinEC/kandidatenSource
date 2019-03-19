@@ -6,7 +6,8 @@
 #include "cinder/System.h"
 #include "cinder/Rand.h"
 #include "cinder/Log.h"
-#include "cinder/Xml.h"
+#include "cinder/Xml.h" //XmlTree
+#include "dataBaseController.h"
 
 #include <vector>
 #include <map>
@@ -67,6 +68,7 @@ public:
 	Cards kort;
 	Cards kort2;
 	int i;
+	dataBaseController db;
 
 
 
@@ -94,11 +96,12 @@ void kandidatenApp::setup()
 	std::vector<std::string> categories;
 	//ci::XmlTree test(ci::app::loadAsset("write.xml"));
 
+	db = dataBaseController("meh", "ble");
+	//db.establishConnection("http://rss.news.yahoo.com/rss/tech");
+
 	disableFrameRate();
 	gl::enableVerticalSync(false);
-	
 
-	
 }
 
 void kandidatenApp::touchesBegan(TouchEvent event)
