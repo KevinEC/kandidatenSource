@@ -129,14 +129,9 @@ void kandidatenApp::setup()
 	/*- extract card categories -*/
 	std::vector<std::vector<std::string> > cardCategory;
 	dbc.extractCardCats(cardCategory);
-<<<<<<< HEAD
-=======
-	
+
 	CI_LOG_I("sizes: " << categories.size() << " " << titles.size() << " " << bodyText.size() << " " << imgPath.size() << " " << cardCategory.size());
 
-
-
->>>>>>> 49f8eeaed63995fb3b1f79f0f9778786deda69c0
 
 	disableFrameRate();
 	gl::enableVerticalSync(false);
@@ -241,14 +236,10 @@ void kandidatenApp::draw()
 	}
 
 	// draw yellow circles at the active touch points
-<<<<<<< HEAD
-	//gl::color(Color(1, 1, 0));
-	for (const auto &touch : getActiveTouches()) {
-=======
+
 	gl::color(Color(1, 1, 0));
 	for (const auto &touch : getActiveTouches()) 
 	{
->>>>>>> 49f8eeaed63995fb3b1f79f0f9778786deda69c0
 		gl::drawStrokedCircle(touch.getPos(), 20);
 	}
 
