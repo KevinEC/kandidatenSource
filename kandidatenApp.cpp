@@ -100,11 +100,11 @@ void kandidatenApp::setup()
 	dbc.extractCategories(categories);
 
 	/*- extract card titles -*/
-	std::vector<std::string> titles;
+	std::vector<std::pair<std::string, std::string>> titles;
 	dbc.extractTitles(titles);
 
 	/*- extract bodytexts -*/
-	std::vector<std::string> bodyText;
+	std::vector<std::pair<std::string, std::string>> bodyText;
 	dbc.extractBodies(bodyText);
 
 	/*- extract image paths -*/
@@ -115,16 +115,6 @@ void kandidatenApp::setup()
 	std::vector<std::vector<std::string> > cardCategory;
 	dbc.extractCardCats(cardCategory);
 	
-	/*int counter = 0;
-	for(int i = 0; i < cardCategory.size() - 1; ++i){
-		CI_LOG_I("Här är kategori för kort på plats: " << i);
-		
-		for (std::string n : cardCategory[i])
-		{
-			CI_LOG_I(n);
-		}
-	}*/
-
 	CI_LOG_I("sizes: " << categories.size() << " " << titles.size() << " " << bodyText.size() << " " << imgPath.size() << " " << cardCategory.size());
 	
 
