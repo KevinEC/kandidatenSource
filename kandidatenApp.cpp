@@ -127,6 +127,8 @@ void kandidatenApp::setup()
 		CI_LOG_I(n);
 	}
 	}
+
+	CI_LOG_I("cardcat: " << cardCategory.size() << "imgpath: " << imgPath.size() << "bodytext: " << bodyText.size() << "titles: " << titles.size());
 	
 
 
