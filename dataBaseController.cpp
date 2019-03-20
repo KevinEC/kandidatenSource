@@ -80,7 +80,6 @@ void dataBaseController::extractTitles(std::vector< std::pair<std::string, std::
 	XmlTree headertree = tree->getChild("content");
 	std::pair<std::string, std::string> temp;
 	
-
 	for (XmlTree::Iter iter2 = headertree.begin(); iter2 != headertree.end(); ++iter2) { // loop through all media-tags
 		if (iter2->hasAttribute("scale_exp")) {
 			for (XmlTree::Iter iter3 = iter2->begin(); iter3 != iter2->end(); ++iter3) { // loop through inside media-tag
@@ -131,7 +130,9 @@ void dataBaseController::extractImgPaths(std::vector<std::string> & imgPath)
 	XmlTree headertree = tree->getChild("content");
 
 	for (XmlTree::Iter iter2 = headertree.begin(); iter2 != headertree.end(); ++iter2) { // loop through all media-tags
-		imgPath.push_back(iter2->getAttributeValue<std::string>("path"));
+		if (iter2->hasAttribute("scale_exp")) {
+			imgPath.push_back(iter2->getAttributeValue<std::string>("path"));
+		}
 	}
 }
 

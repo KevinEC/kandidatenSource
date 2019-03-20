@@ -116,7 +116,7 @@ void kandidatenApp::setup()
 	dbc.extractCardCats(cardCategory);
 	
 	CI_LOG_I("sizes: " << categories.size() << " " << titles.size() << " " << bodyText.size() << " " << imgPath.size() << " " << cardCategory.size());
-	
+
 
 
 
