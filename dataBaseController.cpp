@@ -59,7 +59,6 @@ ci::XmlTree * dataBaseController::establishConnection(std::string url)
 void dataBaseController::extractCategories(std::vector<std::string> & categories)
 {
 	XmlTree branch = tree->getChild("content");
-	//categories = new std::vector <std::string>;
 
 	for (XmlTree::Iter iter = branch.begin(); iter != branch.end(); ++iter) 
 	{
@@ -117,7 +116,6 @@ void dataBaseController::extractCardCats(std::vector<std::vector<std::string> > 
 	for (XmlTree::Iter iter2 = headertree.begin("media"); iter2 != headertree.end(); ++iter2) { // loop through all media-tags
 
 		for (XmlTree::Iter iter3 = iter2->begin("Category"); iter3 != iter2->end(); ++iter3) {
-			//CI_LOG_I("test " + iter3->getAttributeValue<std::string>("name"));
 			tempvec.push_back(iter3->getAttributeValue<std::string>("name"));
 		}
 		
@@ -125,7 +123,6 @@ void dataBaseController::extractCardCats(std::vector<std::vector<std::string> > 
 		tempvec.clear();
 		
 		}
-	
 	}
 
 

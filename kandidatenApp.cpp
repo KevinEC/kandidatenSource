@@ -66,7 +66,7 @@ public:
 	Cards kort;
 	Cards kort2;
 	int i;
-	dataBaseController db;
+	dataBaseController dbc;
 
 
 
@@ -92,36 +92,34 @@ void kandidatenApp::setup()
 	kort2.rectKort.renderTexture();
 
 	/*- connect to data base -*/
-	db = dataBaseController("online", "xml", "http://www.student.itn.liu.se/~chrad171/databas/databas/media/write.xml");
-	CI_LOG_I("db: " << db.tree);
+	dbc = dataBaseController("online", "xml", "http://www.student.itn.liu.se/~chrad171/databas/databas/media/write.xml");
+	// CI_LOG_I("db: " << db.tree);
 
 	/*- extract categories -*/
 	std::vector<std::string> categories;
-	db.extractCategories(categories);
+	dbc.extractCategories(categories);
 
 	/*- extract card titles -*/
 	std::vector<std::string> titles;
-	db.extractTitles(titles);
+	dbc.extractTitles(titles);
 
 	/*- extract bodytexts -*/
 	std::vector<std::string> bodyText;
-	db.extractBodies(bodyText);
+	dbc.extractBodies(bodyText);
 
 	/*- extract image paths -*/
 	std::vector<std::string> imgPath;
-	db.extractImgPaths(imgPath);
-	/*for (std::string n : imgPath)
-	{
-		CI_LOG_I(n);
-	}*/
+	dbc.extractImgPaths(imgPath);
 
 	/*- extract card categories -*/
 	std::vector<std::vector<std::string> > cardCategory;
-	db.extractCardCats(cardCategory);
-	int counter = 0;
+	dbc.extractCardCats(cardCategory);
+	
+	/*int counter = 0;
 	for(int i = 0; i < cardCategory.size() - 1; ++i){
 		CI_LOG_I("Här är kategori för kort på plats: " << i);
 		
+
 	for (std::string n : cardCategory[i])
 	{
 		CI_LOG_I(n);
@@ -129,6 +127,12 @@ void kandidatenApp::setup()
 	}
 
 	CI_LOG_I("cardcat: " << cardCategory.size() << "imgpath: " << imgPath.size() << "bodytext: " << bodyText.size() << "titles: " << titles.size());
+
+		for (std::string n : cardCategory[i])
+		{
+			CI_LOG_I(n);
+		}
+	}*/
 	
 
 
