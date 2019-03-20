@@ -49,7 +49,8 @@ struct TouchPoint {
 	float			mTimeOfDeath;
 };
 
-class kandidatenApp : public App {
+class kandidatenApp : public App 
+{
 public:
 	void setup() override;
 	void update() override;
@@ -105,11 +106,11 @@ void kandidatenApp::setup()
 	dbc.extractCategories(categories);
 
 	/*- extract card titles -*/
-	std::vector<std::string> titles;
+	std::vector<std::pair<std::string, std::string>> titles;
 	dbc.extractTitles(titles);
 
 	/*- extract bodytexts -*/
-	std::vector<std::string> bodyText;
+	std::vector<std::pair<std::string, std::string>> bodyText;
 	dbc.extractBodies(bodyText);
 
 	/*- extract image paths -*/
@@ -128,6 +129,14 @@ void kandidatenApp::setup()
 	/*- extract card categories -*/
 	std::vector<std::vector<std::string> > cardCategory;
 	dbc.extractCardCats(cardCategory);
+<<<<<<< HEAD
+=======
+	
+	CI_LOG_I("sizes: " << categories.size() << " " << titles.size() << " " << bodyText.size() << " " << imgPath.size() << " " << cardCategory.size());
+
+
+
+>>>>>>> 49f8eeaed63995fb3b1f79f0f9778786deda69c0
 
 	disableFrameRate();
 	gl::enableVerticalSync(false);
@@ -137,10 +146,15 @@ void kandidatenApp::setup()
 void kandidatenApp::touchesBegan(TouchEvent event)
 {
 	CI_LOG_I(event);
+	kort.rectKort.touchesBegan(event);
+	kort2.rectKort.touchesBegan(event);
 
-	for (const auto &touch : event.getTouches()) {
+	for (const auto &touch : event.getTouches()) 
+	{
 		Color newColor(CM_HSV, Rand::randFloat(), 1, 1);
 		mActivePoints.insert(make_pair(touch.getId(), TouchPoint(touch.getPos(), newColor)));
+		
+		//lastclick = touch.getPos();
 	}
 
 }
@@ -148,16 +162,27 @@ void kandidatenApp::touchesBegan(TouchEvent event)
 void kandidatenApp::touchesMoved(TouchEvent event)
 {
 	CI_LOG_I(event);
-	for (const auto &touch : event.getTouches()) {
-		mActivePoints[touch.getId()].addPoint(touch.getPos());
-	}
+	test2 = true;
 
+	kort.rectKort.touchesMoved(event);
+	kort2.rectKort.touchesMoved(event);
+
+	for (const auto &touch : event.getTouches()) 
+	{
+		mActivePoints[touch.getId()].addPoint(touch.getPos());
+
+		//mMouseLoc = touch.getPos();
+	}
 }
 
 void kandidatenApp::touchesEnded(TouchEvent event)
 {
 	CI_LOG_I(event);
-	for (const auto &touch : event.getTouches()) {
+	kort.rectKort.touchesEnded(event);
+	kort2.rectKort.touchesEnded(event);
+
+	for (const auto &touch : event.getTouches()) 
+	{
 		mActivePoints[touch.getId()].startDying();
 		mDyingPoints.push_back(mActivePoints[touch.getId()]);
 		mActivePoints.erase(touch.getId());
@@ -206,7 +231,8 @@ void kandidatenApp::draw()
 		activePoint.second.draw();
 	}
 
-	for (auto dyingIt = mDyingPoints.begin(); dyingIt != mDyingPoints.end(); ) {
+	for (auto dyingIt = mDyingPoints.begin(); dyingIt != mDyingPoints.end(); ) 
+	{
 		dyingIt->draw();
 		if (dyingIt->isDead())
 			dyingIt = mDyingPoints.erase(dyingIt);
@@ -215,8 +241,14 @@ void kandidatenApp::draw()
 	}
 
 	// draw yellow circles at the active touch points
+<<<<<<< HEAD
 	//gl::color(Color(1, 1, 0));
 	for (const auto &touch : getActiveTouches()) {
+=======
+	gl::color(Color(1, 1, 0));
+	for (const auto &touch : getActiveTouches()) 
+	{
+>>>>>>> 49f8eeaed63995fb3b1f79f0f9778786deda69c0
 		gl::drawStrokedCircle(touch.getPos(), 20);
 	}
 
