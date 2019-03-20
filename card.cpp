@@ -120,6 +120,49 @@ void Card::mouseUp(MouseEvent event)
 	this->isDragged = false;
 }
 
+void Card::touchesBegan(TouchEvent event) 
+{
+	for (const auto &touch : event.getTouches()) {
+		if (rect.contains(touch.getPos())) {
+			this->isClicked = true;
+			this->isFront = true;
+			this->title = "du har klickat på rektangeln";
+			CI_LOG_I("title: " << title);
+		}
+		else {
+			this->isClicked = false;
+		}
+	}
+}
+
+void Card::touchesMoved(TouchEvent event) 
+{
+	for (const auto &touch : event.getTouches()) {
+		//set a bool to true when rect.contains is true once. Dont set to false until mouseUp to avoid mouse getting outside the rect
+		if (isClicked) {
+			this->title = "du har dragit på rektangeln";
+			float mx = touch.getX();
+
+			float my = touch.getY();
+			float *coords = transform.translate(this->rect.getX1(), this->rect.getY1(), mx, my, isDragged);
+			this->setpos(coords[0], coords[1]);
+			this->rect.set(coords[0], coords[1], coords[0] + rect.getWidth(), coords[1] + rect.getHeight());
+			delete coords;
+			isDragged = true;
+		}
+		else {
+			isDragged = false;
+		}
+	}
+}
+
+void Card::touchesEnded(TouchEvent event) 
+{
+	CI_LOG_I("touchesEnded");
+	this->isClicked = false;
+	this->isDragged = false;
+}
+
 void Card::update() 
 {
 	if (isClicked) {
