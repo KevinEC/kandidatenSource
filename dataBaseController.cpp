@@ -145,7 +145,8 @@ void dataBaseController::extractImgPaths(std::vector<std::string> & imgPath)
 	{ 
 		if (iter2->hasAttribute("scale_exp")) 
 		{
-			imgPath.push_back(iter2->getAttributeValue<std::string>("path"));
+			imgPath.push_back("http://www.student.itn.liu.se/~chrad171/databas/databas" + iter2->getAttributeValue<std::string>("path"));
+
 		}
 	}
 }

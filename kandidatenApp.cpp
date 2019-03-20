@@ -6,6 +6,9 @@
 #include "cinder/System.h"
 #include "cinder/Rand.h"
 #include "cinder/Log.h"
+#include "cinder/DataSource.h"
+#include "cinder/gl/Texture.h"
+#include "cinder/ImageIo.h"
 
 #include <vector>
 #include <map>
@@ -59,6 +62,8 @@ public:
 	void	touchesBegan(TouchEvent event) override;
 	void	touchesMoved(TouchEvent event) override;
 	void	touchesEnded(TouchEvent event) override;
+	gl::Texture2dRef texture;
+	Surface mysurf;
 	vec2 mMouseLoc;
 	vec2 lastclick;
 	vector<Rectf> test;
@@ -111,19 +116,31 @@ void kandidatenApp::setup()
 	/*- extract image paths -*/
 	std::vector<std::string> imgPath;
 	dbc.extractImgPaths(imgPath);
+	 
+	ci::Area area = Area(kort2.rectKort.rect);
+	//texture = gl::Texture2d::create(loadImage(loadUrl("http://www.student.itn.liu.se/~chrad171/databas/databas/media/virus.jpg")));
+	//texture->setCleanBounds(area);
+
+	mysurf = Surface(400, 600, true);
+	Surface mysurf(loadImage(loadUrl("http://www.student.itn.liu.se/~chrad171/databas/databas/media/virus.jpg")), SurfaceConstraintsDefault(), false);
+	texture = gl::Texture2d::create(mysurf);
+	texture->setCleanBounds(area);
 
 	/*- extract card categories -*/
 	std::vector<std::vector<std::string> > cardCategory;
 	dbc.extractCardCats(cardCategory);
+<<<<<<< HEAD
+=======
 	
 	CI_LOG_I("sizes: " << categories.size() << " " << titles.size() << " " << bodyText.size() << " " << imgPath.size() << " " << cardCategory.size());
 
 
 
+>>>>>>> 49f8eeaed63995fb3b1f79f0f9778786deda69c0
 
 	disableFrameRate();
 	gl::enableVerticalSync(false);
-
+	
 }
 
 void kandidatenApp::touchesBegan(TouchEvent event)
@@ -203,7 +220,8 @@ void kandidatenApp::update()
 
 void kandidatenApp::draw()
 {
-	gl::clear(Color(0, 50, 0));
+	
+	//gl::clear(Color(0, 50, 0));
 	//gl::drawSolidCircle(getWindowCenter(), 200);
 	Rectf test[100];
 	gl::enableAlphaBlending();
@@ -223,28 +241,25 @@ void kandidatenApp::draw()
 	}
 
 	// draw yellow circles at the active touch points
+<<<<<<< HEAD
+	//gl::color(Color(1, 1, 0));
+	for (const auto &touch : getActiveTouches()) {
+=======
 	gl::color(Color(1, 1, 0));
 	for (const auto &touch : getActiveTouches()) 
 	{
+>>>>>>> 49f8eeaed63995fb3b1f79f0f9778786deda69c0
 		gl::drawStrokedCircle(touch.getPos(), 20);
 	}
 
 
-
-
-
-
-	gl::drawSolidRect(kort.rectKort.rect);
-	gl::drawSolidRect(kort2.rectKort.rect);
-	gl::draw(kort2.rectKort.text, vec2(50, 50));
-
-
+	
 		gl::drawSolidRect(kort.rectKort.rect);
 		gl::drawSolidRect(kort2.rectKort.rect);
 		gl::draw(kort2.rectKort.text, vec2(50, 50));
 		
-
-
+		gl::draw(texture);
+	
 }
 
 CINDER_APP(kandidatenApp, RendererGl, prepareSettings)
