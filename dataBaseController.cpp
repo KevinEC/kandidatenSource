@@ -80,14 +80,20 @@ void dataBaseController::extractTitles(std::vector< std::pair<std::string, std::
 	XmlTree headertree = tree->getChild("content");
 	std::pair<std::string, std::string> temp;
 	
-	for (XmlTree::Iter iter2 = headertree.begin(); iter2 != headertree.end(); ++iter2) { // loop through all media-tags
-		if (iter2->hasAttribute("scale_exp")) {
-			for (XmlTree::Iter iter3 = iter2->begin(); iter3 != iter2->end(); ++iter3) { // loop through inside media-tag
-				if (iter3->hasChild("header")) {
-					if (iter3->getTag() == "se") { //swedish
+	for (XmlTree::Iter iter2 = headertree.begin(); iter2 != headertree.end(); ++iter2) // loop through all media-tags
+	{ 
+		if (iter2->hasAttribute("scale_exp")) 
+		{
+			for (XmlTree::Iter iter3 = iter2->begin(); iter3 != iter2->end(); ++iter3) // loop through inside media-tag
+			{ 
+				if (iter3->hasChild("header")) 
+				{
+					if (iter3->getTag() == "se") //swedish
+					{ 
 						temp.first = (iter3->getChild("header").getValue());
 					}
-					else { //english 
+					else //english  
+					{ 
 						temp.second = (iter3->getChild("header").getValue());
 					}
 				}
@@ -105,14 +111,20 @@ void dataBaseController::extractBodies(std::vector< std::pair<std::string, std::
 	XmlTree headertree = tree->getChild("content");
 	std::pair<std::string, std::string> temp;
 
-	for (XmlTree::Iter iter2 = headertree.begin(); iter2 != headertree.end(); ++iter2) { // loop through all media-tags
-		if (iter2->hasAttribute("scale_exp")) {
-			for (XmlTree::Iter iter3 = iter2->begin(); iter3 != iter2->end(); ++iter3) { // loop through inside media-tag
-				if (iter3->hasChild("text")) {
-					if (iter3->getTag() == "se") { //swedish
+	for (XmlTree::Iter iter2 = headertree.begin(); iter2 != headertree.end(); ++iter2) // loop through all media-tags
+	{ 
+		if (iter2->hasAttribute("scale_exp")) 
+		{
+			for (XmlTree::Iter iter3 = iter2->begin(); iter3 != iter2->end(); ++iter3) // loop through inside media-tag
+			{ 
+				if (iter3->hasChild("text")) 
+				{
+					if (iter3->getTag() == "se") //swedish
+					{ 
 						temp.first = (iter3->getChild("text").getValue());
 					}
-					else { //english 
+					else //english 
+					{ 
 						temp.second = (iter3->getChild("text").getValue());
 					}
 				}
@@ -129,8 +141,10 @@ void dataBaseController::extractImgPaths(std::vector<std::string> & imgPath)
 {
 	XmlTree headertree = tree->getChild("content");
 
-	for (XmlTree::Iter iter2 = headertree.begin(); iter2 != headertree.end(); ++iter2) { // loop through all media-tags
-		if (iter2->hasAttribute("scale_exp")) {
+	for (XmlTree::Iter iter2 = headertree.begin(); iter2 != headertree.end(); ++iter2) // loop through all media-tags
+	{ 
+		if (iter2->hasAttribute("scale_exp")) 
+		{
 			imgPath.push_back(iter2->getAttributeValue<std::string>("path"));
 		}
 	}
@@ -142,16 +156,15 @@ void dataBaseController::extractCardCats(std::vector<std::vector<std::string> > 
 	XmlTree headertree = tree->getChild("content");
 	std::vector<std::string> tempvec;
 
-	for (XmlTree::Iter iter2 = headertree.begin("media"); iter2 != headertree.end(); ++iter2) { // loop through all media-tags
-
-		for (XmlTree::Iter iter3 = iter2->begin("Category"); iter3 != iter2->end(); ++iter3) {
+	for (XmlTree::Iter iter2 = headertree.begin("media"); iter2 != headertree.end(); ++iter2)  // loop through all media-tags
+	{
+		for (XmlTree::Iter iter3 = iter2->begin("Category"); iter3 != iter2->end(); ++iter3) 
+		{
 			tempvec.push_back(iter3->getAttributeValue<std::string>("name"));
 		}
-		
 		cardCategory.push_back(tempvec);
 		tempvec.clear();
-		
-		}
 	}
+}
 
 

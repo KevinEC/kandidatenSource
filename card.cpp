@@ -30,7 +30,8 @@ Card::~Card()
 {
 }
 
-Card::Card(float n, float m, const float width, const float height) {
+Card::Card(float n, float m, const float width, const float height) 
+{
 	x = n;
 	y = m;
 	this->width = width;
@@ -84,7 +85,8 @@ void Card::initSvg()
 void Card::mouseDrag(MouseEvent event)
 {
 	//set a bool to true when rect.contains is true once. Dont set to false until mouseUp to avoid mouse getting outside the rect
-	if (isClicked) {
+	if (isClicked) 
+	{
 		this->title = "du har dragit på rektangeln";
 		float mx = event.getX();
 		float my = event.getY();
@@ -94,7 +96,8 @@ void Card::mouseDrag(MouseEvent event)
 		delete coords;
 		isDragged = true;
 	}
-	else {
+	else 
+	{
 		isDragged = false;
 	}
 	
@@ -102,13 +105,15 @@ void Card::mouseDrag(MouseEvent event)
 
 void Card::mouseDown(MouseEvent event)
 {
-	if (rect.contains(event.getPos())) {
+	if (rect.contains(event.getPos())) 
+	{
 		this->isClicked = true;
 		this->isFront = true;
 		this->title = "du har klickat på rektangeln";
 		CI_LOG_I("title: " << title);
 	}
-	else {
+	else 
+	{
 		this->isClicked = false;
 	}
 }
@@ -122,14 +127,17 @@ void Card::mouseUp(MouseEvent event)
 
 void Card::touchesBegan(TouchEvent event) 
 {
-	for (const auto &touch : event.getTouches()) {
-		if (rect.contains(touch.getPos())) {
+	for (const auto &touch : event.getTouches()) 
+	{
+		if (rect.contains(touch.getPos())) 
+		{
 			this->isClicked = true;
 			this->isFront = true;
 			this->title = "du har klickat på rektangeln";
 			CI_LOG_I("title: " << title);
 		}
-		else {
+		else 
+		{
 			this->isClicked = false;
 		}
 	}
@@ -137,9 +145,11 @@ void Card::touchesBegan(TouchEvent event)
 
 void Card::touchesMoved(TouchEvent event) 
 {
-	for (const auto &touch : event.getTouches()) {
+	for (const auto &touch : event.getTouches()) 
+	{
 		//set a bool to true when rect.contains is true once. Dont set to false until mouseUp to avoid mouse getting outside the rect
-		if (isClicked) {
+		if (isClicked) 
+		{
 			this->title = "du har dragit på rektangeln";
 			float mx = touch.getX();
 
@@ -150,7 +160,8 @@ void Card::touchesMoved(TouchEvent event)
 			delete coords;
 			isDragged = true;
 		}
-		else {
+		else 
+		{
 			isDragged = false;
 		}
 	}
@@ -165,7 +176,8 @@ void Card::touchesEnded(TouchEvent event)
 
 void Card::update() 
 {
-	if (isClicked) {
+	if (isClicked) 
+	{
 		title = "du har klickat på rektangeln";
 	}
 }
