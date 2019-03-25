@@ -222,7 +222,6 @@ void kandidatenApp::draw()
 	
 	//gl::clear(Color(0, 50, 0));
 	//gl::drawSolidCircle(getWindowCenter(), 200);
-	Rectf test[100];
 	gl::enableAlphaBlending();
 	gl::clear(Color(0.1f, 0.1f, 0.1f));
 
@@ -248,17 +247,11 @@ void kandidatenApp::draw()
 	}
 
 
-
-	gl::drawSolidRect(kort.rectKort.rect);
 	gl::drawSolidRect(kort2.rectKort.rect);
+	gl::drawSolidRect(kort.rectKort.rect);
+	
 	gl::draw(kort2.rectKort.text, vec2(50, 50));
 
-
-	gl::enableAlphaBlending();
-
-	gl::drawSolidRect(kort.rectKort.rect);
-	gl::drawSolidRect(kort2.rectKort.rect);
-	gl::draw(kort2.rectKort.text, vec2(50, 50));
 
 	gl::color(Color::white());
 	gl::draw(kort2.rectKort.cardBg);

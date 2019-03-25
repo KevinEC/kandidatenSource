@@ -8,7 +8,7 @@ using namespace ci;
 using namespace ci::app;
 using namespace std;
 
-const static svg::DocRef svgDoc = svg::Doc::create(loadAsset("cardV2.svg"));
+const static svg::DocRef svgDoc = svg::Doc::create(loadAsset("card.svg"));
 
 Card::Card()
 {

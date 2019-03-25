@@ -6,7 +6,7 @@ Cards::Cards()
 {
 	testkort = Card();
 
-	rectKort = Card(300, 300, 150, 200);
+	rectKort = Card(220, rand() % 400, rand() % 400, 200); //Xupper, Yupper, Xwidth, Yheight
 
 }
 
