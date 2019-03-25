@@ -12,6 +12,10 @@
 #include <list>
 #include <iostream>
 
+// Fix for old version of Cairo lib
+FILE _iob[] = { *stdin, *stdout, *stderr };
+extern "C" FILE * __cdecl __iob_func(void) { return _iob; }
+
 using namespace ci;
 using namespace ci::app;
 using namespace std;
@@ -90,6 +94,7 @@ void kandidatenApp::setup()
 	kort = Cards();
 	kort2 = Cards();
 	kort2.rectKort.renderTexture();
+	kort2.rectKort.initSvg();
 
 	/*- connect to data base -*/
 	dbc = dataBaseController("online", "xml", "http://www.student.itn.liu.se/~chrad171/databas/databas/media/write.xml");
@@ -138,7 +143,7 @@ void kandidatenApp::setup()
 
 
 	disableFrameRate();
-	gl::enableVerticalSync(false);
+	gl::enableVerticalSync(true);
 
 }
 
@@ -237,9 +242,14 @@ void kandidatenApp::draw()
 	gl::draw(kort2.rectKort.text, vec2(50, 50));
 
 
-		gl::drawSolidRect(kort.rectKort.rect);
-		gl::drawSolidRect(kort2.rectKort.rect);
-		gl::draw(kort2.rectKort.text, vec2(50, 50));
+	gl::enableAlphaBlending();
+
+	gl::drawSolidRect(kort.rectKort.rect);
+	gl::drawSolidRect(kort2.rectKort.rect);
+	gl::draw(kort2.rectKort.text, vec2(50, 50));
+
+	gl::color(Color::white());
+	gl::draw(kort2.rectKort.cardBg);
 		
 
 

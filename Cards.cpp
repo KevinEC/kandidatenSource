@@ -6,7 +6,7 @@ Cards::Cards()
 {
 	testkort = Card();
 
-	rectKort = Card(100, 100, 150, 200);
+	rectKort = Card(300, 300, 150, 200);
 
 }
 

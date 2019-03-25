@@ -8,7 +8,7 @@ using namespace ci;
 using namespace ci::app;
 using namespace std;
 
-const static svg::DocRef svgDoc = svg::Doc::create(loadAsset("card.svg"));
+const static svg::DocRef svgDoc = svg::Doc::create(loadAsset("cardV2.svg"));
 
 Card::Card()
 {
@@ -75,9 +75,23 @@ void Card::renderTexture()
 
 void Card::initSvg()
 {
-	svg::Rect svgCardBg = svgDoc->find<svg::Rect>("cardBg");
+	//svg::Rect svgCardBg = svgDoc->find<svg::Rect>("cardBg");
+	
 	//in order to render properly and to be able to scale easier we should probably use Cairo
-	//Surface srf = svgCardBg.render();
+
+	std::list<svg::Node*> children = svgDoc->getChildren();
+	for (auto const& i : children) {
+		CI_LOG_I("child id: " << i->getId() );
+	}
+
+	cairo::SurfaceImage srfImg(svgDoc->getWidth(), svgDoc->getHeight(), true);
+	cairo::Context ctx(srfImg);
+	ctx.scale(0.2, 0.2);
+	ctx.render(*svgDoc);
+	srfImg.flush();
+	this->cardBg = gl::Texture::create(srfImg.getSurface());
+
+
 	//this->cardBg = srf;
 }
 
