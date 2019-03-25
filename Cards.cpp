@@ -4,9 +4,9 @@ using namespace ci;
 
 Cards::Cards()
 {
-	testkort = Card();
+	testkort = Card(300.0f, 120.0f, 300.0f, 100.0f);
 
-	rectKort = Card(300, 300, 150, 200);
+	rectKort = Card(120.0f, 120.0f, 150.0f, 200.0f);
 
 }
 
