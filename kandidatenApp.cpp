@@ -252,7 +252,6 @@ void kandidatenApp::draw()
 	gl::draw(kort2.rectKort.text, vec2(50, 50));
 
 	gl::color(Color::white());
-
 	//gl::draw(kort2.rectKort.cardBg);
 	gl::draw(texture);
 

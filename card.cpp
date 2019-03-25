@@ -38,8 +38,9 @@ Card::Card(float n, float m, const float width, const float height)
 	this->height = height;
 	isClicked = false;
 	isDragged = false;
+	twoTouches = false;
 
-	rect = Rectf(n, m, width, height);
+	rect = Rectf(n, m, n+width, m+height);
 	transform = Transform();
 	this->initSvg();
 
@@ -141,10 +142,17 @@ void Card::mouseUp(MouseEvent event)
 
 void Card::touchesBegan(TouchEvent event) 
 {
-	for (const auto &touch : event.getTouches()) 
+	for (const auto &touch : event.getTouches()) //event.getTouches()) returns std::vector<Touch>
 	{
+		lastTouch = touch;
+
 		if (rect.contains(touch.getPos())) 
 		{
+			if (this->isClicked == true && rect.contains(lastTouch.getPos())) // rect contains two touch points 
+			{
+				this->twoTouches = true;
+			}
+
 			this->isClicked = true;
 			this->isFront = true;
 			this->title = "du har klickat på rektangeln";
@@ -152,7 +160,7 @@ void Card::touchesBegan(TouchEvent event)
 		}
 		else 
 		{
-			this->isClicked = false;
+			//this->isClicked = false;
 		}
 	}
 }
@@ -176,7 +184,16 @@ void Card::touchesMoved(TouchEvent event)
 		}
 		else 
 		{
-			isDragged = false;
+			//isDragged = false;
+		}
+
+		if (this->twoTouches) // rect contains two active touch points 
+		{
+			CI_LOG_I("two touches yeah");
+			vec2 v1 = lastTouch.getPrevPos() - touch.getPrevPos(); // vector between previous touch points
+			vec2 v2 = lastTouch.getPos() - touch.getPos();	// vector between current touch points
+			//float *size = transform.scale(d1, d2);
+			//float *coord = transform.rotate();
 		}
 	}
 }
