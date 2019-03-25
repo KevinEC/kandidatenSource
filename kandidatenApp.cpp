@@ -53,7 +53,7 @@ struct TouchPoint {
 	float			mTimeOfDeath;
 };
 
-class kandidatenApp : public App 
+class kandidatenApp : public App
 {
 public:
 	void setup() override;
@@ -121,7 +121,7 @@ void kandidatenApp::setup()
 	/*- extract image paths -*/
 	std::vector<std::string> imgPath;
 	dbc.extractImgPaths(imgPath);
-	 
+
 	ci::Area area = Area(kort2.rectKort.rect);
 	//texture = gl::Texture2d::create(loadImage(loadUrl("http://www.student.itn.liu.se/~chrad171/databas/databas/media/virus.jpg")));
 	//texture->setCleanBounds(area);
@@ -148,11 +148,11 @@ void kandidatenApp::touchesBegan(TouchEvent event)
 	kort.rectKort.touchesBegan(event);
 	kort2.rectKort.touchesBegan(event);
 
-	for (const auto &touch : event.getTouches()) 
+	for (const auto &touch : event.getTouches())
 	{
 		Color newColor(CM_HSV, Rand::randFloat(), 1, 1);
 		mActivePoints.insert(make_pair(touch.getId(), TouchPoint(touch.getPos(), newColor)));
-		
+
 		//lastclick = touch.getPos();
 	}
 
@@ -166,7 +166,7 @@ void kandidatenApp::touchesMoved(TouchEvent event)
 	kort.rectKort.touchesMoved(event);
 	kort2.rectKort.touchesMoved(event);
 
-	for (const auto &touch : event.getTouches()) 
+	for (const auto &touch : event.getTouches())
 	{
 		mActivePoints[touch.getId()].addPoint(touch.getPos());
 
@@ -180,7 +180,7 @@ void kandidatenApp::touchesEnded(TouchEvent event)
 	kort.rectKort.touchesEnded(event);
 	kort2.rectKort.touchesEnded(event);
 
-	for (const auto &touch : event.getTouches()) 
+	for (const auto &touch : event.getTouches())
 	{
 		mActivePoints[touch.getId()].startDying();
 		mDyingPoints.push_back(mActivePoints[touch.getId()]);
@@ -219,7 +219,7 @@ void kandidatenApp::update()
 
 void kandidatenApp::draw()
 {
-	
+
 	//gl::clear(Color(0, 50, 0));
 	//gl::drawSolidCircle(getWindowCenter(), 200);
 	Rectf test[100];
@@ -230,7 +230,7 @@ void kandidatenApp::draw()
 		activePoint.second.draw();
 	}
 
-	for (auto dyingIt = mDyingPoints.begin(); dyingIt != mDyingPoints.end(); ) 
+	for (auto dyingIt = mDyingPoints.begin(); dyingIt != mDyingPoints.end(); )
 	{
 		dyingIt->draw();
 		if (dyingIt->isDead())
@@ -242,19 +242,10 @@ void kandidatenApp::draw()
 	// draw yellow circles at the active touch points
 
 	gl::color(Color(1, 1, 0));
-	for (const auto &touch : getActiveTouches()) 
+	for (const auto &touch : getActiveTouches())
 	{
 		gl::drawStrokedCircle(touch.getPos(), 20);
 	}
-
-
-
-	gl::drawSolidRect(kort.rectKort.rect);
-	gl::drawSolidRect(kort2.rectKort.rect);
-	gl::draw(kort2.rectKort.text, vec2(50, 50));
-
-
-	gl::enableAlphaBlending();
 
 	gl::drawSolidRect(kort.rectKort.rect);
 	gl::drawSolidRect(kort2.rectKort.rect);
@@ -262,9 +253,9 @@ void kandidatenApp::draw()
 
 	gl::color(Color::white());
 	gl::draw(kort2.rectKort.cardBg);
-		
+
 	gl::draw(texture);
-	
+
 }
 
 CINDER_APP(kandidatenApp, RendererGl, prepareSettings)
