@@ -5,9 +5,7 @@ using namespace ci;
 Cards::Cards()
 {
 	testkort = Card();
-
 	rectKort = Card(220, rand() % 400, rand() % 400, 200); //Xupper, Yupper, Xwidth, Yheight
-
 }
 
 Cards::~Cards()
