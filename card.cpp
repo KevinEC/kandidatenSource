@@ -36,6 +36,10 @@ Card::Card(const float x1, const float y1)
 	y = y1;
 	width = 336;
 	height = 500;
+	cardSize = 1.0;
+
+	title = "Mitochondria";
+	body = "The powerhouse of the cell and stuff and other. The mitochondrion (plural mitochondria) is a double-membrane-bound organelle found in most eukaryotic organisms. Some cells in the body...";
 
 
 	isClicked = false;
@@ -76,26 +80,32 @@ gl::TextureRef Card::renderTexture(TextBox &text)
 
 void Card::initElements()
 {
-	const float paddingX = 22;
-	const float elementWidth = 292.0f;
-	const ColorA textColor = ColorA(65, 64, 66, 0.5);
+	paddingX = 22.0f*cardSize;
+	elementWidth = 292.0f *cardSize;
+	//const ColorA textColor = ColorA(65, 64, 66, 0.5f);
+	const ColorA textColor = ColorA::black();
+	const Font titleFont = Font(loadAsset("fonts/Montserrat.ttf"), 20);
+	const Font bodyFont = Font(loadAsset("fonts/Raleway.ttf"), 14);
 
-	imgCo = vec2(x + paddingX, y + 22.0f);
-	titleCo = vec2(x + paddingX, y + 268.0f);
-	bodyCo = vec2(x + paddingX, y + 363.0f);
-	tagsCo = vec2(x + paddingX, y + 459.0f);
+	updateElementCoords();
 
-	TextBox titleBox = TextBox().text(title).color(ColorA::black());
-	TextBox bodyBox = TextBox().text(body).color(textColor);
+	TextBox titleBox = TextBox().text(title).font(titleFont).color(textColor).size(elementWidth, TextBox::GROW);
+	TextBox bodyBox = TextBox().text(body).font(bodyFont).color(textColor).size(elementWidth, TextBox::GROW);
 
 	CI_LOG_I("CARD COORD:   x: " << x << "  y: " << y);
 	CI_LOG_I("TEXTBOX:   " << titleCo);
 
-	Surface srf = titleBox.render();
 
-	titleTex = gl::Texture::create(srf);
-	//titleTex = renderTexture(titleBox);
+	titleTex = renderTexture(titleBox);
 	bodyTex = renderTexture(bodyBox);
+}
+
+void Card::updateElementCoords()
+{
+	imgCo = vec2(x + paddingX, y + 22.0f)*cardSize;
+	titleCo = vec2(x + paddingX, y + 268.0f)*cardSize;
+	bodyCo = vec2(x + paddingX, y + 320.0f)*cardSize;
+	tagsCo = vec2(x + paddingX, y + 459.0f)*cardSize;
 }
 
 void Card::mouseDrag(MouseEvent event)
@@ -110,6 +120,7 @@ void Card::mouseDrag(MouseEvent event)
 		this->setpos(coords[0], coords[1]);
 		this->rect.set(coords[0], coords[1], coords[0] + rect.getWidth(), coords[1] + rect.getHeight());
 		delete coords;
+		updateElementCoords();
 		isDragged = true;
 	}
 	else 
