@@ -1,6 +1,8 @@
 #include "Cards.h"
 
 using namespace ci;
+using namespace ci::app;
+using namespace std;
 
 Cards::Cards()
 {
@@ -9,6 +11,10 @@ Cards::Cards()
 	testkort = Card(300.0f, 320.0f);
 	rectKort = Card(x1,y1);
 
+}
+Cards::Cards(std::vector<std::pair<std::string, std::string>>* titles, std::vector<std::pair<std::string, std::string>>* bodyText)
+{
+	
 }
 
 Cards::~Cards()
