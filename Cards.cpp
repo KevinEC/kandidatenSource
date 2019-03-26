@@ -4,9 +4,13 @@ using namespace ci;
 
 Cards::Cards()
 {
-	testkort = Card(300.0f, 120.0f, 300.0f, 100.0f);
+	float x1 = rand() % 400;
+	float y1 = rand() % 400;
 
-	rectKort = Card(200, rand() %400, rand() %400, 200);
+	float x2 = rand() % 400;
+	float y2 = rand() % 400;
+	testkort = Card(300.0f, 320.0f, 300.0f, 400.0f);
+	rectKort = Card(x1,y1,x2,y2);
 
 }
 

@@ -8,7 +8,7 @@ using namespace ci;
 using namespace ci::app;
 using namespace std;
 
-const static svg::DocRef svgDoc = svg::Doc::create(loadAsset("cardV2.svg"));
+const static svg::DocRef svgDoc = svg::Doc::create(loadAsset("cardMod.svg"));
 
 Card::Card()
 {
@@ -30,16 +30,16 @@ Card::~Card()
 {
 }
 
-Card::Card(float n, float m, const float width, const float height) 
+Card::Card(const float x1, const float y1, const float width, const float height) 
 {
-	x = n;
-	y = m;
+	x = x1;
+	y = y1;
 	this->width = width;
 	this->height = height;
 	isClicked = false;
 	isDragged = false;
 
-	rect = Rectf(n, m, width, height);
+	rect = Rectf(x1, y1, x1 + width, y1 + height);
 	transform = Transform();
 	this->initSvg();
 
@@ -80,17 +80,28 @@ void Card::initSvg()
 	
 	//in order to render properly and to be able to scale easier we should probably use Cairo
 
-	std::list<svg::Node*> children = svgDoc->getChildren();
+	/*std::list<svg::Node*> children = svgDoc->getChildren();
 	for (auto const& i : children) {
-		CI_LOG_I("child id: " << i->getId() );
-	}
+		CI_LOG_I("child id: " << i->getId() << "    index:" << i );
+	}*/
 
+	svg::Rect rect = svgDoc->findNode("title");
+	
+	CI_LOG_I("RECT:   " << rect.getRect().getHeight() );
+		
 	cairo::SurfaceImage srfImg(svgDoc->getWidth(), svgDoc->getHeight(), true);
 	cairo::Context ctx(srfImg);
 	ctx.scale(0.2, 0.2);
 	ctx.render(*svgDoc);
 	srfImg.flush();
 	this->cardBg = gl::Texture::create(srfImg.getSurface());
+
+	/*cairo::SurfaceImage srfImg(rect.getBoundingBoxAbsolute().getWidth(), rect.getBoundingBoxAbsolute().getHeight(), true);
+	cairo::Context ctx(srfImg);
+	//ctx.scale(0.2, 0.2);
+	ctx.render(rect);
+	srfImg.flush();
+	this->cardBg = gl::Texture::create(srfImg.getSurface());*/
 
 
 	//this->cardBg = srf;

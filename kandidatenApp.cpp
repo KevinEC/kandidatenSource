@@ -248,13 +248,15 @@ void kandidatenApp::draw()
 	}
 
 	gl::drawSolidRect(kort.rectKort.rect);
+	gl::color(Color::white());
+
 	gl::drawSolidRect(kort2.rectKort.rect);
 	gl::draw(kort2.rectKort.text, vec2(50, 50));
 
 	gl::color(Color::white());
 
-	//gl::draw(kort2.rectKort.cardBg);
-	gl::draw(texture);
+	gl::draw(kort2.rectKort.cardBg);
+	//gl::draw(texture);
 
 }
 
