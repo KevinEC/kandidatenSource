@@ -14,7 +14,11 @@ Cards::Cards()
 }
 Cards::Cards(std::vector<std::pair<std::string, std::string>>* titles, std::vector<std::pair<std::string, std::string>>* bodyText)
 {
-	
+	std::vector<std::pair<std::string, std::string>>::iterator it;
+
+	for (it = titles->begin(); it != titles->end(); it++) {
+		
+	}
 }
 
 Cards::~Cards()

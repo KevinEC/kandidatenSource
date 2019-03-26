@@ -34,9 +34,10 @@ Card::Card(const float x1, const float y1)
 {
 	x = x1;
 	y = y1;
-	width = 336;
-	height = 500;
-	cardSize = 1.0;
+
+	cardSize = 1.2;
+	width = 336.0f*cardSize;
+	height = 500.0f*cardSize;
 
 	title = "Mitochondria";
 	body = "The powerhouse of the cell and stuff and other. The mitochondrion (plural mitochondria) is a double-membrane-bound organelle found in most eukaryotic organisms. Some cells in the body...";
@@ -84,8 +85,8 @@ void Card::initElements()
 	elementWidth = 292.0f *cardSize;
 	//const ColorA textColor = ColorA(65, 64, 66, 0.5f);
 	const ColorA textColor = ColorA::black();
-	const Font titleFont = Font(loadAsset("fonts/Montserrat.ttf"), 20);
-	const Font bodyFont = Font(loadAsset("fonts/Raleway.ttf"), 14);
+	const Font titleFont = Font(loadAsset("fonts/Montserrat.ttf"), 20.0*cardSize);
+	const Font bodyFont = Font(loadAsset("fonts/Raleway.ttf"), 14.0*cardSize);
 
 	updateElementCoords();
 
@@ -102,10 +103,18 @@ void Card::initElements()
 
 void Card::updateElementCoords()
 {
-	imgCo = vec2(x + paddingX, y + 22.0f)*cardSize;
-	titleCo = vec2(x + paddingX, y + 268.0f)*cardSize;
-	bodyCo = vec2(x + paddingX, y + 320.0f)*cardSize;
-	tagsCo = vec2(x + paddingX, y + 459.0f)*cardSize;
+	paddingX = 22.0f*cardSize;
+	elementWidth = 292.0f *cardSize;
+
+	float imgY = 22.0f*cardSize;
+	float titleY = 268.0f*cardSize;
+	float bodyY = 320.0f*cardSize;
+	float tagsY = 459.0f*cardSize;
+
+	imgCo = vec2(x + paddingX, y + imgY);
+	titleCo = vec2(x + paddingX, y + titleY);
+	bodyCo = vec2(x + paddingX, y + bodyY);
+	tagsCo = vec2(x + paddingX, y + tagsY);
 }
 
 void Card::mouseDrag(MouseEvent event)
