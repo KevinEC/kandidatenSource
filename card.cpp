@@ -94,6 +94,7 @@ void Card::initSvg()
 	ctx.scale(0.2, 0.2);
 	ctx.render(*svgDoc);
 	srfImg.flush();
+	//Rect
 	this->cardBg = gl::Texture::create(srfImg.getSurface());
 
 	/*cairo::SurfaceImage srfImg(rect.getBoundingBoxAbsolute().getWidth(), rect.getBoundingBoxAbsolute().getHeight(), true);
