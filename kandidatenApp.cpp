@@ -144,7 +144,7 @@ void kandidatenApp::setup()
 
 void kandidatenApp::touchesBegan(TouchEvent event)
 {
-	CI_LOG_I(event);
+	//CI_LOG_I(event);
 	kort.rectKort.touchesBegan(event);
 	kort2.rectKort.touchesBegan(event);
 
@@ -160,7 +160,7 @@ void kandidatenApp::touchesBegan(TouchEvent event)
 
 void kandidatenApp::touchesMoved(TouchEvent event)
 {
-	CI_LOG_I(event);
+	//CI_LOG_I(event);
 	test2 = true;
 
 	kort.rectKort.touchesMoved(event);
@@ -176,7 +176,7 @@ void kandidatenApp::touchesMoved(TouchEvent event)
 
 void kandidatenApp::touchesEnded(TouchEvent event)
 {
-	CI_LOG_I(event);
+	//CI_LOG_I(event);
 	kort.rectKort.touchesEnded(event);
 	kort2.rectKort.touchesEnded(event);
 

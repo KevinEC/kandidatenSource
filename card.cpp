@@ -1,4 +1,4 @@
-#include "Card.h"
+#include "card.h"
 #include "cinder/app/RendererGl.h"
 #include "cinder/gl/gl.h"
 #include <string>
@@ -36,13 +36,17 @@ Card::Card(float n, float m, const float width, const float height)
 	y = m;
 	this->width = width;
 	this->height = height;
+	
 	isClicked = false;
 	isDragged = false;
 	twoTouches = false;
-
+	initFingDist = 0;
+	
 	rect = Rectf(n, m, n+width, m+height);
 	transform = Transform();
 	this->initSvg();
+
+	
 
 
 	/*
@@ -144,23 +148,26 @@ void Card::touchesBegan(TouchEvent event)
 {
 	for (const auto &touch : event.getTouches()) //event.getTouches()) returns std::vector<Touch>
 	{
-		lastTouch = touch;
-
 		if (rect.contains(touch.getPos())) 
 		{
-			if (this->isClicked == true && rect.contains(lastTouch.getPos())) // rect contains two touch points 
+			if (this->isClicked == true) // rect contains two touch points // && rect.contains(lastTouch.getPos()
 			{
 				this->twoTouches = true;
+				this->initFingDist = glm::distance(lastTouch.getPos(), touch.getPos());
+				CI_LOG_I("initial finger distance: " << initFingDist);
+			//	CI_LOG_I("vi har två fingrar på rektangeln");
 			}
-
+			else 
+			{
+				this->twoTouches = false;
+				lastTouch = touch;
+			}
+			
 			this->isClicked = true;
 			this->isFront = true;
 			this->title = "du har klickat på rektangeln";
+			
 			CI_LOG_I("title: " << title);
-		}
-		else 
-		{
-			//this->isClicked = false;
 		}
 	}
 }
@@ -174,25 +181,26 @@ void Card::touchesMoved(TouchEvent event)
 		{
 			this->title = "du har dragit på rektangeln";
 			float mx = touch.getX();
-
 			float my = touch.getY();
+			
 			float *coords = transform.translate(this->rect.getX1(), this->rect.getY1(), mx, my, isDragged);
 			this->setpos(coords[0], coords[1]);
 			this->rect.set(coords[0], coords[1], coords[0] + rect.getWidth(), coords[1] + rect.getHeight());
+			
 			delete coords;
 			isDragged = true;
-		}
-		else 
-		{
-			//isDragged = false;
 		}
 
 		if (this->twoTouches) // rect contains two active touch points 
 		{
-			CI_LOG_I("two touches yeah");
-			vec2 v1 = lastTouch.getPrevPos() - touch.getPrevPos(); // vector between previous touch points
-			vec2 v2 = lastTouch.getPos() - touch.getPos();	// vector between current touch points
-			//float *size = transform.scale(d1, d2);
+			float currFingDist = glm::distance(lastTouch.getPos(), touch.getPos());
+			float size = currFingDist / this->initFingDist;
+			CI_LOG_I("size: " << size);
+
+			if (this->rect.getWidth()*size > 300 & this->rect.getWidth()*size < 1500)
+			{
+				this->rect.scaleCentered(size);
+			}
 			//float *coord = transform.rotate();
 		}
 	}
@@ -200,9 +208,11 @@ void Card::touchesMoved(TouchEvent event)
 
 void Card::touchesEnded(TouchEvent event) 
 {
-	CI_LOG_I("touchesEnded");
+	//CI_LOG_I("touchesEnded");
 	this->isClicked = false;
 	this->isDragged = false;
+	this->twoTouches = false;
+	//this->lastTouch = event.getTouches;
 }
 
 void Card::update() 
