@@ -99,8 +99,6 @@ void kandidatenApp::setup()
 	i = 0;
 	kort = Cards();
 	kort2 = Cards();
-	kort2.rectKort.renderTexture();
-	//kort2.rectKort.initSvg();
 
 	/*- connect to data base -*/
 	dbc = dataBaseController("online", "xml", "http://www.student.itn.liu.se/~chrad171/databas/databas/media/write.xml");
@@ -247,15 +245,12 @@ void kandidatenApp::draw()
 		gl::drawStrokedCircle(touch.getPos(), 20);
 	}
 
-	gl::drawSolidRect(kort.rectKort.rect);
 	gl::color(Color::white());
 
 	gl::drawSolidRect(kort2.rectKort.rect);
-	gl::draw(kort2.rectKort.text, vec2(50, 50));
+	gl::draw(kort2.rectKort.titleTex, kort2.rectKort.titleCo);
+	gl::draw(kort2.rectKort.bodyTex, kort2.rectKort.bodyCo);
 
-	gl::color(Color::white());
-
-	gl::draw(kort2.rectKort.cardBg);
 	//gl::draw(texture);
 
 }

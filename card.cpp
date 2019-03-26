@@ -30,18 +30,20 @@ Card::~Card()
 {
 }
 
-Card::Card(const float x1, const float y1, const float width, const float height) 
+Card::Card(const float x1, const float y1) 
 {
 	x = x1;
 	y = y1;
-	this->width = width;
-	this->height = height;
+	width = 336;
+	height = 500;
+
+
 	isClicked = false;
 	isDragged = false;
 
 	rect = Rectf(x1, y1, x1 + width, y1 + height);
 	transform = Transform();
-	this->initSvg();
+	this->initElements();
 
 
 	/*
@@ -66,46 +68,34 @@ void Card::setpos(float m, float n)
 	y = n;
 }
 
-void Card::renderTexture()
+gl::TextureRef Card::renderTexture(TextBox &text)
 {
-	TextBox text = TextBox().text("testing").color(ColorA::white());
-	
 	Surface srf = text.render();
-	this->text =  gl::Texture::create(srf);
+	return gl::Texture::create(srf);
 }
 
-void Card::initSvg()
+void Card::initElements()
 {
-	//svg::Rect svgCardBg = svgDoc->find<svg::Rect>("cardBg");
-	
-	//in order to render properly and to be able to scale easier we should probably use Cairo
+	const float paddingX = 22;
+	const float elementWidth = 292.0f;
+	const ColorA textColor = ColorA(65, 64, 66, 0.5);
 
-	/*std::list<svg::Node*> children = svgDoc->getChildren();
-	for (auto const& i : children) {
-		CI_LOG_I("child id: " << i->getId() << "    index:" << i );
-	}*/
+	imgCo = vec2(x + paddingX, y + 22.0f);
+	titleCo = vec2(x + paddingX, y + 268.0f);
+	bodyCo = vec2(x + paddingX, y + 363.0f);
+	tagsCo = vec2(x + paddingX, y + 459.0f);
 
-	svg::Rect rect = svgDoc->findNode("title");
-	
-	CI_LOG_I("RECT:   " << rect.getRect().getHeight() );
-		
-	cairo::SurfaceImage srfImg(svgDoc->getWidth(), svgDoc->getHeight(), true);
-	cairo::Context ctx(srfImg);
-	ctx.scale(0.2, 0.2);
-	ctx.render(*svgDoc);
-	srfImg.flush();
-	//Rect
-	this->cardBg = gl::Texture::create(srfImg.getSurface());
+	TextBox titleBox = TextBox().text(title).color(ColorA::black());
+	TextBox bodyBox = TextBox().text(body).color(textColor);
 
-	/*cairo::SurfaceImage srfImg(rect.getBoundingBoxAbsolute().getWidth(), rect.getBoundingBoxAbsolute().getHeight(), true);
-	cairo::Context ctx(srfImg);
-	//ctx.scale(0.2, 0.2);
-	ctx.render(rect);
-	srfImg.flush();
-	this->cardBg = gl::Texture::create(srfImg.getSurface());*/
+	CI_LOG_I("CARD COORD:   x: " << x << "  y: " << y);
+	CI_LOG_I("TEXTBOX:   " << titleCo);
 
+	Surface srf = titleBox.render();
 
-	//this->cardBg = srf;
+	titleTex = gl::Texture::create(srf);
+	//titleTex = renderTexture(titleBox);
+	bodyTex = renderTexture(bodyBox);
 }
 
 void Card::mouseDrag(MouseEvent event)
