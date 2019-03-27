@@ -209,6 +209,7 @@ void Card::touchesMoved(TouchEvent event)
 			float *coords = transform.translate(this->rect.getX1(), this->rect.getY1(), mx, my, isDragged);
 			this->setpos(coords[0], coords[1]);
 			this->rect.set(coords[0], coords[1], coords[0] + rect.getWidth(), coords[1] + rect.getHeight());
+			updateElementCoords();
 			
 			delete coords;
 			isDragged = true;
