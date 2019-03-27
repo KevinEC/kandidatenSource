@@ -60,12 +60,14 @@ public:
 	void update() override;
 	void draw() override;
 
-	void mouseDrag(MouseEvent event) override;
-	void mouseDown(MouseEvent event) override;
-	void mouseUp(MouseEvent event) override;
+	void	mouseDrag(MouseEvent event) override;
+	void	mouseDown(MouseEvent event) override;
+	void	mouseUp(MouseEvent event) override;
 	void	touchesBegan(TouchEvent event) override;
 	void	touchesMoved(TouchEvent event) override;
 	void	touchesEnded(TouchEvent event) override;
+
+	void	renderCards();
 	gl::Texture2dRef texture;
 	Surface mysurf;
 	vec2 mMouseLoc;
@@ -97,7 +99,6 @@ void kandidatenApp::setup()
 	CI_LOG_I("MT: " << System::hasMultiTouch() << " Max points: " << System::getMaxMultiTouchPoints());
 
 	i = 0;
-	kort = Cards();
 	kort2 = Cards();
 
 	/*- connect to data base -*/
@@ -134,6 +135,9 @@ void kandidatenApp::setup()
 	dbc.extractCardCats(cardCategory);
 
 	CI_LOG_I("sizes: " << categories.size() << " " << titles.size() << " " << bodyText.size() << " " << imgPath.size() << " " << cardCategory.size());
+	
+
+	kort = Cards(&titles, &bodyText);
 
 
 	disableFrameRate();
@@ -215,6 +219,11 @@ void kandidatenApp::update()
 
 }
 
+void renderCards()
+{
+
+}
+
 void kandidatenApp::draw()
 {
 
@@ -250,6 +259,12 @@ void kandidatenApp::draw()
 	gl::drawSolidRect(kort2.rectKort.rect);
 	gl::draw(kort2.rectKort.titleTex, kort2.rectKort.titleCo);
 	gl::draw(kort2.rectKort.bodyTex, kort2.rectKort.bodyCo);
+
+	/*gl::drawSolidRect(kort.allcards.begin()->rect);
+	gl::draw(kort.allcards.begin()->titleTex, kort.allcards.begin()->titleCo);
+	gl::draw(kort.allcards.begin()->bodyTex, kort.allcards.begin()->bodyCo);*/
+
+
 
 	//gl::draw(texture);
 

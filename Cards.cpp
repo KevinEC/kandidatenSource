@@ -8,16 +8,23 @@ Cards::Cards()
 {
 	float x1 = rand() % 400;
 	float y1 = rand() % 400;
-	testkort = Card(300.0f, 320.0f);
-	rectKort = Card(x1,y1);
+	testkort = Card(300.0f, 320.0f, "test", "more long text");
+	rectKort = Card(x1,y1,"test", "more long text");
 
 }
 Cards::Cards(std::vector<std::pair<std::string, std::string>>* titles, std::vector<std::pair<std::string, std::string>>* bodyText)
 {
-	std::vector<std::pair<std::string, std::string>>::iterator it;
+	float x1 = rand() % 400;
+	float y1 = rand() % 400;
 
-	for (it = titles->begin(); it != titles->end(); it++) {
-		
+	std::vector<std::pair<std::string, std::string>>::iterator titleIt = titles->begin();
+	std::vector<std::pair<std::string, std::string>>::iterator bodyIt = bodyText->begin();
+
+
+	while(titleIt != titles->end() - 70) {
+		allcards.push_back( Card(x1, y1, titleIt->first, bodyIt->first) );
+		titleIt++;
+		bodyIt++;
 	}
 }
 

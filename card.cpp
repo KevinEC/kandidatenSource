@@ -30,7 +30,7 @@ Card::~Card()
 {
 }
 
-Card::Card(const float x1, const float y1) 
+Card::Card(const float x1, const float y1, std::string title, std::string body) 
 {
 	x = x1;
 	y = y1;
@@ -39,8 +39,8 @@ Card::Card(const float x1, const float y1)
 	width = 336.0f*cardSize;
 	height = 500.0f*cardSize;
 
-	title = "Mitochondria";
-	body = "The powerhouse of the cell and stuff and other. The mitochondrion (plural mitochondria) is a double-membrane-bound organelle found in most eukaryotic organisms. Some cells in the body...";
+	this->title = title;
+	this->body = body;
 
 
 	isClicked = false;
