@@ -60,9 +60,9 @@ public:
 	void update() override;
 	void draw() override;
 
-	void	mouseDrag(MouseEvent event) override;
+	/*void	mouseDrag(MouseEvent event) override;
 	void	mouseDown(MouseEvent event) override;
-	void	mouseUp(MouseEvent event) override;
+	void	mouseUp(MouseEvent event) override;*/
 	void	touchesBegan(TouchEvent event) override;
 	void	touchesMoved(TouchEvent event) override;
 	void	touchesEnded(TouchEvent event) override;
@@ -189,7 +189,7 @@ void kandidatenApp::touchesEnded(TouchEvent event)
 		mActivePoints.erase(touch.getId());
 	}
 }
-
+/*
 void kandidatenApp::mouseDown(MouseEvent event)
 {
 	//mMouseLoc = event.getPos();
@@ -213,7 +213,7 @@ void kandidatenApp::mouseUp(MouseEvent event) {
 	kort.rectKort.mouseUp(event);
 	kort2.rectKort.mouseUp(event);
 }
-
+*/
 void kandidatenApp::update()
 {
 

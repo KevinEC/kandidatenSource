@@ -34,7 +34,7 @@ float * Transform::translate(const float x, const float y, const float mx, const
 	if(!isDragged) {
 		this->deltaX = mx - x;
 		this->deltaY = my - y;
-		CI_LOG_I("updated delta var");
+		//CI_LOG_I("updated delta var");
 	}
 
 	float newx = mx - this->deltaX;

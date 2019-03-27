@@ -31,7 +31,6 @@ Card::~Card()
 
 Card::Card(const float x1, const float y1, std::string title, std::string body) 
 {
-
 	x = x1;
 	y = y1;
 
@@ -41,7 +40,6 @@ Card::Card(const float x1, const float y1, std::string title, std::string body)
 
 	this->title = title;
 	this->body = body;
-
 
 	isClicked = false;
 	isDragged = false;
@@ -53,18 +51,6 @@ Card::Card(const float x1, const float y1, std::string title, std::string body)
 
 	transform = Transform();
 	this->initElements();
-
-	
-
-
-	/*
-string rubrik
-string brödtext
-img img1
-img img2
-taget från xml
-*/
-
 }
 
 /*
@@ -122,7 +108,7 @@ void Card::updateElementCoords()
 	bodyCo = vec2(x + paddingX, y + bodyY);
 	tagsCo = vec2(x + paddingX, y + tagsY);
 }
-
+/*
 void Card::mouseDrag(MouseEvent event)
 {
 	//set a bool to true when rect.contains is true once. Dont set to false until mouseUp to avoid mouse getting outside the rect
@@ -166,7 +152,7 @@ void Card::mouseUp(MouseEvent event)
 	this->isClicked = false;
 	this->isDragged = false;
 }
-
+*/
 void Card::touchesBegan(TouchEvent event) 
 {
 	for (const auto &touch : event.getTouches()) //event.getTouches()) returns std::vector<Touch>
@@ -218,12 +204,12 @@ void Card::touchesMoved(TouchEvent event)
 		if (this->twoTouches) // rect contains two active touch points 
 		{
 			float currFingDist = glm::distance(lastTouch.getPos(), touch.getPos());
-			float size = currFingDist / this->initFingDist;
-			CI_LOG_I("size: " << size);
+			this->cardSize = currFingDist / this->initFingDist;
+			CI_LOG_I("size: " << this->cardSize);
 
-			if (this->rect.getWidth()*size > 300 & this->rect.getWidth()*size < 1500)
+			if (this->rect.getWidth()*this->cardSize > 300 && this->rect.getWidth()*this->cardSize < 1500)
 			{
-				this->rect.scaleCentered(size);
+				this->rect.scaleCentered(this->cardSize);
 			}
 			//float *coord = transform.rotate();
 		}
