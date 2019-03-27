@@ -146,7 +146,7 @@ void kandidatenApp::setup()
 
 void kandidatenApp::touchesBegan(TouchEvent event)
 {
-	CI_LOG_I(event);
+	//CI_LOG_I(event);
 	kort.rectKort.touchesBegan(event);
 	kort2.rectKort.touchesBegan(event);
 
@@ -162,7 +162,7 @@ void kandidatenApp::touchesBegan(TouchEvent event)
 
 void kandidatenApp::touchesMoved(TouchEvent event)
 {
-	CI_LOG_I(event);
+	//CI_LOG_I(event);
 	test2 = true;
 
 	kort.rectKort.touchesMoved(event);
@@ -178,7 +178,7 @@ void kandidatenApp::touchesMoved(TouchEvent event)
 
 void kandidatenApp::touchesEnded(TouchEvent event)
 {
-	CI_LOG_I(event);
+	//CI_LOG_I(event);
 	kort.rectKort.touchesEnded(event);
 	kort2.rectKort.touchesEnded(event);
 
@@ -229,7 +229,6 @@ void kandidatenApp::draw()
 
 	//gl::clear(Color(0, 50, 0));
 	//gl::drawSolidCircle(getWindowCenter(), 200);
-	Rectf test[100];
 	gl::enableAlphaBlending();
 	gl::clear(Color(0.1f, 0.1f, 0.1f));
 
@@ -254,6 +253,7 @@ void kandidatenApp::draw()
 		gl::drawStrokedCircle(touch.getPos(), 20);
 	}
 
+
 	gl::color(Color::white());
 
 	gl::drawSolidRect(kort2.rectKort.rect);
@@ -267,6 +267,7 @@ void kandidatenApp::draw()
 
 
 	//gl::draw(texture);
+
 
 }
 

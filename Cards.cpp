@@ -6,12 +6,14 @@ using namespace std;
 
 Cards::Cards()
 {
+
 	float x1 = rand() % 400;
 	float y1 = rand() % 400;
 	testkort = Card(300.0f, 320.0f, "test", "more long text");
 	rectKort = Card(x1,y1,"test", "more long text");
 
 }
+
 Cards::Cards(std::vector<std::pair<std::string, std::string>>* titles, std::vector<std::pair<std::string, std::string>>* bodyText)
 {
 	float x1 = rand() % 400;
@@ -26,6 +28,7 @@ Cards::Cards(std::vector<std::pair<std::string, std::string>>* titles, std::vect
 		titleIt++;
 		bodyIt++;
 	}
+
 }
 
 Cards::~Cards()

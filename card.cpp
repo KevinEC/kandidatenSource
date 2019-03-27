@@ -1,4 +1,4 @@
-#include "Card.h"
+#include "card.h"
 #include "cinder/app/RendererGl.h"
 #include "cinder/gl/gl.h"
 #include <string>
@@ -8,7 +8,6 @@ using namespace ci;
 using namespace ci::app;
 using namespace std;
 
-const static svg::DocRef svgDoc = svg::Doc::create(loadAsset("cardMod.svg"));
 
 Card::Card()
 {
@@ -32,6 +31,7 @@ Card::~Card()
 
 Card::Card(const float x1, const float y1, std::string title, std::string body) 
 {
+
 	x = x1;
 	y = y1;
 
@@ -47,8 +47,14 @@ Card::Card(const float x1, const float y1, std::string title, std::string body)
 	isDragged = false;
 
 	rect = Rectf(x1, y1, x1 + width, y1 + height);
+
+	twoTouches = false;
+	initFingDist = 0;
+
 	transform = Transform();
 	this->initElements();
+
+	
 
 
 	/*
@@ -163,18 +169,28 @@ void Card::mouseUp(MouseEvent event)
 
 void Card::touchesBegan(TouchEvent event) 
 {
-	for (const auto &touch : event.getTouches()) 
+	for (const auto &touch : event.getTouches()) //event.getTouches()) returns std::vector<Touch>
 	{
 		if (rect.contains(touch.getPos())) 
 		{
+			if (this->isClicked == true) // rect contains two touch points // && rect.contains(lastTouch.getPos()
+			{
+				this->twoTouches = true;
+				this->initFingDist = glm::distance(lastTouch.getPos(), touch.getPos());
+				CI_LOG_I("initial finger distance: " << initFingDist);
+			//	CI_LOG_I("vi har två fingrar på rektangeln");
+			}
+			else 
+			{
+				this->twoTouches = false;
+				lastTouch = touch;
+			}
+			
 			this->isClicked = true;
 			this->isFront = true;
 			this->title = "du har klickat på rektangeln";
+			
 			CI_LOG_I("title: " << title);
-		}
-		else 
-		{
-			this->isClicked = false;
 		}
 	}
 }
@@ -188,26 +204,38 @@ void Card::touchesMoved(TouchEvent event)
 		{
 			this->title = "du har dragit på rektangeln";
 			float mx = touch.getX();
-
 			float my = touch.getY();
+			
 			float *coords = transform.translate(this->rect.getX1(), this->rect.getY1(), mx, my, isDragged);
 			this->setpos(coords[0], coords[1]);
 			this->rect.set(coords[0], coords[1], coords[0] + rect.getWidth(), coords[1] + rect.getHeight());
+			
 			delete coords;
 			isDragged = true;
 		}
-		else 
+
+		if (this->twoTouches) // rect contains two active touch points 
 		{
-			isDragged = false;
+			float currFingDist = glm::distance(lastTouch.getPos(), touch.getPos());
+			float size = currFingDist / this->initFingDist;
+			CI_LOG_I("size: " << size);
+
+			if (this->rect.getWidth()*size > 300 & this->rect.getWidth()*size < 1500)
+			{
+				this->rect.scaleCentered(size);
+			}
+			//float *coord = transform.rotate();
 		}
 	}
 }
 
 void Card::touchesEnded(TouchEvent event) 
 {
-	CI_LOG_I("touchesEnded");
+	//CI_LOG_I("touchesEnded");
 	this->isClicked = false;
 	this->isDragged = false;
+	this->twoTouches = false;
+	//this->lastTouch = event.getTouches;
 }
 
 void Card::update() 

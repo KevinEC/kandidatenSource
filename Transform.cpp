@@ -9,8 +9,12 @@ Transform::~Transform()
 {
 }
 
-void Transform::scale()
+float Transform::scale(glm::vec2 v1, glm::vec2 v2)
 {
+	float res = sqrt(v1.x*v1.x + v1.y*v1.y) - sqrt(v2.x*v2.x + v2.y*v2.y);
+	if (res != 0) return res;
+	else return 1;
+	//glm::length(v1) - glm::length(v2);
 }
 
 void Transform::rotate()
