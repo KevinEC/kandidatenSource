@@ -219,6 +219,7 @@ void Card::touchesMoved(TouchEvent event)
 		{
 			float currFingDist = glm::distance(lastTouch.getPos(), touch.getPos());
 			float size = currFingDist / this->initFingDist;
+			this->cardSize = size;
 			CI_LOG_I("size: " << size);
 
 			if (this->rect.getWidth()*size > 300 & this->rect.getWidth()*size < 1500)
