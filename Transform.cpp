@@ -17,8 +17,39 @@ float Transform::scale(glm::vec2 v1, glm::vec2 v2)
 	//glm::length(v1) - glm::length(v2);
 }
 
-void Transform::rotate()
+glm::mat3 Transform::rotate(glm::vec2 v1, glm::vec2 v2)
 {
+    //glm::vec2 xAxis(1.0,0.0);
+    GLfloat Mtemp[9];
+    glm::mat3 res;
+    v1 = glm::normalize(v1);
+    v2 = glm::normalize(v2);
+
+    //float angle1 = glm::orientedAngle(v1,xAxis); // radians
+    //float angle2 = glm::orientedAngle(v2, xAxis); // radians
+    //float angle = angle1 / angle2;
+    float angle = glm::angle(v1, v2);
+    //angle = glm::degrees(angle); // deg
+    //angle = fmodf(angle, 360);  // < 360
+
+    CI_LOG_I("angle: " << angle);
+   
+    /*
+    glm::mat3 trans = glm::mat3(1.0f);
+    trans = glm::rotate(trans, angle);
+ */
+    Mtemp[0] = cos(angle);  Mtemp[1] = -sin(angle); Mtemp[2] = 0.0f; 
+    Mtemp[3] = sin(angle);  Mtemp[4] = cos(angle);  Mtemp[5] = 0.0f; 
+    Mtemp[6] = 0.0f;        Mtemp[7] = 0.0f;        Mtemp[8] = 1.0f;
+
+    /*Mtemp[0] = cos(angle);  Mtemp[1] = 0.0f;    Mtemp[2] = sin(angle);
+    Mtemp[3] = 0.0f;        Mtemp[4] = 1.0f;      Mtemp[5] = 0.0f;
+    Mtemp[6] = -sin(angle);   Mtemp[7] = 0.0f;   Mtemp[8] = cos(angle);
+    */
+    res = glm::make_mat3(Mtemp);
+    res = glm::transpose(res);
+
+     return res;
 }
 
 void Transform::translate()

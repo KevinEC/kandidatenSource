@@ -34,7 +34,7 @@ Card::Card(const float x1, const float y1, std::string title, std::string body)
 	x = x1;
 	y = y1;
 
-	cardSize = 1.2;
+	cardSize = 1;
 	width = 336.0f*cardSize;
 	height = 500.0f*cardSize;
 
@@ -159,11 +159,11 @@ void Card::touchesBegan(TouchEvent event)
 	{
 		if (rect.contains(touch.getPos())) 
 		{
+            activeTouchesOnCard.push_back(touch);
 			if (this->isClicked == true) // rect contains two touch points // && rect.contains(lastTouch.getPos()
 			{
 				this->twoTouches = true;
-				this->initFingDist = glm::distance(lastTouch.getPos(), touch.getPos());
-				CI_LOG_I("initial finger distance: " << initFingDist);
+                this->initVec = activeTouchesOnCard[1].getPos() - activeTouchesOnCard[0].getPos();
 			//	CI_LOG_I("vi har två fingrar på rektangeln");
 			}
 			else 
@@ -176,7 +176,7 @@ void Card::touchesBegan(TouchEvent event)
 			this->isFront = true;
 			this->title = "du har klickat på rektangeln";
 			
-			CI_LOG_I("title: " << title);
+		//	CI_LOG_I("title: " << title);
 		}
 	}
 }
@@ -186,10 +186,14 @@ void Card::touchesMoved(TouchEvent event)
 	for (const auto &touch : event.getTouches()) 
 	{
 		//set a bool to true when rect.contains is true once. Dont set to false until mouseUp to avoid mouse getting outside the rect
-		if (isClicked) 
+		if (isClicked && !activeTouchesOnCard.empty() && touch.getId() == activeTouchesOnCard[0].getId())
 		{
-			this->title = "du har dragit på rektangeln";
-			float mx = touch.getX();
+			//this->title = "du har dragit på rektangeln";
+			
+            /****************************
+            *       TRANSLATION         *
+            ****************************/
+            float mx = touch.getX();
 			float my = touch.getY();
 			
 			float *coords = transform.translate(this->rect.getX1(), this->rect.getY1(), mx, my, isDragged);
@@ -201,17 +205,29 @@ void Card::touchesMoved(TouchEvent event)
 			isDragged = true;
 		}
 
-		if (this->twoTouches) // rect contains two active touch points 
+		if (this->twoTouches) // rect contains two active touch points - activeTouchesOnCard.size() > 1
 		{
-			float currFingDist = glm::distance(lastTouch.getPos(), touch.getPos());
-			this->cardSize = currFingDist / this->initFingDist;
-			CI_LOG_I("size: " << this->cardSize);
+            /********************************
+            *           SCALING             *
+            ********************************/
+            vec2 currVec = lastTouch.getPos() - touch.getPos();
+            this->cardSize = glm::length(currVec) / glm::length(initVec);
+            
+            if (cardSize > 0.2 && cardSize < 2) // don't scale for very small/big scale factors
+            {
+                //CI_LOG_I("size: " << this->cardSize);
+                if (this->rect.getHeight()*this->cardSize > 300 && this->rect.getHeight()*this->cardSize < 1000) // don't exceed max size
+                {
+                    this->rect.scaleCentered(this->cardSize);
 
-			if (this->rect.getWidth()*this->cardSize > 300 && this->rect.getWidth()*this->cardSize < 1500)
-			{
-				this->rect.scaleCentered(this->cardSize);
-			}
-			//float *coord = transform.rotate();
+                    /************************
+                    *       ROTATION        *
+                    ************************/
+                    glm::mat3 mat = transform.rotate(initVec, currVec);
+                    this->rect.transform(mat);
+                    this->initVec = currVec;
+                }
+            }
 		}
 	}
 }
@@ -219,10 +235,24 @@ void Card::touchesMoved(TouchEvent event)
 void Card::touchesEnded(TouchEvent event) 
 {
 	//CI_LOG_I("touchesEnded");
-	this->isClicked = false;
-	this->isDragged = false;
-	this->twoTouches = false;
-	//this->lastTouch = event.getTouches;
+    for (auto &touch : event.getTouches())
+    {
+        for (int i = 0; i < activeTouchesOnCard.size(); ++i)
+        {
+            if (touch.getId() == activeTouchesOnCard[i].getId())
+            {
+                activeTouchesOnCard.erase(activeTouchesOnCard.begin() + i);
+            }
+        }
+    }
+    
+    if (activeTouchesOnCard.empty())
+    {
+        this->isClicked = false;
+        this->isDragged = false;
+    }
+    else if (activeTouchesOnCard.size() < 2) this->twoTouches = false;
+	
 }
 
 void Card::update() 
