@@ -35,7 +35,7 @@ Card::Card(const float x1, const float y1, std::string title, std::string body)
 	x = x1;
 	y = y1;
 
-	cardSize = 1.2;
+	cardSize = 1.0f;
 	width = 336.0f*cardSize;
 	height = 500.0f*cardSize;
 
@@ -52,7 +52,8 @@ Card::Card(const float x1, const float y1, std::string title, std::string body)
 	initFingDist = 0;
 
 	transform = Transform();
-	this->initElements();
+	initElements();
+	setStyles();
 
 	
 
@@ -90,14 +91,17 @@ void Card::initElements()
 	paddingX = 22.0f*cardSize;
 	elementWidth = 292.0f *cardSize;
 	//const ColorA textColor = ColorA(65, 64, 66, 0.5f);
-	const ColorA textColor = ColorA::black();
-	const Font titleFont = Font(loadAsset("fonts/Montserrat.ttf"), 20.0*cardSize);
-	const Font bodyFont = Font(loadAsset("fonts/Raleway.ttf"), 14.0*cardSize);
+	textColor = ColorA::hex(0x1d1d1d);
+	montserrat = loadAsset("fonts/Montserrat.ttf");
+	raleway = loadAsset("fonts/Raleway.ttf");
+
+	const Font titleFont = Font(montserrat , 20.0*cardSize);
+	const Font bodyFont = Font(raleway, 14.0*cardSize);
 
 	updateElementCoords();
 
-	TextBox titleBox = TextBox().text(title).font(titleFont).color(textColor).size(elementWidth, TextBox::GROW);
-	TextBox bodyBox = TextBox().text(body).font(bodyFont).color(textColor).size(elementWidth, TextBox::GROW);
+	TextBox titleBox = TextBox().text(title).font(titleFont).color(textColor).size(elementWidth, 30*cardSize);
+	TextBox bodyBox = TextBox().text(body).font(bodyFont).color(textColor).size(elementWidth, 129*cardSize);
 
 	CI_LOG_I("CARD COORD:   x: " << x << "  y: " << y);
 	CI_LOG_I("TEXTBOX:   " << titleCo);
@@ -112,6 +116,12 @@ void Card::updateElementCoords()
 	paddingX = 22.0f*cardSize;
 	elementWidth = 292.0f *cardSize;
 
+	const Font titleFont = Font(montserrat, 20.0*cardSize);
+	const Font bodyFont = Font(raleway, 14.0*cardSize);
+
+	TextBox titleBox = TextBox().text(title).font(titleFont).color(textColor).size(elementWidth, 30 * cardSize);
+	TextBox bodyBox = TextBox().text(body).font(bodyFont).color(textColor).size(elementWidth, 129 * cardSize);
+
 	float imgY = 22.0f*cardSize;
 	float titleY = 268.0f*cardSize;
 	float bodyY = 320.0f*cardSize;
@@ -121,6 +131,7 @@ void Card::updateElementCoords()
 	titleCo = vec2(x + paddingX, y + titleY);
 	bodyCo = vec2(x + paddingX, y + bodyY);
 	tagsCo = vec2(x + paddingX, y + tagsY);
+
 }
 
 void Card::mouseDrag(MouseEvent event)
@@ -242,8 +253,33 @@ void Card::touchesEnded(TouchEvent event)
 
 void Card::update() 
 {
-	if (isClicked) 
-	{
-		title = "du har klickat på rektangeln";
-	}
+	updateElementCoords();
+
+}
+
+void Card::setStyles()
+{
+	bgColor = Color::hex(0xfcfcfc); // off-white
+	borderColor = Color::hex(0xbcbcbc);
+	borderRadius = 5.0f;
+}
+
+void Card::renderCard() {
+
+	int cornerSegments = 5;
+
+	gl::color(bgColor);
+
+	gl::drawSolidRoundedRect(rect, borderRadius, cornerSegments);
+
+	gl::color(borderColor);
+
+	gl::drawStrokedRoundedRect(rect, borderRadius, cornerSegments);
+
+	gl::color(Color::white());
+
+	gl::draw(titleTex, titleCo);
+	gl::draw(bodyTex, bodyCo);
+
+
 }
