@@ -68,7 +68,6 @@ public:
 	void	touchesEnded(TouchEvent event) override;
 
 	void	renderCards();
-	void	renderCard();
 
 	gl::Texture2dRef texture;
 	gl::Texture2dRef background;
@@ -200,7 +199,7 @@ void kandidatenApp::mouseDown(MouseEvent event)
 {
 	//mMouseLoc = event.getPos();
 	lastclick = event.getPos();
-	kort.rectKort.mouseDown(event);
+	kort.mouseDown(event);
 	kort2.rectKort.mouseDown(event);
 
 }
@@ -210,13 +209,13 @@ void kandidatenApp::mouseDrag(MouseEvent event) {
 	test2 = true;
 
 	mActivePoints[i++].addPoint(event.getPos());
-	kort.rectKort.mouseDrag(event);
+	kort.mouseDrag(event);
 	kort2.rectKort.mouseDrag(event);
 }
 
 void kandidatenApp::mouseUp(MouseEvent event) {
 
-	kort.rectKort.mouseUp(event);
+	kort.mouseUp(event);
 	kort2.rectKort.mouseUp(event);
 }
 
@@ -261,7 +260,8 @@ void kandidatenApp::draw()
 		gl::drawStrokedCircle(touch.getPos(), 20);
 	}
 
-	kort2.renderCards();
+	if(kort.loaded)
+		kort.renderCards();
 
 }
 

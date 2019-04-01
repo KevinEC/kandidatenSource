@@ -103,9 +103,6 @@ void Card::initElements()
 	TextBox titleBox = TextBox().text(title).font(titleFont).color(textColor).size(elementWidth, 30*cardSize);
 	TextBox bodyBox = TextBox().text(body).font(bodyFont).color(textColor).size(elementWidth, 129*cardSize);
 
-	CI_LOG_I("CARD COORD:   x: " << x << "  y: " << y);
-	CI_LOG_I("TEXTBOX:   " << titleCo);
-
 
 	titleTex = renderTexture(titleBox);
 	bodyTex = renderTexture(bodyBox);
@@ -121,6 +118,10 @@ void Card::updateElementCoords()
 
 	TextBox titleBox = TextBox().text(title).font(titleFont).color(textColor).size(elementWidth, 30 * cardSize);
 	TextBox bodyBox = TextBox().text(body).font(bodyFont).color(textColor).size(elementWidth, 129 * cardSize);
+
+	//Texturer kan inte skapas i en renderings loop..?
+	/*titleTex = renderTexture(titleBox);
+	bodyTex = renderTexture(bodyBox);*/
 
 	float imgY = 22.0f*cardSize;
 	float titleY = 268.0f*cardSize;
