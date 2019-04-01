@@ -68,7 +68,11 @@ public:
 	void	touchesEnded(TouchEvent event) override;
 
 	void	renderCards();
+	void	renderCard();
+
 	gl::Texture2dRef texture;
+	gl::Texture2dRef background;
+
 	Surface mysurf;
 	vec2 mMouseLoc;
 	vec2 lastclick;
@@ -97,6 +101,8 @@ void prepareSettings(kandidatenApp::Settings *settings)
 void kandidatenApp::setup()
 {
 	CI_LOG_I("MT: " << System::hasMultiTouch() << " Max points: " << System::getMaxMultiTouchPoints());
+
+	background = gl::Texture::create( loadImage(loadAsset("background.png")));
 
 	i = 0;
 	kort2 = Cards();
@@ -230,7 +236,9 @@ void kandidatenApp::draw()
 	//gl::clear(Color(0, 50, 0));
 	//gl::drawSolidCircle(getWindowCenter(), 200);
 	gl::enableAlphaBlending();
+
 	gl::clear(Color(0.1f, 0.1f, 0.1f));
+	gl::draw(background);
 
 	for (const auto &activePoint : mActivePoints) {
 		activePoint.second.draw();
@@ -253,22 +261,10 @@ void kandidatenApp::draw()
 		gl::drawStrokedCircle(touch.getPos(), 20);
 	}
 
-
-	gl::color(Color::white());
-
-	gl::drawSolidRect(kort2.rectKort.rect);
-	gl::draw(kort2.rectKort.titleTex, kort2.rectKort.titleCo);
-	gl::draw(kort2.rectKort.bodyTex, kort2.rectKort.bodyCo);
-
-	/*gl::drawSolidRect(kort.allcards.begin()->rect);
-	gl::draw(kort.allcards.begin()->titleTex, kort.allcards.begin()->titleCo);
-	gl::draw(kort.allcards.begin()->bodyTex, kort.allcards.begin()->bodyCo);*/
-
-
-
-	//gl::draw(texture);
-
+	kort2.renderCards();
 
 }
+
+
 
 CINDER_APP(kandidatenApp, RendererGl, prepareSettings)

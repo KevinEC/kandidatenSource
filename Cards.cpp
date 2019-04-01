@@ -6,11 +6,12 @@ using namespace std;
 
 Cards::Cards()
 {
+	string par = "more long text with a lot of important words for testing and stuff. more long text with a lot of important words for testing and stuff. more long text with a lot of important words for testing and stuff. more long text with a lot of important words for testing and stuff. more long text with a lot of important words for testing and stuff. more long text with a lot of important words for testing and stuff. ";
 
 	float x1 = rand() % 400;
 	float y1 = rand() % 400;
 	testkort = Card(300.0f, 320.0f, "test", "more long text");
-	rectKort = Card(x1,y1,"test", "more long text");
+	rectKort = Card(x1,y1,"A pretty title", par);
 
 }
 
@@ -29,6 +30,12 @@ Cards::Cards(std::vector<std::pair<std::string, std::string>>* titles, std::vect
 		bodyIt++;
 	}
 
+}
+
+void Cards::renderCards() {
+
+	rectKort.renderCard();
+	//testkort.renderCard();
 }
 
 Cards::~Cards()
