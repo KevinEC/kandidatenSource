@@ -33,7 +33,8 @@ Cards::Cards(std::vector<std::pair<std::string, std::string>>* titles, std::vect
 }
 
 void Cards::renderCards() {
-
+   /* gl::pushModelMatrix();
+    gl::rotate*/
 	rectKort.renderCard();
 	//testkort.renderCard();
 }

@@ -17,22 +17,32 @@ float Transform::scale(glm::vec2 v1, glm::vec2 v2)
 	//glm::length(v1) - glm::length(v2);
 }
 
+float Transform::rotateCard(glm::vec2 v1, glm::vec2 v2)
+{
+    v1 = glm::normalize(v1);
+    v2 = glm::normalize(v2);
+    float angle = glm::orientedAngle(v1, v2);
+    
+    CI_LOG_I("Angle: " << glm::degrees(angle));
+
+    return angle;
+}
+
 glm::mat3 Transform::rotate(glm::vec2 v1, glm::vec2 v2)
 {
-    //glm::vec2 xAxis(1.0,0.0);
     GLfloat Mtemp[9];
     glm::mat3 res;
     v1 = glm::normalize(v1);
     v2 = glm::normalize(v2);
 
+    //glm::vec2 xAxis(1.0,0.0);
     //float angle1 = glm::orientedAngle(v1,xAxis); // radians
     //float angle2 = glm::orientedAngle(v2, xAxis); // radians
     //float angle = angle1 / angle2;
-    float angle = glm::angle(v1, v2);
-    //angle = glm::degrees(angle); // deg
-    //angle = fmodf(angle, 360);  // < 360
 
-    CI_LOG_I("angle: " << angle);
+    float angle = glm::angle(v1, v2);
+
+    CI_LOG_I("angle: " << glm::degrees(angle));
    
     /*
     glm::mat3 trans = glm::mat3(1.0f);

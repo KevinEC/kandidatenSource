@@ -33,8 +33,8 @@ Card::Card(const float x1, const float y1, std::string title, std::string body)
 {
 	x = x1;
 	y = y1;
-
-
+    angle = 0;
+   
 	cardSize = 1.0f;
 	width = 336.0f*cardSize;
 	height = 500.0f*cardSize;
@@ -90,8 +90,8 @@ void Card::initElements()
 	TextBox titleBox = TextBox().text(title).font(titleFont).color(textColor).size(elementWidth, 30*cardSize);
 	TextBox bodyBox = TextBox().text(body).font(bodyFont).color(textColor).size(elementWidth, 129*cardSize);
 
-	CI_LOG_I("CARD COORD:   x: " << x << "  y: " << y);
-	CI_LOG_I("TEXTBOX:   " << titleCo);
+	//CI_LOG_I("CARD COORD:   x: " << x << "  y: " << y);
+	//CI_LOG_I("TEXTBOX:   " << titleCo);
 
 
 	titleTex = renderTexture(titleBox);
@@ -211,7 +211,7 @@ void Card::touchesMoved(TouchEvent event)
 			float *coords = transform.translate(this->rect.getX1(), this->rect.getY1(), mx, my, isDragged);
 			this->setpos(coords[0], coords[1]);
 			this->rect.set(coords[0], coords[1], coords[0] + rect.getWidth(), coords[1] + rect.getHeight());
-			updateElementCoords();
+			//updateElementCoords();
 			
 			delete coords;
 			isDragged = true;
@@ -235,8 +235,11 @@ void Card::touchesMoved(TouchEvent event)
                     /************************
                     *       ROTATION        *
                     ************************/
-                    glm::mat3 mat = transform.rotate(initVec, currVec);
-                    this->rect.transform(mat);
+                    this->angle = transform.rotateCard(initVec, currVec);
+                    
+                    //this->rotMat = transform.rotate(initVec, currVec);
+                    //this->rect.transform(mat);
+                    
                     this->initVec = currVec;
                 }
             }
@@ -281,21 +284,27 @@ void Card::setStyles()
 }
 
 void Card::renderCard() {
-
-	int cornerSegments = 5;
-
+    int cornerSegments = 5;
 	gl::color(bgColor);
-
-	gl::drawSolidRoundedRect(rect, borderRadius, cornerSegments);
-
 	gl::color(borderColor);
+  
+    float xPos = this->rect.getCenter().x;
+    float yPos = this->rect.getCenter().y;
 
-	gl::drawStrokedRoundedRect(rect, borderRadius, cornerSegments);
+    gl::pushModelMatrix();
 
-	gl::color(Color::white());
+    gl::translate(-xPos, yPos, 0); //translate to origin  - not doing anythinh ?
+    gl::rotate(this->angle, vec3{0, 0, 1});
+    gl::translate(xPos, -yPos, 0); //translate back - not doing anythinh ?
 
-	gl::draw(titleTex, titleCo);
-	gl::draw(bodyTex, bodyCo);
+    gl::drawSolidRoundedRect(rect, borderRadius, cornerSegments);
+    gl::drawStrokedRoundedRect(rect, borderRadius, cornerSegments);
+    
+    gl::color(Color::white());
+    gl::draw(titleTex, titleCo);
+    gl::draw(bodyTex, bodyCo);
 
-
+    // gl::drawSolidRect(rect, vec2{0,1}, vec2{ 1,0 });
+    //gl::drawSolidRect(rect, rect.getUpperLeft(), rect.getLowerRight());
+    gl::popModelMatrix();  
 }
