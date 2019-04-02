@@ -15,6 +15,11 @@ Cards::Cards()
 
 }
 
+Cards::Cards(string categorie)
+{
+	this->categorie = categorie;
+}
+
 Cards::Cards(vector<pair<string, string>>* titles, vector<pair<string, string>>* bodyText)
 {
 	loaded = false;
