@@ -67,7 +67,8 @@ public:
 	void	touchesMoved(TouchEvent event) override;
 	void	touchesEnded(TouchEvent event) override;
 
-	void	renderCards();
+	void	renderCategories();
+	void	selectCategories(int enable[]);
 
 	gl::Texture2dRef texture;
 	gl::Texture2dRef background;
@@ -82,6 +83,7 @@ public:
 	Cards kort2;
 	int i;
 	dataBaseController dbc;
+	vector<pair<string, Cards*>> allCategories;
 
 
 
@@ -111,19 +113,19 @@ void kandidatenApp::setup()
 	// CI_LOG_I("db: " << db.tree);
 
 	/*- extract categories -*/
-	std::vector<std::string> categories;
+	vector<string> categories;
 	dbc.extractCategories(categories);
 
 	/*- extract card titles -*/
-	std::vector<std::pair<std::string, std::string>> titles;
+	vector<pair<string, string>> titles;
 	dbc.extractTitles(titles);
 
 	/*- extract bodytexts -*/
-	std::vector<std::pair<std::string, std::string>> bodyText;
+	vector<pair<string, string>> bodyText;
 	dbc.extractBodies(bodyText);
 
 	/*- extract image paths -*/
-	std::vector<std::string> imgPath;
+	vector<string> imgPath;
 	dbc.extractImgPaths(imgPath);
 
 	ci::Area area = Area(kort2.rectKort.rect);
@@ -136,7 +138,7 @@ void kandidatenApp::setup()
 	texture->setCleanBounds(area);
 
 	/*- extract card categories -*/
-	std::vector<std::vector<std::string> > cardCategory;
+	vector<vector<string> > cardCategory;
 	dbc.extractCardCats(cardCategory);
 
 	CI_LOG_I("sizes: " << categories.size() << " " << titles.size() << " " << bodyText.size() << " " << imgPath.size() << " " << cardCategory.size());
@@ -144,6 +146,11 @@ void kandidatenApp::setup()
 
 	kort = Cards(&titles, &bodyText);
 
+	Cards allCards = Cards();
+	allCategories = allCards.categorize(&titles, &bodyText, &categories, &cardCategory);
+
+	int enabledCategories[7] = { 1, 0, 0, 0, 0, 0, 0 };
+	selectCategories(enabledCategories);
 
 	disableFrameRate();
 	gl::enableVerticalSync(true);
@@ -200,7 +207,6 @@ void kandidatenApp::mouseDown(MouseEvent event)
 	//mMouseLoc = event.getPos();
 	lastclick = event.getPos();
 	kort.mouseDown(event);
-	kort2.rectKort.mouseDown(event);
 
 }
 
@@ -210,13 +216,11 @@ void kandidatenApp::mouseDrag(MouseEvent event) {
 
 	mActivePoints[i++].addPoint(event.getPos());
 	kort.mouseDrag(event);
-	kort2.rectKort.mouseDrag(event);
 }
 
 void kandidatenApp::mouseUp(MouseEvent event) {
 
 	kort.mouseUp(event);
-	kort2.rectKort.mouseUp(event);
 }
 
 void kandidatenApp::update()
@@ -224,9 +228,30 @@ void kandidatenApp::update()
 
 }
 
-void renderCards()
+void kandidatenApp::renderCategories()
 {
+	for (auto &categorie : allCategories)
+	{
+		categorie.second->renderCards();
+	}
+}
 
+// list of bools for every categorie. Type 1 to enable a categorie.
+// Categories are ordered as the following list:
+// Protte, Virus, Celler, Molekyler, gener, livsprocesser, sjukdomar
+void kandidatenApp::selectCategories(int enable[])
+{
+	int index = 0;
+	for (auto &categorie : allCategories)
+	{
+		if (enable[index]) {
+			categorie.second->render = true;
+		}
+		else {
+			categorie.second->render = false;
+		}
+		index++;
+	}
 }
 
 void kandidatenApp::draw()
@@ -260,8 +285,7 @@ void kandidatenApp::draw()
 		gl::drawStrokedCircle(touch.getPos(), 20);
 	}
 
-	if(kort.loaded)
-		kort.renderCards();
+	renderCategories();
 
 }
 

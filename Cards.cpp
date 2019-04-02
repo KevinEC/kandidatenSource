@@ -6,12 +6,17 @@ using namespace std;
 
 Cards::Cards()
 {
+	//render the instace of card by default
+	render = true;
+
+
+	// this should be removed
 	string par = "more long text with a lot of important words for testing and stuff. more long text with a lot of important words for testing and stuff. more long text with a lot of important words for testing and stuff. more long text with a lot of important words for testing and stuff. more long text with a lot of important words for testing and stuff. more long text with a lot of important words for testing and stuff. ";
 
 	float x1 = rand() % 400;
 	float y1 = rand() % 400;
 	testkort = Card(300.0f, 320.0f, "test", "more long text");
-	rectKort = Card(x1,y1,"A pretty title", par);
+	rectKort = Card(x1, y1, "A pretty title", par);
 
 }
 
@@ -22,7 +27,6 @@ Cards::Cards(string categorie)
 
 Cards::Cards(vector<pair<string, string>>* titles, vector<pair<string, string>>* bodyText)
 {
-	loaded = false;
 	allcards.reserve(20);
 	float x1 = rand() % 400;
 	float y1 = rand() % 400;
@@ -41,61 +45,74 @@ Cards::Cards(vector<pair<string, string>>* titles, vector<pair<string, string>>*
 		bodyIt++;
 	}
 
-	loaded = true;
-
-}
-
-Cards::Cards(vector<pair<string, string>>* titles, vector<pair<string, string>>* bodyText, vector<pair<string, string>>* categories, vector<pair<string, string>>* cardCat, bool createAll)
-{
-	vector<pair<string, string>>::iterator catIt = categories->begin();
-
-	vector< pair<string, Cards*> > categorizedCards;
-
-	// insert all categorie names
-	while (catIt != categories->end())
-	{
-		categorizedCards.push_back( make_pair(catIt->first, nullptr) );
-		catIt++;
-	}
-	categorize(categorizedCards, cardCat, titles, bodyText);
-}
-
-void Cards::renderCards() 
-{
-	for (int i = 0; i < allcards.size(); i++)
-	{
-		allcards[i]->renderCard();
-	}
 }
 
 Cards::~Cards()
 {
 }
 
-void Cards::sort()
+vector< pair<string, Cards*> > Cards::categorize(vector<pair<string, string>>* titles, vector<pair<string, string>>* bodyText, vector<string>* categories, vector<vector<string>>* cardCat)
 {
+	vector<string>::iterator catIt = categories->begin();
+
+	vector< pair<string, Cards*> > categorizedCards;
+	categorizedCards.reserve(8);
+
+	// insert all categorie names
+	while (catIt != categories->end())
+	{
+		categorizedCards.push_back( make_pair(*catIt, new Cards() ) );
+		categorizedCards.back().second->categorie = *catIt; // set the instance var categorie to the right catgorie as well
+		catIt++;
+	}
+	return *sort(&categorizedCards, cardCat, titles, bodyText); // dereference to create a copy to main
 }
 
-void Cards::categorize(vector< pair<string, Cards*> >& categorizedCards, vector<pair<string, string>>* cardCat, vector<pair<string, string>>* titles, vector<pair<string, string>>* bodyText)
+
+vector<pair<string, Cards*>>* Cards::sort(vector< pair<string, Cards*> >* categorizedCards, vector<vector<string>>* cardCat, vector<pair<string, string>>* titles, vector<pair<string, string>>* bodyText)
 {
-	vector< pair<string, Cards*> >::iterator sortedCardsIt;
 
-	vector<pair<string, string>>::iterator cardCatIt = titles->begin();
-	vector<pair<string, string>>::iterator titleIt = titles->begin();
-	vector<pair<string, string>>::iterator bodyIt = bodyText->begin();
-
-	for (int i = 0; i < categorizedCards.size(); i++)
+	for (int i = 0; i < categorizedCards->size(); i++)
 	{
-		while (cardCatIt != cardCat->end())
+		for (int j = 0; j < cardCat->size(); j++)
 		{
-			if (categorizedCards[i].first == cardCatIt->first) {
-				categorizedCards[i].second = new Cards();
+			string searched = categorizedCards->at(i).first;
+			if (findCat(cardCat->at(j).begin(), cardCat->at(j).end(), searched)) { // help function to search vector for string
+				float x1 = rand() % 400;
+				float y1 = rand() % 400;
+				categorizedCards->at(i).second->addCard(new Card(x1, y1, titles->at(j).first, bodyText->at(j).first));
 			}
+
 		}
 	}
 
+	return categorizedCards; // return pointer to avoid making an extra copy locally in Cards
+}
 
+void Cards::renderCards()
+{
+	// only render if true
+	if (render) {
+		for (int i = 0; i < allcards.size(); i++)
+		{
+			allcards[i]->renderCard();
+		}
+	}
 
+}
+
+void Cards::addCard(Card *card)
+{
+	allcards.push_back(card);
+}
+
+bool Cards::findCat(vector<string>::iterator first, vector<string>::iterator last, string searched)
+{
+	for (; first != last; ++first)
+	{
+		if (*first == searched) return true;
+	}
+	return false;
 }
 
 void Cards::collision()
@@ -112,24 +129,36 @@ void Cards::search()
 
 void Cards::mouseDown(MouseEvent event)
 {
-	for (int i = 0; i < allcards.size(); i++)
+	if (render)
 	{
-		allcards[i]->mouseDown(event);
+		for (int i = 0; i < allcards.size(); i++)
+		{
+			allcards[i]->mouseDown(event);
+		}
 	}
+
 }
 
 void Cards::mouseDrag(MouseEvent event)
 {
-	for (int i = 0; i < allcards.size(); i++)
+	if (render)
 	{
-		allcards[i]->mouseDrag(event);
+		for (int i = 0; i < allcards.size(); i++)
+		{
+			allcards[i]->mouseDrag(event);
+		}
 	}
+
 }
 
 void Cards::mouseUp(MouseEvent event)
 {
-	for (int i = 0; i < allcards.size(); i++)
+	if (render)
 	{
-		allcards[i]->mouseUp(event);
+		for (int i = 0; i < allcards.size(); i++)
+		{
+			allcards[i]->mouseUp(event);
+		}
 	}
+
 }
