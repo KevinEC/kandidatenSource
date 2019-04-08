@@ -21,10 +21,17 @@ float Transform::rotateCard(glm::vec2 v1, glm::vec2 v2)
 {
     v1 = glm::normalize(v1);
     v2 = glm::normalize(v2);
-    float angle = glm::orientedAngle(v1, v2);
-    
-    CI_LOG_I("Angle: " << glm::degrees(angle));
+    /*
+    glm::vec2 xAxis(1.0,0.0);
+    float angle1 = glm::orientedAngle(v1,xAxis); // radians
+    float angle2 = glm::orientedAngle(v2, xAxis); // radians
+    float angle = angle1 / angle2;*/
 
+    float angle = glm::orientedAngle(v1, v2);
+    //float angle = glm::angle(v1, v2);
+    
+    
+    //if (angle > M_PI && angle < -M_PI) return 0;
     return angle;
 }
 
@@ -40,34 +47,43 @@ glm::mat3 Transform::rotate(glm::vec2 v1, glm::vec2 v2)
     //float angle2 = glm::orientedAngle(v2, xAxis); // radians
     //float angle = angle1 / angle2;
 
-    float angle = glm::angle(v1, v2);
+    float angle = glm::orientedAngle(v1, v2);
 
     CI_LOG_I("angle: " << glm::degrees(angle));
    
-    /*
     glm::mat3 trans = glm::mat3(1.0f);
-    trans = glm::rotate(trans, angle);
- */
+    //trans = glm::rotate(trans, angle);
+
+    /* rot z
     Mtemp[0] = cos(angle);  Mtemp[1] = -sin(angle); Mtemp[2] = 0.0f; 
     Mtemp[3] = sin(angle);  Mtemp[4] = cos(angle);  Mtemp[5] = 0.0f; 
-    Mtemp[6] = 0.0f;        Mtemp[7] = 0.0f;        Mtemp[8] = 1.0f;
+    Mtemp[6] = 0.0f;        Mtemp[7] = 0.0f;        Mtemp[8] = 1.0f; */
 
-    /*Mtemp[0] = cos(angle);  Mtemp[1] = 0.0f;    Mtemp[2] = sin(angle);
+    /* rot y 
+    Mtemp[0] = cos(angle);  Mtemp[1] = 0.0f;    Mtemp[2] = sin(angle);
     Mtemp[3] = 0.0f;        Mtemp[4] = 1.0f;      Mtemp[5] = 0.0f;
     Mtemp[6] = -sin(angle);   Mtemp[7] = 0.0f;   Mtemp[8] = cos(angle);
     */
-    res = glm::make_mat3(Mtemp);
-    res = glm::transpose(res);
+    //res = glm::make_mat3(Mtemp);
+    //res = glm::transpose(res);
 
-     return res;
+     return glm::rotate(trans, angle);
 }
 
-void Transform::translate()
+glm::mat3 Transform::translateCard(float x, float y)
 {
-	Animate animation = Animate();
-	animation.newPage();
-
+    glm::mat3 trans = glm::mat3(1.0f);
+    
+    return glm::translate(trans, {x,y});
 }
+
+glm::mat3 Transform::scaling(float size)
+{
+    glm::mat3 trans = glm::mat3(1.0f);
+    
+    return glm::scale(trans, {size, size});
+}
+
 
 //Calculate the new coordinates for card taking into consideration the relative position to the top left corner
 float * Transform::translate(const float x, const float y, const float mx, const float my, const bool isDragged)
