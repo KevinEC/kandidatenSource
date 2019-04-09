@@ -286,6 +286,7 @@ void kandidatenApp::draw()
 	}
 
 	renderCategories();
+	//kort.renderCards();
 
 }
 

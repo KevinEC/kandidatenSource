@@ -255,7 +255,6 @@ void Card::touchesEnded(TouchEvent event)
 void Card::update() 
 {
 	updateElementCoords();
-
 }
 
 void Card::setStyles()
