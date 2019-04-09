@@ -198,32 +198,16 @@ void Card::touchesMoved(TouchEvent event)
 {
 	for (const auto &touch : event.getTouches()) 
 	{
-		//set a bool to true when rect.contains is true once. Dont set to false until mouseUp to avoid mouse getting outside the rect
-		if (isClicked && !activeTouchesOnCard.empty() && touch.getId() == activeTouchesOnCard[0].getId())
-		{
-			//this->title = "du har dragit på rektangeln";
-			
-            /****************************
-            *       TRANSLATION         *
-            ****************************/
-            float mx = touch.getX();
-			float my = touch.getY();
-			
-			float *coords = transform.translate(this->rect.getX1(), this->rect.getY1(), mx, my, isDragged);
-			this->setpos(coords[0], coords[1]);
-            this->transMat = transform.translateCard(coords[0], coords[1]);
-			this->rect.set(coords[0], coords[1], coords[0] + rect.getWidth(), coords[1] + rect.getHeight());
-			//updateElementCoords();
-			
-			delete coords;
-			isDragged = true;
-		}
-
+		
+		translate(touch);
+		scaling(touch);
+		rotation(touch);
+		/*
 		if (this->twoTouches) // rect contains two active touch points - activeTouchesOnCard.size() > 1
 		{
             /********************************
             *           SCALING             *
-            ********************************/
+            ********************************
             vec2 currVec = lastTouch.getPos() - touch.getPos();
             this->cardSize = glm::length(currVec) / glm::length(initVec);
             
@@ -232,13 +216,16 @@ void Card::touchesMoved(TouchEvent event)
                 //CI_LOG_I("size: " << this->cardSize);
                 if (this->rect.getHeight()*this->cardSize > 300 && this->rect.getHeight()*this->cardSize < 600) // don't exceed max size
                 {
-                   // this->rect.scaleCentered(this->cardSize);
-                    this->scaleMat = transform.scaling(this->cardSize);
+                    this->rect.scaleCentered(this->cardSize);
+                    /*this->scaleMat = transform.scaling(this->cardSize);
+					CI_LOG_I("scale Matrix: " << scaleMat);
+					this->rect.transform(scaleMat);
+
                     this->isScaled = true;
 
                     /************************
                     *       ROTATION        *
-                    ************************/
+                    ************************
                     
                 }
             }
@@ -250,7 +237,7 @@ void Card::touchesMoved(TouchEvent event)
             //this->rect.transform(mat);
 
             this->initVec = currVec;
-		}
+		}*/
 	}
 }
 
@@ -280,6 +267,68 @@ void Card::touchesEnded(TouchEvent event)
 	
 }
 
+void Card::translate(TouchEvent::Touch touch)
+{
+	if (isClicked && !activeTouchesOnCard.empty() && touch.getId() == activeTouchesOnCard[0].getId())
+	{
+		float mx = touch.getX();
+		float my = touch.getY();
+
+		float oldX = this->rect.getX1();
+		float oldY = this->rect.getY1();
+
+		float *coords = transform.translate(oldX, oldY, mx, my, isDragged);
+		//this->setpos(coords[0], coords[1]);
+		this->transMat = transform.translateCard(oldX, oldY, coords[0], coords[1]);
+
+		//this->rect.set(coords[0], coords[1], coords[0] + rect.getWidth(), coords[1] + rect.getHeight());
+		//updateElementCoords();
+		this->rect.transform(transMat);
+
+		delete coords;
+		//set a bool to true when rect.contains is true once. Dont set to false until mouseUp to avoid mouse getting outside the rect
+		isDragged = true;
+	}
+}
+
+void Card::scaling(TouchEvent::Touch touch)
+{
+	if (this->twoTouches) // rect contains two active touch points - activeTouchesOnCard.size() > 1
+	{
+		vec2 currVec = lastTouch.getPos() - touch.getPos();
+		this->cardSize = glm::length(currVec) / glm::length(initVec);
+		CI_LOG_I("cardSize: " << cardSize);
+
+		if (cardSize > 0.2 && cardSize < 2) // don't scale for very small/big scale factors
+		{
+			// don't exceed max size
+			if (this->rect.getHeight()*this->cardSize > 300 && this->rect.getHeight()*this->cardSize < 600)
+			{
+				this->rect.scaleCentered(this->cardSize);
+
+				this->isScaled = true;
+			}
+		}
+		this->initVec = currVec;
+	}
+}
+
+void Card::rotation(TouchEvent::Touch touch)
+{
+	if (this->twoTouches) // rect contains two active touch points - activeTouchesOnCard.size() > 1
+	{
+		vec2 currVec = lastTouch.getPos() - touch.getPos();
+		//this->angle = transform.rotateCard(initVec, currVec);
+
+		CI_LOG_I("Angle: " << glm::degrees(this->angle));
+
+		this->rotMat = transform.rotate(initVec, currVec);
+		//this->rect.transform(mat);
+
+		this->initVec = currVec;
+	}
+}
+
 void Card::update() 
 {
 	updateElementCoords();
@@ -299,8 +348,7 @@ void Card::renderCard() {
 	gl::color(borderColor);
   
     gl::pushModelMatrix();
-    glm::mat3 matrix = this->transMat* this->rotMat * this->scaleMat;
-    //this->rect.transform(matrix);
+	
 
         
     /*if (!activeTouchesOnCard.empty())//(this->angle != 0 && isScaled)

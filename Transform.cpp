@@ -70,18 +70,22 @@ glm::mat3 Transform::rotate(glm::vec2 v1, glm::vec2 v2)
      return glm::rotate(trans, angle);
 }
 
-glm::mat3 Transform::translateCard(float x, float y)
+glm::mat3 Transform::translateCard(float oldX, float oldY, float x, float y)
 {
     glm::mat3 trans = glm::mat3(1.0f);
+
+	float deltaX = x - oldX;
+	float deltaY = y - oldY;
     
-    return glm::translate(trans, {x,y});
+    return glm::translate(trans, {deltaX,deltaY});
 }
 
 glm::mat3 Transform::scaling(float size)
 {
-    glm::mat3 trans = glm::mat3(1.0f);
+    //glm::mat3 trans = glm::mat3(1.0f);
     
-    return glm::scale(trans, {size, size});
+    //return glm::scale(trans, {size, size});
+	return glm::mat3(size);
 }
 
 
