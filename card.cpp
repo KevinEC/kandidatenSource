@@ -170,6 +170,8 @@ void Card::touchesBegan(TouchEvent event)
 {
 	for (const auto &touch : event.getTouches()) //event.getTouches()) returns std::vector<Touch>
 	{
+
+
 		if (rect.contains(touch.getPos())) 
 		{
             activeTouchesOnCard.push_back(touch);
