@@ -1,5 +1,6 @@
 #include "Cards.h"
 #include "dataBaseController.h"
+#include "Story.h"
 #include "cinder/app/App.h"
 #include "cinder/app/RendererGl.h"
 #include "cinder/gl/gl.h"
@@ -89,6 +90,7 @@ public:
 private:
 	map<uint32_t, TouchPoint>	mActivePoints;
 	list<TouchPoint>			mDyingPoints;
+	vector<TouchEvent::Touch> tangibletouch;
 
 };
 
@@ -160,9 +162,50 @@ void kandidatenApp::touchesBegan(TouchEvent event)
 	{
 		Color newColor(CM_HSV, Rand::randFloat(), 1, 1);
 		mActivePoints.insert(make_pair(touch.getId(), TouchPoint(touch.getPos(), newColor)));
-
-		//lastclick = touch.getPos();
+		
+		// fill array to check if touches are a tangible object
+		if (tangibletouch.size() < 4) {
+			tangibletouch.push_back(touch);
+		}
+		else {
+			tangibletouch.erase(tangibletouch.begin());
+			tangibletouch.push_back(touch);
+		}
 	}
+	
+	if (tangibletouch.size() == 4) {
+		int count = 0;
+		int mindist = 1000;
+		int dist;
+		vector<int> newdist;
+		for (int j = 0; j < tangibletouch.size(); ++j) {
+			for (int i = 0; i < tangibletouch.size(); ++i) {
+				int dist = glm::distance(tangibletouch[j].getPos(), tangibletouch[i].getPos());
+
+				if (dist != 0) {
+					newdist.push_back(dist);
+					if (dist < mindist) mindist = dist;
+				}
+				if (dist < 70 && dist > 60) {
+					count++;
+					//CI_LOG_I("counter" << count);
+
+				}
+			}
+		}
+		if (count != 0 && count % 2 == 0) {
+			CI_LOG_I("counter" << count);
+			CI_LOG_I("Vi lyckades hitta tangible enheten");
+			CI_LOG_I("mindist: " << mindist);
+			//pseudo-kod
+			//if(mindist == storymodedist), call story inst = new story(storycards)
+			//if mindist == categorydist), call categorymode
+			//if mindist == reset, call resetfunction.
+
+			Story inst;
+		}
+	}
+
 
 }
 

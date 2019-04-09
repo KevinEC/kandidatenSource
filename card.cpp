@@ -166,36 +166,80 @@ void Card::mouseUp(MouseEvent event)
 	this->isDragged = false;
 }
 */
-void Card::touchesBegan(TouchEvent event) 
+void Card::touchesBegan(TouchEvent event)
 {
+
+
 	for (const auto &touch : event.getTouches()) //event.getTouches()) returns std::vector<Touch>
 	{
 
 
-		if (rect.contains(touch.getPos())) 
+		if (rect.contains(touch.getPos()))
 		{
-            activeTouchesOnCard.push_back(touch);
+			activeTouchesOnCard.push_back(touch);
 			if (this->isClicked == true) // rect contains two touch points // && rect.contains(lastTouch.getPos()
 			{
 				this->twoTouches = true;
-                this->initVec = activeTouchesOnCard[1].getPos() - activeTouchesOnCard[0].getPos();
-			//	CI_LOG_I("vi har två fingrar på rektangeln");
+				this->initVec = activeTouchesOnCard[1].getPos() - activeTouchesOnCard[0].getPos();
+				//	CI_LOG_I("vi har två fingrar på rektangeln");
 			}
-			else 
+			else
 			{
 				this->twoTouches = false;
 				lastTouch = touch;
 			}
-			
+
 			this->isClicked = true;
 			this->isFront = true;
 			this->title = "du har klickat på rektangeln";
-			
-		//	CI_LOG_I("title: " << title);
+
+			//	CI_LOG_I("title: " << title);
+		}
+		/*
+		else {
+			if (tangibletouch.size() < 4) {
+				tangibletouch.push_back(touch);
+			}
+			else {
+				tangibletouch.erase(tangibletouch.begin());
+				tangibletouch.push_back(touch);
+			}
+		}
+
+	}
+	int count = 0;
+	int mindist = 1000;
+	int dist = 0;
+	if (tangibletouch.size() == 4) {
+
+		vector<int> newdist;
+		for (int j = 0; j < tangibletouch.size(); ++j) {
+			for (int i = 0; i < tangibletouch.size(); ++i) {
+				int dist = glm::distance(tangibletouch[j].getPos(), tangibletouch[i].getPos());
+
+				if (dist != 0) {
+					newdist.push_back(dist);
+					if (dist < mindist) mindist = dist;
+				}
+				if (dist < 70 && dist > 60) {
+					count++;
+				}
+
+				//mindist = *std::min(newdist.begin(), newdist.end());
+
+			}
 		}
 	}
+	if (count == 8) {
+		CI_LOG_I("counter" << count);
+		CI_LOG_I("Vi lyckades hitta tangible enheten");
+		CI_LOG_I("mindist: " << mindist);
+		//count = 0;
+		//calla på story mode
+	}
+*/
+	}
 }
-
 void Card::touchesMoved(TouchEvent event) 
 {
 	for (const auto &touch : event.getTouches()) 
@@ -246,7 +290,7 @@ void Card::touchesMoved(TouchEvent event)
             }
             //this->angle = transform.rotateCard(initVec, currVec);
 
-            CI_LOG_I("Angle: " << glm::degrees(this->angle));
+          //  CI_LOG_I("Angle: " << glm::degrees(this->angle));
 
             this->rotMat = transform.rotate(initVec, currVec);
             //this->rect.transform(mat);

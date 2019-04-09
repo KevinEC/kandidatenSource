@@ -49,7 +49,7 @@ glm::mat3 Transform::rotate(glm::vec2 v1, glm::vec2 v2)
 
     float angle = glm::orientedAngle(v1, v2);
 
-    CI_LOG_I("angle: " << glm::degrees(angle));
+   // CI_LOG_I("angle: " << glm::degrees(angle));
    
     glm::mat3 trans = glm::mat3(1.0f);
     //trans = glm::rotate(trans, angle);
