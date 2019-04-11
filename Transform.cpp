@@ -11,8 +11,8 @@ Transform::~Transform()
 
 float Transform::scale(glm::vec2 v1, glm::vec2 v2)
 {
-	float res = sqrt(v1.x*v1.x + v1.y*v1.y) - sqrt(v2.x*v2.x + v2.y*v2.y);
-	if (res != 0) return res;
+	float res = sqrt(v1.x*v1.x + v1.y*v1.y) / sqrt(v2.x*v2.x + v2.y*v2.y);
+	if (res) return res;
 	else return 1;
 	//glm::length(v1) - glm::length(v2);
 }
@@ -49,7 +49,7 @@ glm::mat3 Transform::rotate(glm::vec2 v1, glm::vec2 v2)
 
     float angle = glm::orientedAngle(v1, v2);
 
-    CI_LOG_I("angle: " << glm::degrees(angle));
+   // CI_LOG_I("angle: " << glm::degrees(angle));
    
     glm::mat3 trans = glm::mat3(1.0f);
     //trans = glm::rotate(trans, angle);

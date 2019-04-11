@@ -35,6 +35,7 @@ Card::Card(const float x1, const float y1, std::string title, std::string body)
 	y = y1;
     angle = 0;
     initAngle = 0;
+	initDist = 0;
    
 	cardSize = 1.0f;
 	width = 336.0f*cardSize;
@@ -177,6 +178,8 @@ void Card::touchesBegan(TouchEvent event)
 			{
 				this->twoTouches = true;
                 this->initVec = activeTouchesOnCard[1].getPos() - activeTouchesOnCard[0].getPos();
+				//this->initDist = glm::distance(activeTouchesOnCard[1].getPos(), activeTouchesOnCard[0].getPos());
+				this->initDist = sqrt(pow(lastTouch.getX() - touch.getX(), 2) + pow(lastTouch.getY() - touch.getY(), 2));
 			//	CI_LOG_I("vi har två fingrar på rektangeln");
 			}
 			else 
@@ -293,10 +296,17 @@ void Card::translate(TouchEvent::Touch touch)
 
 void Card::scaling(TouchEvent::Touch touch)
 {
-	if (this->twoTouches) // rect contains two active touch points - activeTouchesOnCard.size() > 1
+	if (activeTouchesOnCard.size() > 1)//(this->twoTouches) // rect contains two active touch points - activeTouchesOnCard.size() > 1
 	{
-		vec2 currVec = lastTouch.getPos() - touch.getPos();
-		this->cardSize = glm::length(currVec) / glm::length(initVec);
+		vec2 currVec = activeTouchesOnCard[activeTouchesOnCard.size()-2].getPos() - activeTouchesOnCard.back().getPos();
+		//vec2 currVec = lastTouch.getPos() - touch.getPos();
+		//float currDist = glm::distance(lastTouch.getPos(), touch.getPos());
+		float currDist = sqrt(pow(lastTouch.getX() - touch.getX(), 2) + pow(lastTouch.getY() - touch.getY(), 2));
+		//this->cardSize = glm::length(currVec) / glm::length(initVec);
+		//this->cardSize = transform.scale(currVec,initVec); // nya/gamla
+		
+		if(initDist != 0) this->cardSize = currDist / this->initDist;
+		
 		CI_LOG_I("cardSize: " << cardSize);
 
 		if (cardSize > 0.2 && cardSize < 2) // don't scale for very small/big scale factors
@@ -310,6 +320,7 @@ void Card::scaling(TouchEvent::Touch touch)
 			}
 		}
 		this->initVec = currVec;
+		this->initDist = currDist;
 	}
 }
 
@@ -320,7 +331,7 @@ void Card::rotation(TouchEvent::Touch touch)
 		vec2 currVec = lastTouch.getPos() - touch.getPos();
 		//this->angle = transform.rotateCard(initVec, currVec);
 
-		CI_LOG_I("Angle: " << glm::degrees(this->angle));
+		//CI_LOG_I("Angle: " << glm::degrees(this->angle));
 
 		this->rotMat = transform.rotate(initVec, currVec);
 		//this->rect.transform(mat);
@@ -345,7 +356,6 @@ void Card::setStyles()
 void Card::renderCard() {
     int cornerSegments = 5;
 	gl::color(bgColor);
-	gl::color(borderColor);
   
     gl::pushModelMatrix();
 	
@@ -371,6 +381,8 @@ void Card::renderCard() {
         */
 
     gl::drawSolidRoundedRect(rect, borderRadius, cornerSegments);
+	gl::color(borderColor);
+
     gl::drawStrokedRoundedRect(rect, borderRadius, cornerSegments);
 
     gl::color(Color::white());
