@@ -15,13 +15,17 @@
 #include <list>
 #include <iostream>
 
-// Fix for old version of Cairo lib
-FILE _iob[] = { *stdin, *stdout, *stderr };
-extern "C" FILE * __cdecl __iob_func(void) { return _iob; }
+#include "bluecadet/core/BaseApp.h"
+#include "bluecadet/views/TouchView.h"
 
 using namespace ci;
 using namespace ci::app;
 using namespace std;
+
+using namespace bluecadet::core;
+using namespace bluecadet::views;
+using namespace bluecadet::touch;
+
 
 //Controller-app
 
@@ -63,9 +67,9 @@ public:
 	void	mouseDrag(MouseEvent event) override;
 	void	mouseDown(MouseEvent event) override;
 	void	mouseUp(MouseEvent event) override;
-	void	touchesBegan(TouchEvent event) override;
-	void	touchesMoved(TouchEvent event) override;
-	void	touchesEnded(TouchEvent event) override;
+//	void	touchesBegan(TouchEvent event) override;
+//	void	touchesMoved(TouchEvent event) override;
+//	void	touchesEnded(TouchEvent event) override;
 
 	void	renderCards();
 	void	renderCard();
@@ -150,6 +154,7 @@ void kandidatenApp::setup()
 	gl::enableVerticalSync(true);
 }
 
+/*
 void kandidatenApp::touchesBegan(TouchEvent event)
 {
 	//CI_LOG_I(event);
@@ -195,7 +200,7 @@ void kandidatenApp::touchesEnded(TouchEvent event)
 		mActivePoints.erase(touch.getId());
 	}
 }
-
+*/
 void kandidatenApp::mouseDown(MouseEvent event)
 {
 	//mMouseLoc = event.getPos();
@@ -264,7 +269,6 @@ void kandidatenApp::draw()
 	kort2.renderCards();
 
 }
-
 
 
 CINDER_APP(kandidatenApp, RendererGl, prepareSettings)
