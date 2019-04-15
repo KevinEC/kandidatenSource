@@ -73,14 +73,8 @@ public:
 	gl::Texture2dRef texture;
 	gl::Texture2dRef background;
 
-	Surface mysurf;
 	vec2 mMouseLoc;
 	vec2 lastclick;
-	vector<Rectf> test;
-	bool test2 = false;
-	Card card1;
-	Cards kort;
-	Cards kort2;
 	int i;
 	dataBaseController dbc;
 	vector<pair<string, Cards*>> allCategories;
@@ -106,7 +100,6 @@ void kandidatenApp::setup()
 	background = gl::Texture::create( loadImage(loadAsset("background.png")));
 
 	i = 0;
-	kort2 = Cards();
 
 	/*- connect to data base -*/
 	dbc = dataBaseController("online", "xml", "http://www.student.itn.liu.se/~chrad171/databas/databas/media/write.xml");
@@ -128,6 +121,7 @@ void kandidatenApp::setup()
 	vector<string> imgPath;
 	dbc.extractImgPaths(imgPath);
 
+	/*
 	ci::Area area = Area(kort2.rectKort.rect);
 	//texture = gl::Texture2d::create(loadImage(loadUrl("http://www.student.itn.liu.se/~chrad171/databas/databas/media/virus.jpg")));
 	//texture->setCleanBounds(area);
@@ -136,6 +130,7 @@ void kandidatenApp::setup()
 	Surface mysurf(loadImage(loadUrl("http://www.student.itn.liu.se/~chrad171/databas/databas/media/virus.jpg")), SurfaceConstraintsDefault(), false);
 	texture = gl::Texture2d::create(mysurf);
 	texture->setCleanBounds(area);
+	*/
 
 	/*- extract card categories -*/
 	vector<vector<string> > cardCategory;
@@ -143,8 +138,6 @@ void kandidatenApp::setup()
 
 	CI_LOG_I("sizes: " << categories.size() << " " << titles.size() << " " << bodyText.size() << " " << imgPath.size() << " " << cardCategory.size());
 	
-
-	kort = Cards(&titles, &bodyText);
 
 	Cards allCards = Cards();
 	allCategories = allCards.categorize(&titles, &bodyText, &categories, &cardCategory);
@@ -159,8 +152,6 @@ void kandidatenApp::setup()
 void kandidatenApp::touchesBegan(TouchEvent event)
 {
 	//CI_LOG_I(event);
-	kort.rectKort.touchesBegan(event);
-	kort2.rectKort.touchesBegan(event);
 
 	for (const auto &touch : event.getTouches())
 	{
@@ -175,10 +166,6 @@ void kandidatenApp::touchesBegan(TouchEvent event)
 void kandidatenApp::touchesMoved(TouchEvent event)
 {
 	//CI_LOG_I(event);
-	test2 = true;
-
-	kort.rectKort.touchesMoved(event);
-	kort2.rectKort.touchesMoved(event);
 
 	for (const auto &touch : event.getTouches())
 	{
@@ -191,8 +178,6 @@ void kandidatenApp::touchesMoved(TouchEvent event)
 void kandidatenApp::touchesEnded(TouchEvent event)
 {
 	//CI_LOG_I(event);
-	kort.rectKort.touchesEnded(event);
-	kort2.rectKort.touchesEnded(event);
 
 	for (const auto &touch : event.getTouches())
 	{
@@ -206,21 +191,32 @@ void kandidatenApp::mouseDown(MouseEvent event)
 {
 	//mMouseLoc = event.getPos();
 	lastclick = event.getPos();
-	kort.mouseDown(event);
+
+	for (auto &categorie : allCategories)
+	{
+		categorie.second->mouseDown(event);
+	}
 
 }
 
 void kandidatenApp::mouseDrag(MouseEvent event) {
 	mMouseLoc = event.getPos();
-	test2 = true;
 
 	mActivePoints[i++].addPoint(event.getPos());
-	kort.mouseDrag(event);
+
+	for (auto &categorie : allCategories)
+	{
+		categorie.second->mouseDrag(event);
+	}
 }
 
 void kandidatenApp::mouseUp(MouseEvent event) {
+	
+	for (auto &categorie : allCategories)
+	{
+		categorie.second->mouseUp(event);
+	}
 
-	kort.mouseUp(event);
 }
 
 void kandidatenApp::update()
@@ -256,37 +252,12 @@ void kandidatenApp::selectCategories(int enable[])
 
 void kandidatenApp::draw()
 {
-
-	//gl::clear(Color(0, 50, 0));
-	//gl::drawSolidCircle(getWindowCenter(), 200);
 	gl::enableAlphaBlending();
 
 	gl::clear(Color(0.1f, 0.1f, 0.1f));
 	gl::draw(background);
 
-	for (const auto &activePoint : mActivePoints) {
-		activePoint.second.draw();
-	}
-
-	for (auto dyingIt = mDyingPoints.begin(); dyingIt != mDyingPoints.end(); )
-	{
-		dyingIt->draw();
-		if (dyingIt->isDead())
-			dyingIt = mDyingPoints.erase(dyingIt);
-		else
-			++dyingIt;
-	}
-
-	// draw yellow circles at the active touch points
-
-	gl::color(Color(1, 1, 0));
-	for (const auto &touch : getActiveTouches())
-	{
-		gl::drawStrokedCircle(touch.getPos(), 20);
-	}
-
 	renderCategories();
-	//kort.renderCards();
 
 }
 
