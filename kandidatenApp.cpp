@@ -18,6 +18,9 @@
 #include "bluecadet/core/BaseApp.h"
 #include "bluecadet/views/TouchView.h"
 
+#include "cinder/Signals.h"
+
+
 using namespace ci;
 using namespace ci::app;
 using namespace std;
@@ -29,47 +32,13 @@ using namespace bluecadet::touch;
 
 //Controller-app
 
-struct TouchPoint {
-	TouchPoint() {} //default constructor
-	TouchPoint(const vec2 &initialPt, const Color &color) : mColor(color), mTimeOfDeath(-1.0)
-	{
-		mLine.push_back(initialPt);
-	}
-
-	void addPoint(const vec2 &pt) { mLine.push_back(pt); }
-
-	void draw() const
-	{
-		if (mTimeOfDeath > 0) // are we dying? then fade out
-			gl::color(ColorA(mColor, (double(mTimeOfDeath) - getElapsedSeconds()) / 2.0));
-		else
-			gl::color(mColor);
-
-		gl::draw(mLine);
-	}
-
-	void startDying() { mTimeOfDeath = getElapsedSeconds() + 2.0f; } // two seconds 'til dead
-
-	bool isDead() const { return getElapsedSeconds() > mTimeOfDeath; }
-
-	PolyLine2f		mLine;
-	Color			mColor;
-	float			mTimeOfDeath;
-};
-
-class kandidatenApp : public App
+class kandidatenApp : public BaseApp
 {
 public:
-	void setup() override;
-	void update() override;
-	void draw() override;
+	static void prepareSettings(ci::app::App::Settings* settings);
 
-	void	mouseDrag(MouseEvent event) override;
-	void	mouseDown(MouseEvent event) override;
-	void	mouseUp(MouseEvent event) override;
-//	void	touchesBegan(TouchEvent event) override;
-//	void	touchesMoved(TouchEvent event) override;
-//	void	touchesEnded(TouchEvent event) override;
+	void setup() override;
+	void addView(BaseViewRef view);
 
 	void	renderCategories();
 	void	selectCategories(int enable[]);
@@ -84,21 +53,39 @@ public:
 	vector<pair<string, Cards*>> allCategories;
 
 
-
-private:
-	map<uint32_t, TouchPoint>	mActivePoints;
-	list<TouchPoint>			mDyingPoints;
-
 };
 
-void prepareSettings(kandidatenApp::Settings *settings)
-{
-	settings->setMultiTouchEnabled(true);
+void kandidatenApp::prepareSettings(ci::app::App::Settings* settings) {
+	settings->setHighDensityDisplayEnabled(true);
 
+	SettingsManager::getInstance()->setup(settings, ci::app::getAssetPath("../assets/settings.json"), [](SettingsManager * manager) {
+		manager->mFullscreen = false;
+		manager->mWindowSize = ivec2(1920, 1080);
+		manager->mDisplaySize = ivec2(1920, 1080);
+		manager->mConsole = false;
+		manager->mShowMinimap = false;
+		manager->mShowStats = true;
+		manager->mShowTouches = true;
+		manager->mMinimizeParams = true;
+	});
+}
+
+// may not be needed. Used to add a View from Blue cadet to the scene root
+void kandidatenApp::addView(BaseViewRef view)
+{
+	auto container = make_shared<BaseView>();
+	container->setSize({ 100,200 });
+	getRootView()->addChild(container);
+
+	vec2 viewOffset = view->getPosition();
+	view->setPosition((container->getSize() - view->getSize()) * 0.5f + viewOffset);
+	container->addChild(view);
 }
 
 void kandidatenApp::setup()
 {
+	BaseApp::setup();
+
 	CI_LOG_I("MT: " << System::hasMultiTouch() << " Max points: " << System::getMaxMultiTouchPoints());
 
 	background = gl::Texture::create( loadImage(loadAsset("background.png")));
@@ -125,17 +112,6 @@ void kandidatenApp::setup()
 	vector<string> imgPath;
 	dbc.extractImgPaths(imgPath);
 
-	/*
-	ci::Area area = Area(kort2.rectKort.rect);
-	//texture = gl::Texture2d::create(loadImage(loadUrl("http://www.student.itn.liu.se/~chrad171/databas/databas/media/virus.jpg")));
-	//texture->setCleanBounds(area);
-
-	mysurf = Surface(400, 600, true);
-	Surface mysurf(loadImage(loadUrl("http://www.student.itn.liu.se/~chrad171/databas/databas/media/virus.jpg")), SurfaceConstraintsDefault(), false);
-	texture = gl::Texture2d::create(mysurf);
-	texture->setCleanBounds(area);
-	*/
-
 	/*- extract card categories -*/
 	vector<vector<string> > cardCategory;
 	dbc.extractCardCats(cardCategory);
@@ -151,82 +127,15 @@ void kandidatenApp::setup()
 
 	disableFrameRate();
 	gl::enableVerticalSync(true);
-}
 
-/*
-void kandidatenApp::touchesBegan(TouchEvent event)
-{
-	//CI_LOG_I(event);
-
-	for (const auto &touch : event.getTouches())
-	{
-		Color newColor(CM_HSV, Rand::randFloat(), 1, 1);
-		mActivePoints.insert(make_pair(touch.getId(), TouchPoint(touch.getPos(), newColor)));
-
-		//lastclick = touch.getPos();
-	}
-
-}
-
-void kandidatenApp::touchesMoved(TouchEvent event)
-{
-	//CI_LOG_I(event);
-
-	for (const auto &touch : event.getTouches())
-	{
-		mActivePoints[touch.getId()].addPoint(touch.getPos());
-
-		//mMouseLoc = touch.getPos();
-	}
-}
-
-void kandidatenApp::touchesEnded(TouchEvent event)
-{
-	//CI_LOG_I(event);
-
-	for (const auto &touch : event.getTouches())
-	{
-		mActivePoints[touch.getId()].startDying();
-		mDyingPoints.push_back(mActivePoints[touch.getId()]);
-		mActivePoints.erase(touch.getId());
-	}
-}
-*/
-void kandidatenApp::mouseDown(MouseEvent event)
-{
-	//mMouseLoc = event.getPos();
-	lastclick = event.getPos();
-
-	for (auto &categorie : allCategories)
-	{
-		categorie.second->mouseDown(event);
-	}
-
-}
-
-void kandidatenApp::mouseDrag(MouseEvent event) {
-	mMouseLoc = event.getPos();
-
-	mActivePoints[i++].addPoint(event.getPos());
-
-	for (auto &categorie : allCategories)
-	{
-		categorie.second->mouseDrag(event);
-	}
-}
-
-void kandidatenApp::mouseUp(MouseEvent event) {
-	
-	for (auto &categorie : allCategories)
-	{
-		categorie.second->mouseUp(event);
-	}
-
-}
-
-void kandidatenApp::update()
-{
-
+	// x and y
+	auto dragView = make_shared<TouchView>();
+	dragView->setSize(vec2(100,200));
+	dragView->setBackgroundColor(Color::hex(0xbcbcbc));
+	dragView->setDragEnabled(true);
+	dragView->setRotation(0.5f);
+	dragView->setMultiTouchEnabled(true);
+	addView(dragView);
 }
 
 void kandidatenApp::renderCategories()
@@ -255,16 +164,5 @@ void kandidatenApp::selectCategories(int enable[])
 	}
 }
 
-void kandidatenApp::draw()
-{
-	gl::enableAlphaBlending();
 
-	gl::clear(Color(0.1f, 0.1f, 0.1f));
-	gl::draw(background);
-
-	renderCategories();
-
-}
-
-
-CINDER_APP(kandidatenApp, RendererGl, prepareSettings)
+CINDER_APP(kandidatenApp, RendererGl(RendererGl::Options().msaa(4).stencil(true)), kandidatenApp::prepareSettings)
