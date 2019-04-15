@@ -17,16 +17,6 @@ float Transform::scale(glm::vec2 v1, glm::vec2 v2)
 	//glm::length(v1) - glm::length(v2);
 }
 
-void Transform::rotate()
-{
-}
-
-void Transform::translate()
-{
-	Animate animation = Animate();
-	animation.newPage();
-
-}
 
 //Calculate the new coordinates for card taking into consideration the relative position to the top left corner
 float * Transform::translate(const float x, const float y, const float mx, const float my, const bool isDragged)
