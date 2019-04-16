@@ -14,14 +14,6 @@ Card::Card()
 	x = 200;
 	y = 100;
 	title = "Hej Hilma";
-	/*
-string rubrik
-string brödtext
-substring brödtext; (ta 10 första orden i brödtext;)
-img img1
-img img2
-taget från xml
-*/
 
 }
 
@@ -55,12 +47,6 @@ Card::Card(const float x1, const float y1, std::string title, std::string body)
 	initElements();
 	setStyles();
 }
-
-/*
-State getcurrentstate() {
-	return currentstate;
-}
-*/
 
 void Card::setpos(float m, float n)
 {
@@ -169,11 +155,8 @@ void Card::mouseUp(MouseEvent event)
 void Card::touchesBegan(TouchEvent event)
 {
 
-
 	for (const auto &touch : event.getTouches()) //event.getTouches()) returns std::vector<Touch>
 	{
-
-
 		if (rect.contains(touch.getPos()))
 		{
 			activeTouchesOnCard.push_back(touch);
@@ -240,6 +223,7 @@ void Card::touchesBegan(TouchEvent event)
 */
 	}
 }
+
 void Card::touchesMoved(TouchEvent event) 
 {
 	for (const auto &touch : event.getTouches()) 

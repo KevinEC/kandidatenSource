@@ -15,6 +15,7 @@
 #include <map>
 #include <list>
 #include <iostream>
+#include <cmath>
 
 // Fix for old version of Cairo lib
 FILE _iob[] = { *stdin, *stdout, *stderr };
@@ -167,36 +168,44 @@ void kandidatenApp::touchesBegan(TouchEvent event)
 		if (tangibletouch.size() < 4) {
 			tangibletouch.push_back(touch);
 		}
-		else {
+		else { 
+            tangibletouch.push_back(touch);
 			tangibletouch.erase(tangibletouch.begin());
-			tangibletouch.push_back(touch);
+            CI_LOG_I("tangSize: " << tangibletouch.size());
 		}
 	}
 	
+    // angle ?
 	if (tangibletouch.size() == 4) {
 		int count = 0;
 		int mindist = 1000;
 		int dist;
-		vector<int> newdist;
+        float angle;
+	
 		for (int j = 0; j < tangibletouch.size(); ++j) {
 			for (int i = 0; i < tangibletouch.size(); ++i) {
-				int dist = glm::distance(tangibletouch[j].getPos(), tangibletouch[i].getPos());
+				dist = glm::distance(tangibletouch[j].getPos(), tangibletouch[i].getPos());
+               // angle = glm::orientedAngle(tangibletouch[j].getPos(), tangibletouch[i].getPos());
+                //if (dist > 100) break;
+                
+                angle = glm::degrees(atan2( abs(tangibletouch[j].getX()-tangibletouch[i].getX()) , abs(tangibletouch[j].getY()-tangibletouch[i].getY()) ));
+
+               // CI_LOG_I("dist: " << dist);
+                CI_LOG_I("angle: " << angle);
 
 				if (dist != 0) {
-					newdist.push_back(dist);
 					if (dist < mindist) mindist = dist;
 				}
-				if (dist < 70 && dist > 60) {
+				if (dist < 90 && dist > 50) {
 					count++;
 					//CI_LOG_I("counter" << count);
-
 				}
 			}
 		}
-		if (count != 0 && count % 2 == 0) {
-			CI_LOG_I("counter" << count);
+		if (count != 0 && count == 8) {
+		//	CI_LOG_I("counter" << count);
 			CI_LOG_I("Vi lyckades hitta tangible enheten");
-			CI_LOG_I("mindist: " << mindist);
+		//	CI_LOG_I("mindist: " << mindist);
 			//pseudo-kod
 			//if(mindist == storymodedist), call story inst = new story(storycards)
 			//if mindist == categorydist), call categorymode
@@ -205,8 +214,6 @@ void kandidatenApp::touchesBegan(TouchEvent event)
 			Story inst;
 		}
 	}
-
-
 }
 
 void kandidatenApp::touchesMoved(TouchEvent event)
@@ -236,7 +243,14 @@ void kandidatenApp::touchesEnded(TouchEvent event)
 		mActivePoints[touch.getId()].startDying();
 		mDyingPoints.push_back(mActivePoints[touch.getId()]);
 		mActivePoints.erase(touch.getId());
+
+        for (int i = 0; i < tangibletouch.size(); ++i)
+        {
+            if (touch.getId() == tangibletouch[i].getId())
+                tangibletouch.erase(tangibletouch.begin() + i);
+        }
 	}
+
 }
 /*
 void kandidatenApp::mouseDown(MouseEvent event)
