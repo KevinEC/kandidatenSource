@@ -4,10 +4,16 @@ using namespace ci;
 using namespace ci::app;
 using namespace std;
 
+using namespace bluecadet::core;
+using namespace bluecadet::views;
+using namespace bluecadet::touch;
+
 Cards::Cards()
 {
 	//render the instace of card by default
 	render = true;
+	view = make_shared<BaseView>();
+	view->setSize({ 1920, 1080 });
 
 }
 
@@ -15,6 +21,9 @@ Cards::Cards(string categorie)
 {
 	this->categorie = categorie;
 	render = true;
+
+	view = make_shared<BaseView>();
+	view->setSize({ 1920, 1080 });	
 }
 
 Cards::~Cards()
@@ -64,10 +73,16 @@ void Cards::renderCards()
 	if (render) {
 		for (int i = 0; i < allcards.size(); i++)
 		{
-			allcards[i]->renderCard();
+			//allcards[i]->renderCard();
+			addView(allcards[i]->object);
 		}
 	}
 
+}
+
+void Cards::addView(BaseViewRef view)
+{
+	this->view->addChild(view);
 }
 
 void Cards::addCard(Card *card)
@@ -95,7 +110,7 @@ void Cards::setPath(Card &inst)
 void Cards::search()
 {
 }
-
+/*
 void Cards::mouseDown(MouseEvent event)
 {
 	if (render)
@@ -130,4 +145,4 @@ void Cards::mouseUp(MouseEvent event)
 		}
 	}
 
-}
+}*/

@@ -1,12 +1,12 @@
 #include "card.h"
-#include "cinder/app/RendererGl.h"
-#include "cinder/gl/gl.h"
-#include <string>
-#include <iostream>
 
 using namespace ci;
 using namespace ci::app;
 using namespace std;
+
+using namespace bluecadet::core;
+using namespace bluecadet::views;
+using namespace bluecadet::touch;
 
 
 Card::Card()
@@ -45,6 +45,7 @@ Card::Card(const float x1, const float y1, std::string title, std::string body)
 	transform = Transform();
 	initElements();
 	setStyles();
+
 }
 
 void Card::setpos(float m, float n)
@@ -61,6 +62,7 @@ gl::TextureRef Card::renderTexture(TextBox &text)
 
 void Card::initElements()
 {
+	/*
 	paddingX = 22.0f*cardSize;
 	elementWidth = 292.0f *cardSize;
 	//const ColorA textColor = ColorA(65, 64, 66, 0.5f);
@@ -78,7 +80,22 @@ void Card::initElements()
 
 
 	titleTex = renderTexture(titleBox);
-	bodyTex = renderTexture(bodyBox);
+	bodyTex = renderTexture(bodyBox);*/
+
+	//create bluecadet touchview
+	object = make_shared<TouchView>();
+	object->setSize({ 336.0f*cardSize, 500.0f*cardSize });
+	object->setPosition({ x,y });
+	object->setDragEnabled(true);
+	object->setMultiTouchEnabled(true);
+
+	//create border
+	StrokedRoundedRectViewRef border = make_shared<StrokedRoundedRectView>();
+	//border->setBackgroundColor(borderColor);
+	border->setStrokeColor(borderColor);
+	border->setCornerRadius(borderRadius);
+	border->setSize({ object->getSize() });
+	object->addChild(border);
 }
 
 void Card::updateElementCoords()
@@ -232,7 +249,7 @@ void Card::update()
 
 void Card::setStyles()
 {
-	bgColor = Color::hex(0xfcfcfc); // off-white
+	object->setBackgroundColor(Color::hex(0xfcfcfc)); // off-white
 	borderColor = Color::hex(0xbcbcbc);
 	borderRadius = 5.0f;
 }

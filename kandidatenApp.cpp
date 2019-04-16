@@ -73,13 +73,7 @@ void kandidatenApp::prepareSettings(ci::app::App::Settings* settings) {
 // may not be needed. Used to add a View from Blue cadet to the scene root
 void kandidatenApp::addView(BaseViewRef view)
 {
-	auto container = make_shared<BaseView>();
-	container->setSize({ 100,200 });
-	getRootView()->addChild(container);
-
-	vec2 viewOffset = view->getPosition();
-	view->setPosition((container->getSize() - view->getSize()) * 0.5f + viewOffset);
-	container->addChild(view);
+	getRootView()->addChild(view);
 }
 
 void kandidatenApp::setup()
@@ -128,14 +122,7 @@ void kandidatenApp::setup()
 	disableFrameRate();
 	gl::enableVerticalSync(true);
 
-	// x and y
-	auto dragView = make_shared<TouchView>();
-	dragView->setSize(vec2(100,200));
-	dragView->setBackgroundColor(Color::hex(0xbcbcbc));
-	dragView->setDragEnabled(true);
-	dragView->setRotation(0.5f);
-	dragView->setMultiTouchEnabled(true);
-	addView(dragView);
+	renderCategories();
 }
 
 void kandidatenApp::renderCategories()
@@ -143,6 +130,7 @@ void kandidatenApp::renderCategories()
 	for (auto &categorie : allCategories)
 	{
 		categorie.second->renderCards();
+		addView(categorie.second->view);
 	}
 }
 
