@@ -18,7 +18,6 @@
 
 #include "bluecadet/core/BaseApp.h"
 #include "bluecadet/views/TouchView.h"
-
 #include "cinder/Signals.h"
 
 
@@ -51,6 +50,7 @@ public:
 
     ivec2 windowSize{ 1920, 1080 };
     vector<bluecadet::touch::TouchEvent> tangibleTouch;
+    Story inst;
 
 	gl::Texture2dRef texture;
 	gl::Texture2dRef background;
@@ -76,7 +76,7 @@ void kandidatenApp::prepareSettings(ci::app::App::Settings* settings) {
 		manager->mShowStats = true;
 		manager->mShowTouches = true;
 		manager->mMinimizeParams = true;
-        manager->mNativeTouchEnabled = true;    // for table
+        manager->mNativeTouchEnabled = false;    // true for table
 	});
 }
 
@@ -200,7 +200,6 @@ void kandidatenApp::handleTouchBegan(const bluecadet::touch::TouchEvent& touchEv
         CI_LOG_I("tangSize: " << tangibleTouch.size());
     }
 
-
     if (tangibleTouch.size() == 4) {
         int count = 0;
         int mindist = 1000;
@@ -236,7 +235,28 @@ void kandidatenApp::handleTouchBegan(const bluecadet::touch::TouchEvent& touchEv
                 //if mindist == categorydist), call categorymode
                 //if mindist == reset, call resetfunction.
 
-            Story inst;
+        //    Story inst;
+        //    addView(inst.storyView);
+
+        }
+    }
+
+    if (tangibleTouch.size() == 2)
+    {
+        CI_LOG_I("storypucken hittad");
+        addView(inst.storyView);
+        inst.storyView->setHidden(false);
+       // translate active cards
+
+        for (auto &categorie : allCategories)
+        {
+            categorie.second->view->setSize(vec2{ 0.5f*windowSize.x, windowSize.y });
+            categorie.second->view->setGlobalPosition(ivec2{960,0});
+          /*  auto kids = categorie.second->view->getChildren();
+            for (auto &kid : kids)
+            {
+                if (!(kid->isHidden())) kid->setGlobalPosition(ivec2{rand() % 700 + 960, rand() % 1080});
+            }*/
         }
     }
 }
@@ -247,6 +267,16 @@ void kandidatenApp::handleTouchEnded(const bluecadet::touch::TouchEvent& touchEv
     {
         if (touchEvent.touchId == tangibleTouch[i].touchId)
             tangibleTouch.erase(tangibleTouch.begin() + i);
+    }
+    
+    if (tangibleTouch.empty())
+    {
+        inst.storyView->setHidden(true);
+        for (auto &categorie : allCategories)
+        {
+            categorie.second->view->setSize(windowSize);
+            categorie.second->view->setGlobalPosition(ivec2{ 0,0 });
+        }
     }
 }
 

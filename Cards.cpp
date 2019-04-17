@@ -77,7 +77,6 @@ void Cards::renderCards()
 			addView(allcards[i]->object);
 		}
 	}
-
 }
 
 void Cards::addView(BaseViewRef view)
