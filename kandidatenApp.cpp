@@ -1,4 +1,5 @@
 #include "Cards.h"
+#include "Story.h"
 #include "dataBaseController.h"
 #include "cinder/app/App.h"
 #include "cinder/app/RendererGl.h"
@@ -42,6 +43,14 @@ public:
 
 	void	renderCategories();
 	void	selectCategories(int enable[]);
+    void    setUpTang();
+
+    void	handleTouchBegan(const bluecadet::touch::TouchEvent& touchEvent);
+    void	handleTouchMoved(const bluecadet::touch::TouchEvent& touchEvent);
+    void	handleTouchEnded(const bluecadet::touch::TouchEvent& touchEvent);
+
+    ivec2 windowSize{ 1920, 1080 };
+    vector<bluecadet::touch::TouchEvent> tangibleTouch;
 
 	gl::Texture2dRef texture;
 	gl::Texture2dRef background;
@@ -67,6 +76,7 @@ void kandidatenApp::prepareSettings(ci::app::App::Settings* settings) {
 		manager->mShowStats = true;
 		manager->mShowTouches = true;
 		manager->mMinimizeParams = true;
+        manager->mNativeTouchEnabled = true;    // for table
 	});
 }
 
@@ -79,12 +89,14 @@ void kandidatenApp::addView(BaseViewRef view)
 void kandidatenApp::setup()
 {
 	BaseApp::setup();
+    setUpTang();
 
 	CI_LOG_I("MT: " << System::hasMultiTouch() << " Max points: " << System::getMaxMultiTouchPoints());
 
 	background = gl::Texture::create( loadImage(loadAsset("background.png")));
 
 	i = 0;
+
 
 	/*- connect to data base -*/
 	dbc = dataBaseController("online", "xml", "http://www.student.itn.liu.se/~chrad171/databas/databas/media/write.xml");
@@ -113,6 +125,7 @@ void kandidatenApp::setup()
 	CI_LOG_I("sizes: " << categories.size() << " " << titles.size() << " " << bodyText.size() << " " << imgPath.size() << " " << cardCategory.size());
 	
 
+
 	Cards allCards = Cards();
 	allCategories = allCards.categorize(&titles, &bodyText, &categories, &cardCategory);
 
@@ -134,6 +147,7 @@ void kandidatenApp::renderCategories()
 	}
 }
 
+
 // list of bools for every categorie. Type 1 to enable a categorie.
 // Categories are ordered as the following list:
 // Protte, Virus, Celler, Molekyler, gener, livsprocesser, sjukdomar
@@ -150,6 +164,90 @@ void kandidatenApp::selectCategories(int enable[])
 		}
 		index++;
 	}
+}
+
+
+/********************************
+*         TANGIBLE STUFF        *
+********************************/
+void kandidatenApp::setUpTang()
+{
+    auto tangView = make_shared<TouchView>();
+    tangView->moveToBack();
+    tangView->setDragEnabled(false);
+    tangView->setDebugDrawTouchPath(true);
+    tangView->setMultiTouchEnabled(true);
+    tangView->setSize(windowSize);
+    tangView->setTransformOrigin(0.5f * tangView->getSize());
+
+     // call touchesBegan
+    tangView->getSignalTouchBegan().connect([=](const bluecadet::touch::TouchEvent& e){ handleTouchBegan(e); });
+
+    // call touchesEnded
+    tangView->getSignalTouchEnded().connect([=](const bluecadet::touch::TouchEvent& e) { handleTouchEnded(e); });
+
+    addView(tangView); // add to root
+}
+void kandidatenApp::handleTouchBegan(const bluecadet::touch::TouchEvent& touchEvent) 
+{
+    // fill array to check if touches are a tangible object
+    if (tangibleTouch.size() < 4) {
+        tangibleTouch.push_back(touchEvent);
+    }
+    else {
+        tangibleTouch.push_back(touchEvent);
+        tangibleTouch.erase(tangibleTouch.begin());
+        CI_LOG_I("tangSize: " << tangibleTouch.size());
+    }
+
+
+    if (tangibleTouch.size() == 4) {
+        int count = 0;
+        int mindist = 1000;
+        int dist;
+        float angle;
+
+        for (int j = 0; j < tangibleTouch.size(); ++j) {
+            for (int i = 0; i < tangibleTouch.size(); ++i) {
+
+                dist = glm::distance(tangibleTouch[j].localPosition, tangibleTouch[i].localPosition);
+                angle = glm::degrees(atan2(abs(tangibleTouch[j].localPosition.x - tangibleTouch[i].localPosition.x), abs(tangibleTouch[j].localPosition.y - tangibleTouch[i].localPosition.y)));
+
+                // CI_LOG_I("dist: " << dist);
+                //CI_LOG_I("angle: " << angle);
+
+                if (dist != 0) {
+                    if (dist < mindist) mindist = dist;
+                }
+                if (dist < 90 && dist > 50) {
+                    count++;
+                    //CI_LOG_I("counter" << count);
+                }
+            }
+        }
+        if (count != 0 && count == 8) {
+            CI_LOG_I("counter" << count);
+            CI_LOG_I("Vi lyckades hitta tangible enheten");
+            CI_LOG_I("mindist: " << mindist);
+            
+            
+                //pseudo-kod
+                //if(mindist == storymodedist), call story inst = new story(storycards)
+                //if mindist == categorydist), call categorymode
+                //if mindist == reset, call resetfunction.
+
+            Story inst;
+        }
+    }
+}
+void kandidatenApp::handleTouchMoved(const bluecadet::touch::TouchEvent& touchEvent) {}
+void kandidatenApp::handleTouchEnded(const bluecadet::touch::TouchEvent& touchEvent)
+{
+    for (int i = 0; i < tangibleTouch.size(); ++i)
+    {
+        if (touchEvent.touchId == tangibleTouch[i].touchId)
+            tangibleTouch.erase(tangibleTouch.begin() + i);
+    }
 }
 
 
