@@ -59,8 +59,7 @@ public:
 	vec2 lastclick;
 	int i;
 	dataBaseController dbc;
-	vector<pair<string, Cards*>> allCategories;
-
+	vector<pair<string, Cards*>> allCategories; // MAIN CONTAINER OF CARDS SORTED BY CATEGORY
 
 };
 
@@ -80,7 +79,7 @@ void kandidatenApp::prepareSettings(ci::app::App::Settings* settings) {
 	});
 }
 
-// may not be needed. Used to add a View from Blue cadet to the scene root
+// may not be needed. Used to add a View from Bluecadet to the scene root
 void kandidatenApp::addView(BaseViewRef view)
 {
 	getRootView()->addChild(view);
@@ -95,42 +94,39 @@ void kandidatenApp::setup()
 
 	background = gl::Texture::create( loadImage(loadAsset("background.png")));
 
-	i = 0;
 
+	/****************************   
+    *       DATABASE STUFF      *
+    *****************************/
+    vector<string> categories;
+    vector<pair<string, string>> titles;
+    vector<pair<string, string>> bodyText;
+    vector<string> imgPath;
+    vector<vector<string> > cardCategory;
 
-	/*- connect to data base -*/
-	dbc = dataBaseController("online", "xml", "http://www.student.itn.liu.se/~chrad171/databas/databas/media/write.xml");
-	// CI_LOG_I("db: " << db.tree);
-
-	/*- extract categories -*/
-	vector<string> categories;
-	dbc.extractCategories(categories);
-
-	/*- extract card titles -*/
-	vector<pair<string, string>> titles;
-	dbc.extractTitles(titles);
-
-	/*- extract bodytexts -*/
-	vector<pair<string, string>> bodyText;
-	dbc.extractBodies(bodyText);
-
-	/*- extract image paths -*/
-	vector<string> imgPath;
-	dbc.extractImgPaths(imgPath);
-
-	/*- extract card categories -*/
-	vector<vector<string> > cardCategory;
-	dbc.extractCardCats(cardCategory);
-
+    {
+        dbc = dataBaseController("online", "xml", "http://www.student.itn.liu.se/~chrad171/databas/databas/media/write.xml");
+       
+        dbc.extractCategories(categories);
+        dbc.extractTitles(titles);
+        dbc.extractBodies(bodyText);
+        dbc.extractImgPaths(imgPath);
+        dbc.extractCardCats(cardCategory);
+    }
+	// 7 83 83 83 83
 	CI_LOG_I("sizes: " << categories.size() << " " << titles.size() << " " << bodyText.size() << " " << imgPath.size() << " " << cardCategory.size());
-	
+    
 
-
+    /********************************
+    *       FILL MAIN CONTAINER     *
+    *********************************/
 	Cards allCards = Cards();
 	allCategories = allCards.categorize(&titles, &bodyText, &categories, &cardCategory);
 
 	int enabledCategories[7] = { 1, 0, 0, 0, 0, 0, 0 };
 	selectCategories(enabledCategories);
+    /*********************************/
+
 
 	disableFrameRate();
 	gl::enableVerticalSync(true);
@@ -146,7 +142,6 @@ void kandidatenApp::renderCategories()
 		addView(categorie.second->view);
 	}
 }
-
 
 // list of bools for every categorie. Type 1 to enable a categorie.
 // Categories are ordered as the following list:
@@ -165,7 +160,6 @@ void kandidatenApp::selectCategories(int enable[])
 		index++;
 	}
 }
-
 
 /********************************
 *         TANGIBLE STUFF        *
@@ -188,6 +182,7 @@ void kandidatenApp::setUpTang()
 
     addView(tangView); // add to root
 }
+
 void kandidatenApp::handleTouchBegan(const bluecadet::touch::TouchEvent& touchEvent) 
 {
     // fill array to check if touches are a tangible object
@@ -206,6 +201,7 @@ void kandidatenApp::handleTouchBegan(const bluecadet::touch::TouchEvent& touchEv
         int dist;
         float angle;
 
+        // find min dist between spikes to ID puck
         for (int j = 0; j < tangibleTouch.size(); ++j) {
             for (int i = 0; i < tangibleTouch.size(); ++i) {
 
@@ -240,27 +236,30 @@ void kandidatenApp::handleTouchBegan(const bluecadet::touch::TouchEvent& touchEv
 
         }
     }
-
+    /* TEMP STORYMODE INST */
     if (tangibleTouch.size() == 2)
     {
         CI_LOG_I("storypucken hittad");
         addView(inst.storyView);
         inst.storyView->setHidden(false);
-       // translate active cards
-
+      
+        // translate view of active cards
         for (auto &categorie : allCategories)
         {
             categorie.second->view->setSize(vec2{ 0.5f*windowSize.x, windowSize.y });
             categorie.second->view->setGlobalPosition(ivec2{960,0});
-          /*  auto kids = categorie.second->view->getChildren();
+            
+            auto kids = categorie.second->view->getChildren();
             for (auto &kid : kids)
             {
-                if (!(kid->isHidden())) kid->setGlobalPosition(ivec2{rand() % 700 + 960, rand() % 1080});
-            }*/
+                if (!(kid->isHidden())) kid->setScale(0.5); // scale kid
+            }
         }
     }
 }
+
 void kandidatenApp::handleTouchMoved(const bluecadet::touch::TouchEvent& touchEvent) {}
+
 void kandidatenApp::handleTouchEnded(const bluecadet::touch::TouchEvent& touchEvent)
 {
     for (int i = 0; i < tangibleTouch.size(); ++i)
@@ -269,13 +268,20 @@ void kandidatenApp::handleTouchEnded(const bluecadet::touch::TouchEvent& touchEv
             tangibleTouch.erase(tangibleTouch.begin() + i);
     }
     
+    // puck is lifted 
     if (tangibleTouch.empty())
     {
-        inst.storyView->setHidden(true);
-        for (auto &categorie : allCategories)
+        inst.storyView->setHidden(true); // hide storymode 
+        for (auto &categorie : allCategories) // make active cards fullscreen
         {
             categorie.second->view->setSize(windowSize);
             categorie.second->view->setGlobalPosition(ivec2{ 0,0 });
+
+            auto kids = categorie.second->view->getChildren();
+            for (auto &kid : kids)
+            {
+                if (!(kid->isHidden())) kid->setScale(1); // scale kid
+            }
         }
     }
 }

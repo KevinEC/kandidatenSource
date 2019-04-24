@@ -14,11 +14,20 @@ Story::Story()
     storyView->setTransformOrigin(0.5f * storyView->getSize());
     storyView->setHidden(false);
 
-    // call touchesBegan
+    // call touchesBegan - perhaps not needed
     storyView->getSignalTouchBegan().connect([=](const bluecadet::touch::TouchEvent& e) { handleTouchBegan(e); });
-
-    // call touchesEnded
+    // call touchesEnded - perhaps not needed
     storyView->getSignalTouchEnded().connect([=](const bluecadet::touch::TouchEvent& e) { handleTouchEnded(e); });
+
+    auto labelView = make_shared<TextView>();
+    labelView->setPadding(10, 10);
+    labelView->setWidth(storyView->getWidth());
+    labelView->setFontSize(50.0f);
+    labelView->setTextColor(Color::black());
+    labelView->setTextAlign(bluecadet::text::TextAlign::Center);
+    labelView->setText("STORYMODE YAY");
+    storyView->addChild(labelView);
+
 }
 
 // constructor

@@ -8,7 +8,6 @@ using namespace bluecadet::core;
 using namespace bluecadet::views;
 using namespace bluecadet::touch;
 
-
 Card::Card()
 {
 	x = 200;
@@ -22,7 +21,6 @@ Card::~Card()
 
 Card::Card(const float x1, const float y1, std::string title, std::string body) 
 {
-
 	x = x1;
 	y = y1;
 
@@ -32,7 +30,6 @@ Card::Card(const float x1, const float y1, std::string title, std::string body)
 
 	this->title = title;
 	this->body = body;
-
 
 	isClicked = false;
 	isDragged = false;
@@ -45,7 +42,6 @@ Card::Card(const float x1, const float y1, std::string title, std::string body)
 	transform = Transform();
 	initElements();
 	setStyles();
-
 }
 
 void Card::setpos(float m, float n)
@@ -81,6 +77,7 @@ void Card::initElements()
 
 	titleTex = renderTexture(titleBox);
 	bodyTex = renderTexture(bodyBox);*/
+
 
 	//create bluecadet touchview
 	object = make_shared<TouchView>();
@@ -122,7 +119,6 @@ void Card::updateElementCoords()
 	titleCo = vec2(x + paddingX, y + titleY);
 	bodyCo = vec2(x + paddingX, y + bodyY);
 	tagsCo = vec2(x + paddingX, y + tagsY);
-
 }
 
 void Card::mouseDrag(MouseEvent event)
@@ -168,6 +164,9 @@ void Card::mouseUp(MouseEvent event)
 	this->isClicked = false;
 	this->isDragged = false;
 }
+
+
+// TOUCH EVENTS
 /*
 void Card::touchesBegan(TouchEvent event) 
 {
@@ -242,6 +241,7 @@ void Card::touchesEnded(TouchEvent event)
 	//this->lastTouch = event.getTouches;
 }
 */
+
 void Card::update() 
 {
 	updateElementCoords();
@@ -254,22 +254,17 @@ void Card::setStyles()
 	borderRadius = 5.0f;
 }
 
-void Card::renderCard() {
-
-	int cornerSegments = 5;
-
+void Card::renderCard() 
+{
 	gl::color(bgColor);
-
+    int cornerSegments = 5;
 	gl::drawSolidRoundedRect(rect, borderRadius, cornerSegments);
 
 	gl::color(borderColor);
-
 	gl::drawStrokedRoundedRect(rect, borderRadius, cornerSegments);
 
 	gl::color(Color::white());
-
 	gl::draw(titleTex, titleCo);
 	gl::draw(bodyTex, bodyCo);
-
 
 }
