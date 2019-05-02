@@ -186,6 +186,7 @@ void kandidatenApp::setUpTang()
 void kandidatenApp::handleTouchBegan(const bluecadet::touch::TouchEvent& touchEvent) 
 {
     bool istangible = false;
+
     // fill array to check if touches are a tangible object
     CI_LOG_I("touchid: " << touchEvent.touchId);
     if (tangibleTouch.size() < 4) {
@@ -197,55 +198,57 @@ void kandidatenApp::handleTouchBegan(const bluecadet::touch::TouchEvent& touchEv
         CI_LOG_I("tangSize: " << tangibleTouch.size());
     }
 
+    // when array could contain tangible object
     if (tangibleTouch.size() == 4) {
-        for (int i = 0; i < 4; ++i) {
-            if (tangibleTouch[i].touchId == touchEvent.touchId - 3 + i) {
+
+        // make sure touchIDs are a sequence
+        for (int i = 0; i < 4; ++i) 
+        {
+            if (tangibleTouch[i].touchId == touchEvent.touchId - 3 + i) 
+            {
                 CI_LOG_I("4 tangila punkter eftervarandra");
                 istangible = true;
-           }
-            else {
-                istangible = false;
-            }
+            }    
+            else istangible = false;
+         
         }
+
         int count = 0;
         int mindist = 1000;
         int maxdist;
         int dist;
         float angle;
         bool big = false;
-        bool found = true;
 
         if(istangible){
+            
             // find min dist between spikes to ID puck
             for (int j = 0; j < tangibleTouch.size(); ++j) {
                 for (int i = 0; i < tangibleTouch.size(); ++i) {
-
                     dist = glm::distance(tangibleTouch[j].localPosition, tangibleTouch[i].localPosition);
                     angle = glm::degrees(atan2(abs(tangibleTouch[j].localPosition.x - tangibleTouch[i].localPosition.x), abs(tangibleTouch[j].localPosition.y - tangibleTouch[i].localPosition.y)));
 
                     CI_LOG_I("dist: " << dist);
                     //CI_LOG_I("angle: " << angle);
 
+                    // save minimum distance
                     if (dist != 0) {
                         if (dist < mindist && dist > 20) mindist = dist;
-                        if (dist > 250) {
-                            big = true;
-                            //CI_LOG_I("här breakar vi");
-                            //break;
-                        }
+                        if (dist > 250) big = true;
                     }
-                
-                    if (dist > 80 && dist < 150) {
-                        count++;
-                        //CI_LOG_I("counter" << count);
-                    }
+
+                    // edge distances
+                    if (dist > 80 && dist < 150) count++;
                 }
             }
+            
+            // tangible object found 
             if (count != 0 && count >= 8 && !big) {
                 CI_LOG_I("counter" << count);
                 CI_LOG_I("Vi lyckades hitta tangible enheten");
                 CI_LOG_I("mindist: " << mindist);
 
+                // storymode
                 if (mindist < 60 && mindist > 30) {
                     CI_LOG_I("storypucken hittad");
                     addView(inst.storyView);
