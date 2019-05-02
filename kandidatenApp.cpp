@@ -50,7 +50,10 @@ public:
 
     ivec2 windowSize{ 1920, 1080 };
     vector<bluecadet::touch::TouchEvent> tangibleTouch;
+   
     Story inst;
+    Story cardStory;
+    Cards storyCards;
 
 	gl::Texture2dRef texture;
 	gl::Texture2dRef background;
@@ -60,6 +63,7 @@ public:
 	int i;
 	dataBaseController dbc;
 	vector<pair<string, Cards*>> allCategories; // MAIN CONTAINER OF CARDS SORTED BY CATEGORY
+    // container of cards for stories
 
 };
 
@@ -88,7 +92,6 @@ void kandidatenApp::addView(BaseViewRef view)
 void kandidatenApp::setup()
 {
 	BaseApp::setup();
-    setUpTang();
 
 	CI_LOG_I("MT: " << System::hasMultiTouch() << " Max points: " << System::getMaxMultiTouchPoints());
 
@@ -127,6 +130,7 @@ void kandidatenApp::setup()
 	selectCategories(enabledCategories);
     /*********************************/
 
+    setUpTang();
 
 	disableFrameRate();
 	gl::enableVerticalSync(true);
@@ -180,6 +184,10 @@ void kandidatenApp::setUpTang()
     // call touchesEnded
     tangView->getSignalTouchEnded().connect([=](const bluecadet::touch::TouchEvent& e) { handleTouchEnded(e); });
 
+    // fill story cards
+    storyCards = *allCategories[0].second;
+    cardStory = Story(storyCards);
+
     addView(tangView); // add to root
 }
 
@@ -188,14 +196,14 @@ void kandidatenApp::handleTouchBegan(const bluecadet::touch::TouchEvent& touchEv
     bool istangible = false;
 
     // fill array to check if touches are a tangible object
-    CI_LOG_I("touchid: " << touchEvent.touchId);
+    //CI_LOG_I("touchid: " << touchEvent.touchId);
     if (tangibleTouch.size() < 4) {
         tangibleTouch.push_back(touchEvent);
     }
     else {
         tangibleTouch.push_back(touchEvent);
         tangibleTouch.erase(tangibleTouch.begin());
-        CI_LOG_I("tangSize: " << tangibleTouch.size());
+    //    CI_LOG_I("tangSize: " << tangibleTouch.size());
     }
 
     // when array could contain tangible object
@@ -206,7 +214,7 @@ void kandidatenApp::handleTouchBegan(const bluecadet::touch::TouchEvent& touchEv
         {
             if (tangibleTouch[i].touchId == touchEvent.touchId - 3 + i) 
             {
-                CI_LOG_I("4 tangila punkter eftervarandra");
+             //   CI_LOG_I("4 tangila punkter eftervarandra");
                 istangible = true;
             }    
             else istangible = false;
@@ -228,7 +236,7 @@ void kandidatenApp::handleTouchBegan(const bluecadet::touch::TouchEvent& touchEv
                     dist = glm::distance(tangibleTouch[j].localPosition, tangibleTouch[i].localPosition);
                     angle = glm::degrees(atan2(abs(tangibleTouch[j].localPosition.x - tangibleTouch[i].localPosition.x), abs(tangibleTouch[j].localPosition.y - tangibleTouch[i].localPosition.y)));
 
-                    CI_LOG_I("dist: " << dist);
+                //    CI_LOG_I("dist: " << dist);
                     //CI_LOG_I("angle: " << angle);
 
                     // save minimum distance
@@ -244,15 +252,18 @@ void kandidatenApp::handleTouchBegan(const bluecadet::touch::TouchEvent& touchEv
             
             // tangible object found 
             if (count != 0 && count >= 8 && !big) {
-                CI_LOG_I("counter" << count);
-                CI_LOG_I("Vi lyckades hitta tangible enheten");
-                CI_LOG_I("mindist: " << mindist);
+            //    CI_LOG_I("counter" << count);
+             //   CI_LOG_I("Vi lyckades hitta tangible enheten");
+            //    CI_LOG_I("mindist: " << mindist);
 
                 // storymode
                 if (mindist < 60 && mindist > 30) {
-                    CI_LOG_I("storypucken hittad");
-                    addView(inst.storyView);
-                    inst.storyView->setHidden(false);
+                //    CI_LOG_I("storypucken hittad");
+                    addView(cardStory.storyView);
+                    cardStory.storyView->setHidden(false);
+
+                 //   addView(inst.storyView);
+                 //   inst.storyView->setHidden(false);
 
                     // translate view of active cards
                     for (auto &categorie : allCategories)
@@ -285,7 +296,8 @@ void kandidatenApp::handleTouchEnded(const bluecadet::touch::TouchEvent& touchEv
     // puck is lifted 
     if (tangibleTouch.empty())
     {
-        inst.storyView->setHidden(true); // hide storymode 
+        cardStory.storyView->setHidden(true);
+     //   inst.storyView->setHidden(true); // hide storymode 
         for (auto &categorie : allCategories) // make active cards fullscreen
         {
             categorie.second->view->setSize(windowSize);
