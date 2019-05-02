@@ -124,7 +124,7 @@ void Card::updateElementCoords()
 	tagsCo = vec2(x + paddingX, y + tagsY);
 
 }
-
+/*
 void Card::mouseDrag(MouseEvent event)
 {
 	//set a bool to true when rect.contains is true once. Dont set to false until mouseUp to avoid mouse getting outside the rect
@@ -168,6 +168,8 @@ void Card::mouseUp(MouseEvent event)
 	this->isClicked = false;
 	this->isDragged = false;
 }
+*/
+
 /*
 void Card::touchesBegan(TouchEvent event) 
 {
@@ -246,6 +248,10 @@ void Card::update()
 {
 	updateElementCoords();
 }
+
+void Card::handleTouchBegan(const bluecadet::touch::TouchEvent& touchEvent) {}
+void Card::handleTouchMoved(const bluecadet::touch::TouchEvent& touchEvent) {}
+void Card::handleTouchEnded(const bluecadet::touch::TouchEvent& touchEvent) {}
 
 void Card::setStyles()
 {
