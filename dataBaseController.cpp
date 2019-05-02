@@ -74,6 +74,7 @@ void dataBaseController::extractCategories(std::vector<std::string> & categories
 
 }
 
+
 // store swedish title in first slot and english title in second slot of a pair
 void dataBaseController::extractTitles(std::vector< std::pair<std::string, std::string> > & titles)
 {
@@ -168,4 +169,79 @@ void dataBaseController::extractCardCats(std::vector<std::vector<std::string> > 
 	}
 }
 
+void dataBaseController::extractStorytitles(std::vector<std::string>& storytitles)
+{
+	XmlTree branch = tree->getChild("content");
+
+	for (XmlTree::Iter iter = branch.begin(); iter != branch.end(); ++iter)
+	{
+		if (iter->hasAttribute("tex_se"))
+		{
+			//tex_se
+			CI_LOG_I("titles: " << iter->getAttributeValue<std::string>("tex_se"));
+			storytitles.push_back(iter->getAttributeValue<std::string>("tex_se"));
+		}
+	/*	if (iter->hasAttribute("tex_en"))
+		{
+			CI_LOG_I("titles: " << iter->getAttributeValue<std::string>("tex_en"));
+			storytitles.push_back(iter->getAttributeValue<std::string>("tex_en"));
+		}*/
+	}
+
+}
+
+void dataBaseController::extractstoryBodies(std::vector<std::pair<std::string, std::string>>& storybodies)
+{
+	XmlTree headertree = tree->getChild("content");
+	std::pair<std::string, std::string> temp;
+
+	for (XmlTree::Iter iter2 = headertree.begin(); iter2 != headertree.end(); ++iter2) // loop through all media-tags
+	{			
+		if (iter2->hasChild("media"))
+			{
+			for (XmlTree::Iter iter3 = iter2->begin(); iter3 != iter2->end(); ++iter3) // loop through inside media-tag
+			{
+				if (iter3->hasChild("se")) {
+					for (XmlTree::Iter iter4 = iter3->begin(); iter4 != iter3->end(); ++iter4) // loop through inside media-tag
+					{
+							//CI_LOG_I("test2");
+						if (iter4->getTag() == "se") //swedish
+						{
+							temp.first = (iter4->getChild("text").getValue());
+							//CI_LOG_I("svensk text: " << iter4->getChild("text").getValue());
+						}
+						else if (iter4->getTag() == "en") //english 
+						{
+							temp.second = (iter4->getChild("text").getValue());								
+							//CI_LOG_I("engelsk text: " << iter4->getChild("text").getValue());
+						}
+						storybodies.push_back(temp);
+						temp.first.clear();
+						temp.second.clear();
+						}
+					}
+				}
+			}
+					
+		}
+	}
+		
+
+void dataBaseController::extractstoryImgPaths(std::vector<std::string> & imgPath)
+{
+	XmlTree headertree = tree->getChild("content");
+
+	for (XmlTree::Iter iter2 = headertree.begin(); iter2 != headertree.end(); ++iter2) // loop through all media-tags
+	{
+		if (iter2->hasChild("media"))
+
+		{
+			for (XmlTree::Iter iter3 = iter2->begin(); iter3 != iter2->end(); ++iter3) // loop through inside media-tag
+			{
+				//if(iter3->hasAttribute("path"))
+					imgPath.push_back("http://www.student.itn.liu.se/~chrad171/databas/databas" + iter3->getAttributeValue<std::string>("path"));
+			}
+		}
+	}
+}
 

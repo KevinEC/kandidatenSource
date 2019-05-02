@@ -59,6 +59,7 @@ public:
 	vec2 lastclick;
 	int i;
 	dataBaseController dbc;
+	dataBaseController dbcstory;
 	vector<pair<string, Cards*>> allCategories; // MAIN CONTAINER OF CARDS SORTED BY CATEGORY
 
 };
@@ -103,18 +104,26 @@ void kandidatenApp::setup()
     vector<pair<string, string>> bodyText;
     vector<string> imgPath;
     vector<vector<string> > cardCategory;
+	vector<string> storytitles;
+	vector<pair<string, string>> storybodies;
+	vector<string> storyimgPath;
 
     {
         dbc = dataBaseController("online", "xml", "http://www.student.itn.liu.se/~chrad171/databas/databas/media/write.xml");
-       
+       dbcstory = dataBaseController("online", "xml", "http://www.student.itn.liu.se/~chrad171/databas/databas/media/stories.xml");
+
         dbc.extractCategories(categories);
         dbc.extractTitles(titles);
         dbc.extractBodies(bodyText);
         dbc.extractImgPaths(imgPath);
         dbc.extractCardCats(cardCategory);
+		dbcstory.extractStorytitles(storytitles);
+		dbcstory.extractstoryBodies(storybodies);
+		dbcstory.extractstoryImgPaths(storyimgPath);
     }
 	// 7 83 83 83 83
 	CI_LOG_I("sizes: " << categories.size() << " " << titles.size() << " " << bodyText.size() << " " << imgPath.size() << " " << cardCategory.size());
+	CI_LOG_I("test" << storytitles.size() << "storybodies" << storybodies.size() << "storyimgpath" << storyimgPath.size());
     
 
     /********************************
