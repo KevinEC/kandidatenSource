@@ -40,7 +40,8 @@ Card::Card(const float x1, const float y1, std::string title, std::string body)
 	rect = Rectf(x1, y1, x1 + width, y1 + height);
 
 	twoTouches = false;
-	initFingDist = 0;
+	initDist = 0;
+	currDist = 0;
 
 	transform = Transform();
 	initElements();
@@ -88,6 +89,18 @@ void Card::initElements()
 	object->setPosition({ x,y });
 	object->setDragEnabled(true);
 	object->setMultiTouchEnabled(true);
+	object->setTransformOrigin(object->getCenter());
+
+	//link touchevents
+	object->getSignalTouchBegan().connect([=](bluecadet::touch::TouchEvent e) {
+		this->handleTouchBegan(&e);
+	});
+	object->getSignalTouchMoved().connect([=](bluecadet::touch::TouchEvent e) {
+		this->handleTouchMoved(&e);
+	});
+	object->getSignalTouchEnded().connect([=](bluecadet::touch::TouchEvent e) {
+		this->handleTouchMoved(&e);
+	});
 
 	//create border
 	StrokedRoundedRectViewRef border = make_shared<StrokedRoundedRectView>();
@@ -125,123 +138,6 @@ void Card::updateElementCoords()
 
 }
 
-void Card::mouseDrag(MouseEvent event)
-{
-	//set a bool to true when rect.contains is true once. Dont set to false until mouseUp to avoid mouse getting outside the rect
-	if (isClicked) 
-	{
-		this->title = "du har dragit på rektangeln";
-		float mx = event.getX();
-		float my = event.getY();
-		float *coords = transform.translate(this->rect.getX1(), this->rect.getY1(), mx, my, isDragged);
-		this->setpos(coords[0], coords[1]);
-		this->rect.set(coords[0], coords[1], coords[0] + rect.getWidth(), coords[1] + rect.getHeight());
-		delete coords;
-		updateElementCoords();
-		isDragged = true;
-	}
-	else 
-	{
-		isDragged = false;
-	}
-	
-}
-
-void Card::mouseDown(MouseEvent event)
-{
-	if (rect.contains(event.getPos())) 
-	{
-		this->isClicked = true;
-		this->isFront = true;
-		this->title = "du har klickat på rektangeln";
-		CI_LOG_I("title: " << title);
-	}
-	else 
-	{
-		this->isClicked = false;
-	}
-}
-
-void Card::mouseUp(MouseEvent event)
-{
-	CI_LOG_I("mouseUp");
-	this->isClicked = false;
-	this->isDragged = false;
-}
-/*
-void Card::touchesBegan(TouchEvent event) 
-{
-	for (const auto &touch : event.getTouches()) //event.getTouches()) returns std::vector<Touch>
-	{
-		if (rect.contains(touch.getPos())) 
-		{
-			if (this->isClicked == true) // rect contains two touch points // && rect.contains(lastTouch.getPos()
-			{
-				this->twoTouches = true;
-				this->initFingDist = glm::distance(lastTouch.getPos(), touch.getPos());
-				CI_LOG_I("initial finger distance: " << initFingDist);
-			//	CI_LOG_I("vi har två fingrar på rektangeln");
-			}
-			else 
-			{
-				this->twoTouches = false;
-				lastTouch = touch;
-			}
-			
-			this->isClicked = true;
-			this->isFront = true;
-			this->title = "du har klickat på rektangeln";
-			
-			CI_LOG_I("title: " << title);
-		}
-	}
-}
-
-void Card::touchesMoved(TouchEvent event) 
-{
-	for (const auto &touch : event.getTouches()) 
-	{
-		//set a bool to true when rect.contains is true once. Dont set to false until mouseUp to avoid mouse getting outside the rect
-		if (isClicked) 
-		{
-			this->title = "du har dragit på rektangeln";
-			float mx = touch.getX();
-			float my = touch.getY();
-			
-			float *coords = transform.translate(this->rect.getX1(), this->rect.getY1(), mx, my, isDragged);
-			this->setpos(coords[0], coords[1]);
-			this->rect.set(coords[0], coords[1], coords[0] + rect.getWidth(), coords[1] + rect.getHeight());
-			updateElementCoords();
-			
-			delete coords;
-			isDragged = true;
-		}
-
-		if (this->twoTouches) // rect contains two active touch points 
-		{
-			float currFingDist = glm::distance(lastTouch.getPos(), touch.getPos());
-			float size = currFingDist / this->initFingDist;
-			this->cardSize = size;
-			CI_LOG_I("size: " << size);
-
-			if (this->rect.getWidth()*size > 300 & this->rect.getWidth()*size < 1500)
-			{
-				this->rect.scaleCentered(size);
-			}
-			//float *coord = transform.rotate();
-		}
-	}
-}
-
-void Card::touchesEnded(TouchEvent event) 
-{
-	//CI_LOG_I("touchesEnded");
-	this->isClicked = false;
-	this->isDragged = false;
-	this->twoTouches = false;
-	//this->lastTouch = event.getTouches;
-}
-*/
 void Card::update() 
 {
 	updateElementCoords();
@@ -273,3 +169,197 @@ void Card::renderCard() {
 
 
 }
+
+
+void Card::handleTouchBegan(bluecadet::touch::TouchEvent* touchEvent)
+{
+	// init vars for conditional handling of touchpoints
+	firstTouchPoint = true;
+	firstTouchId = 0;
+	maxDist = 0;
+	initDist = -1;
+
+	// add touchpoints on began
+	activeTouches.insert(make_pair(touchEvent->touchId, *touchEvent));
+}
+
+void Card::handleTouchMoved(bluecadet::touch::TouchEvent* touchEvent)
+{
+	// update the touchpoint coord
+	activeTouches.at(touchEvent->touchId) = *touchEvent;
+
+	// reset vars too determine the loongest distance between all active touchpoints
+	maxDist = 0;
+	currDist = 0;
+
+	float sumX = 0;
+	float sumY = 0;
+
+	if ( object->getNumTouches() >= 2 )
+	{
+		//find longest dist
+		for (auto touch : activeTouches)
+		{
+			//save the first touch point id
+			if (firstTouchPoint) {
+				firstTouchId = touch.first;
+				firstTouchPoint = false;
+			}
+
+			// measure the distance from the first touchpoint on the card to each individual touchpoint
+			currDist = abs(glm::distance(activeTouches.at(firstTouchId).globalPosition, touch.second.globalPosition));
+
+			// determine the longest distance
+			if (currDist > maxDist) maxDist = currDist;
+
+			sumX += touch.second.globalPosition.x;
+			sumY += touch.second.globalPosition.y;
+
+			
+		}
+
+		// fool lösning too save the inital distance
+		if (initDist == -1) initDist = maxDist;
+		cardSize = maxDist / initDist;
+
+		// determine mid point
+		float midX = sumX / activeTouches.size();
+		float midY = sumY / activeTouches.size();
+		vec2 midPos = { midX, midY };
+
+
+		object->setTransformOrigin(midPos - object->getCenter());
+		if (cardSize > 0.2 && cardSize < 1.5) {
+			object->setScale(cardSize);
+		}
+		vec2 newPos = midPos - object->getCenter();
+
+		//object->setPosition(newPos);
+
+	}
+
+}
+
+void Card::handleTouchEnded(bluecadet::touch::TouchEvent* touchEvent)
+{
+	activeTouches.clear();
+}
+/*
+void Card::mouseDrag(MouseEvent event)
+{
+	//set a bool to true when rect.contains is true once. Dont set to false until mouseUp to avoid mouse getting outside the rect
+	if (isClicked)
+	{
+		this->title = "du har dragit på rektangeln";
+		float mx = event.getX();
+		float my = event.getY();
+		float *coords = transform.translate(this->rect.getX1(), this->rect.getY1(), mx, my, isDragged);
+		this->setpos(coords[0], coords[1]);
+		this->rect.set(coords[0], coords[1], coords[0] + rect.getWidth(), coords[1] + rect.getHeight());
+		delete coords;
+		updateElementCoords();
+		isDragged = true;
+	}
+	else
+	{
+		isDragged = false;
+	}
+
+}
+
+void Card::mouseDown(MouseEvent event)
+{
+	if (rect.contains(event.getPos()))
+	{
+		this->isClicked = true;
+		this->isFront = true;
+		this->title = "du har klickat på rektangeln";
+		CI_LOG_I("title: " << title);
+	}
+	else
+	{
+		this->isClicked = false;
+	}
+}
+
+void Card::mouseUp(MouseEvent event)
+{
+	CI_LOG_I("mouseUp");
+	this->isClicked = false;
+	this->isDragged = false;
+}
+*/
+/*
+void Card::touchesBegan(TouchEvent event)
+{
+	for (const auto &touch : event.getTouches()) //event.getTouches()) returns std::vector<Touch>
+	{
+		if (rect.contains(touch.getPos()))
+		{
+			if (this->isClicked == true) // rect contains two touch points // && rect.contains(lastTouch.getPos()
+			{
+				this->twoTouches = true;
+				this->initFingDist = glm::distance(lastTouch.getPos(), touch.getPos());
+				CI_LOG_I("initial finger distance: " << initFingDist);
+			//	CI_LOG_I("vi har två fingrar på rektangeln");
+			}
+			else
+			{
+				this->twoTouches = false;
+				lastTouch = touch;
+			}
+
+			this->isClicked = true;
+			this->isFront = true;
+			this->title = "du har klickat på rektangeln";
+
+			CI_LOG_I("title: " << title);
+		}
+	}
+}
+
+void Card::touchesMoved(TouchEvent event)
+{
+	for (const auto &touch : event.getTouches())
+	{
+		//set a bool to true when rect.contains is true once. Dont set to false until mouseUp to avoid mouse getting outside the rect
+		if (isClicked)
+		{
+			this->title = "du har dragit på rektangeln";
+			float mx = touch.getX();
+			float my = touch.getY();
+
+			float *coords = transform.translate(this->rect.getX1(), this->rect.getY1(), mx, my, isDragged);
+			this->setpos(coords[0], coords[1]);
+			this->rect.set(coords[0], coords[1], coords[0] + rect.getWidth(), coords[1] + rect.getHeight());
+			updateElementCoords();
+
+			delete coords;
+			isDragged = true;
+		}
+
+		if (this->twoTouches) // rect contains two active touch points
+		{
+			float currFingDist = glm::distance(lastTouch.getPos(), touch.getPos());
+			float size = currFingDist / this->initFingDist;
+			this->cardSize = size;
+			CI_LOG_I("size: " << size);
+
+			if (this->rect.getWidth()*size > 300 & this->rect.getWidth()*size < 1500)
+			{
+				this->rect.scaleCentered(size);
+			}
+			//float *coord = transform.rotate();
+		}
+	}
+}
+
+void Card::touchesEnded(TouchEvent event)
+{
+	//CI_LOG_I("touchesEnded");
+	this->isClicked = false;
+	this->isDragged = false;
+	this->twoTouches = false;
+	//this->lastTouch = event.getTouches;
+}
+*/

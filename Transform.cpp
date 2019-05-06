@@ -33,3 +33,13 @@ float * Transform::translate(const float x, const float y, const float mx, const
 	return new float[2]{ newx, newy };
 
 }
+
+glm::vec2 Transform::translate(const glm::vec2 pos, const glm::vec2 inputPoint)
+{
+	
+	this->delta = inputPoint - pos;
+
+	glm::vec2 newPoint = inputPoint - this->delta;
+
+	return newPoint;
+}
