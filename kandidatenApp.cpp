@@ -113,17 +113,20 @@ void kandidatenApp::setup()
 
     {
         dbc = dataBaseController("online", "xml", "http://www.student.itn.liu.se/~chrad171/databas/databas/media/write.xml");
-       dbcstory = dataBaseController("online", "xml", "http://www.student.itn.liu.se/~chrad171/databas/databas/media/stories.xml");
-
+     
         dbc.extractCategories(categories);
         dbc.extractTitles(titles);
         dbc.extractBodies(bodyText);
         dbc.extractImgPaths(imgPath);
         dbc.extractCardCats(cardCategory);
+
+        dbcstory = dataBaseController("online", "xml", "http://www.student.itn.liu.se/~chrad171/databas/databas/media/stories.xml");
+
 		dbcstory.extractStorytitles(storytitles);
 		dbcstory.extractstoryBodies(storybodies);
 		dbcstory.extractstoryImgPaths(storyimgPath);
     }
+
 	// 7 83 83 83 83
 	CI_LOG_I("sizes: " << categories.size() << " " << titles.size() << " " << bodyText.size() << " " << imgPath.size() << " " << cardCategory.size());
 	CI_LOG_I("test" << storytitles.size() << "storybodies" << storybodies.size() << "storyimgpath" << storyimgPath.size());
@@ -133,9 +136,12 @@ void kandidatenApp::setup()
 	vector < pair <string, Cards*>> story1;
 	vector < pair <string, pair<string, string>>> story2;
 	vector < pair <string, pair<string, string>>> story3;
-	for(auto bodies : storyimgPath) {
+	
+    for(auto bodies : storyimgPath) 
+    {
 		++i;
-		if (i <= 3) {
+		if (i <= 3) 
+        {
 			//story1.
 		}
 
@@ -151,8 +157,7 @@ void kandidatenApp::setup()
 	selectCategories(enabledCategories);
     /*********************************/
 	
-
-    setUpTang();
+    setUpTang(); // view for tangible objects 
 
 	disableFrameRate();
 	gl::enableVerticalSync(true);
@@ -178,12 +183,12 @@ void kandidatenApp::selectCategories(int enable[])
 	int index = 0;
 	for (auto &categorie : allCategories)
 	{
-		if (enable[index]) {
+		if (enable[index]) 
 			categorie.second->render = true;
-		}
-		else {
+		
+		else 
 			categorie.second->render = false;
-		}
+		
 		index++;
 	}
 }
@@ -201,17 +206,15 @@ void kandidatenApp::setUpTang()
     tangView->setSize(windowSize);
     tangView->setTransformOrigin(0.5f * tangView->getSize());
 
-     // call touchesBegan
+     // call touch functions
     tangView->getSignalTouchBegan().connect([=](const bluecadet::touch::TouchEvent& e){ handleTouchBegan(e); });
-
-    // call touchesEnded
     tangView->getSignalTouchEnded().connect([=](const bluecadet::touch::TouchEvent& e) { handleTouchEnded(e); });
 
     // fill story cards
     storyCards = *allCategories[0].second;
     cardStory = Story(storyCards);
 
-    addView(tangView); // add to root
+    addView(tangView); // add tang touch view to root
 }
 
 void kandidatenApp::handleTouchBegan(const bluecadet::touch::TouchEvent& touchEvent) 
@@ -219,51 +222,48 @@ void kandidatenApp::handleTouchBegan(const bluecadet::touch::TouchEvent& touchEv
     bool istangible = false;
 
     // fill array to check if touches are a tangible object
-    //CI_LOG_I("touchid: " << touchEvent.touchId);
-    if (tangibleTouch.size() < 4) {
+    if (tangibleTouch.size() < 4) 
         tangibleTouch.push_back(touchEvent);
-    }
-    else {
+   
+    else 
+    {
         tangibleTouch.push_back(touchEvent);
         tangibleTouch.erase(tangibleTouch.begin());
-    //    CI_LOG_I("tangSize: " << tangibleTouch.size());
     }
 
     // when array could contain tangible object
-    if (tangibleTouch.size() == 4) {
+    if (tangibleTouch.size() == 4) 
+    {
 
         // make sure touchIDs are a sequence
         for (int i = 0; i < 4; ++i) 
         {
             if (tangibleTouch[i].touchId == touchEvent.touchId - 3 + i) 
-            {
-             //   CI_LOG_I("4 tangila punkter eftervarandra");
-                istangible = true;
-            }    
+                istangible = true;   
+
             else istangible = false;
-         
         }
 
-        int count = 0;
+        int count = 0;  // number of distances that are on the outer triangle of puck
         int mindist = 1000;
-        int maxdist;
+        //int maxdist;
         int dist;
-        float angle;
+        //float angle;
         bool big = false;
 
         if(istangible){
             
             // find min dist between spikes to ID puck
-            for (int j = 0; j < tangibleTouch.size(); ++j) {
-                for (int i = 0; i < tangibleTouch.size(); ++i) {
+            for (int j = 0; j < tangibleTouch.size(); ++j) 
+            {
+                for (int i = 0; i < tangibleTouch.size(); ++i) 
+                {
                     dist = glm::distance(tangibleTouch[j].localPosition, tangibleTouch[i].localPosition);
-                    angle = glm::degrees(atan2(abs(tangibleTouch[j].localPosition.x - tangibleTouch[i].localPosition.x), abs(tangibleTouch[j].localPosition.y - tangibleTouch[i].localPosition.y)));
-
-                //    CI_LOG_I("dist: " << dist);
-                    //CI_LOG_I("angle: " << angle);
+                    //angle = glm::degrees(atan2(abs(tangibleTouch[j].localPosition.x - tangibleTouch[i].localPosition.x), abs(tangibleTouch[j].localPosition.y - tangibleTouch[i].localPosition.y)));
 
                     // save minimum distance
-                    if (dist != 0) {
+                    if (dist != 0) 
+                    {
                         if (dist < mindist && dist > 20) mindist = dist;
                         if (dist > 250) big = true;
                     }
@@ -274,19 +274,13 @@ void kandidatenApp::handleTouchBegan(const bluecadet::touch::TouchEvent& touchEv
             }
             
             // tangible object found 
-            if (count != 0 && count >= 8 && !big) {
-            //    CI_LOG_I("counter" << count);
-             //   CI_LOG_I("Vi lyckades hitta tangible enheten");
-            //    CI_LOG_I("mindist: " << mindist);
-
+            if (count != 0 && count >= 8 && !big) 
+            {
                 // storymode
-                if (mindist < 60 && mindist > 30) {
-                //    CI_LOG_I("storypucken hittad");
+                if (mindist < 60 && mindist > 30) 
+                {
                     addView(cardStory.storyView);
                     cardStory.storyView->setHidden(false);
-
-                 //   addView(inst.storyView);
-                 //   inst.storyView->setHidden(false);
 
                     // translate view of active cards
                     for (auto &categorie : allCategories)
@@ -320,7 +314,7 @@ void kandidatenApp::handleTouchEnded(const bluecadet::touch::TouchEvent& touchEv
     if (tangibleTouch.empty())
     {
         cardStory.storyView->setHidden(true);
-     //   inst.storyView->setHidden(true); // hide storymode 
+
         for (auto &categorie : allCategories) // make active cards fullscreen
         {
             categorie.second->view->setSize(windowSize);
@@ -329,7 +323,7 @@ void kandidatenApp::handleTouchEnded(const bluecadet::touch::TouchEvent& touchEv
             auto kids = categorie.second->view->getChildren();
             for (auto &kid : kids)
             {
-                if (!(kid->isHidden())) kid->setScale(1); // scale kid
+                if (!(kid->isHidden())) kid->setScale(1); // scale kid back
             }
         }
     }

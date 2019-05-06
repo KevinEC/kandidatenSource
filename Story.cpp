@@ -14,10 +14,9 @@ Story::Story()
     storyView->setTransformOrigin(0.5f * storyView->getSize());
     storyView->setHidden(false);
 
-    // call touchesBegan - perhaps not needed
-    storyView->getSignalTouchBegan().connect([=](const bluecadet::touch::TouchEvent& e) { handleTouchBegan(e); });
-    // call touchesEnded - perhaps not needed
-    storyView->getSignalTouchEnded().connect([=](const bluecadet::touch::TouchEvent& e) { handleTouchEnded(e); });
+ //   storyView->getSignalTouchBegan().connect([=](const bluecadet::touch::TouchEvent& e) { handleTouchBegan(e); });
+ //   storyView->getSignalTouchEnded().connect([=](const bluecadet::touch::TouchEvent& e) { handleTouchBegan(e); });
+  //  storyView->getSignalTouchEnded().connect([=](const bluecadet::touch::TouchEvent& e) { handleTouchEnded(e); });
 
     auto labelView = make_shared<TextView>();
     labelView->setPadding(10, 10);
@@ -46,6 +45,10 @@ Story::Story(Cards cards) : storyCards(cards)
     storyView->setTransformOrigin(0.5f * storyView->getSize());
     storyView->setHidden(false);
 
+    storyView->getSignalTouchBegan().connect([=](const bluecadet::touch::TouchEvent& e) { handleTouchBegan(e); });
+    storyView->getSignalTouchMoved().connect([=](const bluecadet::touch::TouchEvent& e) { handleTouchMoved(e); });
+    storyView->getSignalTouchEnded().connect([=](const bluecadet::touch::TouchEvent& e) { handleTouchEnded(e); });
+
     int offset = 0;
 
     for(auto &card : cards.allcards)
@@ -71,7 +74,7 @@ Story::Story(Cards cards) : storyCards(cards)
             headerView->setTextColor(Color::black());
             headerView->setTextAlign(bluecadet::text::TextAlign::Center);
             headerView->setText("STORYMODE YAY");
-
+       
             // body view
             auto bodyView = make_shared<TextView>();
             bodyView->setPadding(20, 20);
@@ -97,6 +100,9 @@ Story::Story(Cards cards) : storyCards(cards)
         storyView->addChild(cardView);
     }
 
+    // make top card red 
+    storyView->getChildren().back()->setBackgroundColor(Color::hex(0xFF0000));
+
     CI_LOG_I("kids: " << storyView->getNumChildren());
 }
 
@@ -106,10 +112,12 @@ Story::~Story()
 
 void Story::handleTouchBegan(const bluecadet::touch::TouchEvent & touchEvent)
 {
+    touchEvent.target->getChildren().back()->moveToBack();
 }
 
 void Story::handleTouchMoved(const bluecadet::touch::TouchEvent & touchEvent)
 {
+    
 }
 
 void Story::handleTouchEnded(const bluecadet::touch::TouchEvent & touchEvent)
