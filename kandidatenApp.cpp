@@ -87,7 +87,7 @@ void kandidatenApp::setup()
 	i = 0;
 
 	/*- connect to data base -*/
-	dbc = dataBaseController("online", "xml", "http://www.student.itn.liu.se/~chrad171/databas/databas/media/write.xml");
+	dbc = dataBaseController("online", "xml", "http://www.student.itn.liu.se/~chrad171/databas/databas/media/noVid.xml");
 	// CI_LOG_I("db: " << db.tree);
 
 	/*- extract categories -*/
@@ -114,7 +114,7 @@ void kandidatenApp::setup()
 	
 
 	Cards allCards = Cards();
-	allCategories = allCards.categorize(&titles, &bodyText, &categories, &cardCategory);
+	allCategories = allCards.categorize(&titles, &bodyText, &imgPath, &categories, &cardCategory);
 
 	int enabledCategories[7] = { 1, 0, 0, 0, 0, 0, 0 };
 	selectCategories(enabledCategories);

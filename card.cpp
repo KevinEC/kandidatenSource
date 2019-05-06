@@ -7,20 +7,21 @@ using namespace std;
 using namespace bluecadet::core;
 using namespace bluecadet::views;
 using namespace bluecadet::touch;
+using namespace bluecadet::text;
 
 
 Card::Card()
 {
 	x = 200;
 	y = 100;
-	title = "Hej Hilma";
+	titleText = "Hej Hilma";
 }
 
 Card::~Card()
 {
 }
 
-Card::Card(const float x1, const float y1, std::string title, std::string body) 
+Card::Card(const float x1, const float y1, std::string title, std::string body, std::string imgPath)
 {
 
 	x = x1;
@@ -30,8 +31,9 @@ Card::Card(const float x1, const float y1, std::string title, std::string body)
 	width = 336.0f*cardSize;
 	height = 500.0f*cardSize;
 
-	this->title = title;
-	this->body = body;
+	this->titleText = title;
+	this->bodyText = body;
+	this->imgPath = imgPath;
 
 
 	isClicked = false;
@@ -44,8 +46,8 @@ Card::Card(const float x1, const float y1, std::string title, std::string body)
 	currDist = 0;
 
 	transform = Transform();
-	initElements();
 	setStyles();
+	initElements();
 
 }
 
@@ -55,37 +57,17 @@ void Card::setpos(float m, float n)
 	y = n;
 }
 
-gl::TextureRef Card::renderTexture(TextBox &text)
+gl::TextureRef Card::renderTexture(StyledTextLayoutRef text)
 {
-	Surface srf = text.render();
+	auto srf = text->renderToSurface();
 	return gl::Texture::create(srf);
 }
 
 void Card::initElements()
 {
-	/*
-	paddingX = 22.0f*cardSize;
-	elementWidth = 292.0f *cardSize;
-	//const ColorA textColor = ColorA(65, 64, 66, 0.5f);
-	textColor = ColorA::hex(0x1d1d1d);
-	montserrat = loadAsset("fonts/Montserrat.ttf");
-	raleway = loadAsset("fonts/Raleway.ttf");
-
-	const Font titleFont = Font(montserrat , 20.0*cardSize);
-	const Font bodyFont = Font(raleway, 14.0*cardSize);
-
-	updateElementCoords();
-
-	TextBox titleBox = TextBox().text(title).font(titleFont).color(textColor).size(elementWidth, 30*cardSize);
-	TextBox bodyBox = TextBox().text(body).font(bodyFont).color(textColor).size(elementWidth, 129*cardSize);
-
-
-	titleTex = renderTexture(titleBox);
-	bodyTex = renderTexture(bodyBox);*/
-
 	//create bluecadet touchview
 	object = make_shared<TouchView>();
-	object->setSize({ 336.0f*cardSize, 500.0f*cardSize });
+	object->setSize({ 336.0f, 500.0f });
 	object->setPosition({ x,y });
 	object->setDragEnabled(true);
 	object->setMultiTouchEnabled(true);
@@ -104,16 +86,78 @@ void Card::initElements()
 
 	//create border
 	StrokedRoundedRectViewRef border = make_shared<StrokedRoundedRectView>();
-	//border->setBackgroundColor(borderColor);
+	border->setBackgroundColor(bgColor);
+	border->setStrokeWidth(borderWidth);
 	border->setStrokeColor(borderColor);
 	border->setCornerRadius(borderRadius);
 	border->setSize({ object->getSize() });
 	object->addChild(border);
+
+	// main content box
+	float size = 0.9f;
+	float padding = (1.0f - size) / 2;
+
+	//create main content box
+	BaseViewRef contentBox = make_shared<BaseView>();
+	contentBox->setSize({ object->getSize() * size });
+
+
+	contentBox->setPosition({ object->getSize() * padding });
+	object->addChild(contentBox);
+
+	//create img
+	ImageViewRef image = make_shared<ImageView>();
+	DataSourceRef imgUrl = DataSourceUrl::create(Url::Url(imgPath));
+	auto srf = loadImage(imgUrl, ImageSource::Options());
+
+	image->setTexture(gl::Texture::create(srf));
+	image->setWidth(contentBox->getWidth());
+	image->setHeight(200.0f);
+	image->setScaleMode(bluecadet::views::ImageView::ScaleMode::COVER);
+	contentBox->addChild(image);
+
+
+	//init Font manager
+	FontManager::getInstance()->setup(getAssetPath("fonts/fonts.json"));
+
+	//create title
+	auto title = make_shared<TextView>();
+	title->setText(titleText);
+	title->setTextColor(textColor);
+	title->setFontSize(20.0f);
+	title->setFontFamily("Montserrat");
+	title->setFontWeight(bluecadet::text::FontWeight::Medium);
+	title->setPosition({ 0, 220.0f });
+	title->setWidth(contentBox->getWidth());
+	//title->setBackgroundColor(Color::hex(0x0f2ff3)); // nice for debugging
+
+	contentBox->addChild(title);
+
+	//create body
+	float relativeYpos = title->getPositionConst().y + title->getHeight() + 20.0f;
+	float relativeHeight = contentBox->getHeight() - relativeYpos;
+
+	auto body = make_shared<TextView>();
+	body->setText(bodyText);
+	body->setTextColor(textColor);
+	body->setFontSize(15.0f);
+	body->setFontFamily("Raleway");
+	body->setPosition({ 0, relativeYpos });
+	body->setWidth(contentBox->getWidth());
+	body->setTextAlign(bluecadet::text::TextAlign::Left);
+	//body->setBackgroundColor(Color::hex(0x0fdf43)); // nice for debugging
+	body->setHeight(relativeHeight);
+	contentBox->addChild(body);
+
+	//move the touchView to front to ensure touch is enabled
+	object->moveToFront();
+
+
 }
 
 void Card::updateElementCoords()
 {
-	paddingX = 22.0f*cardSize;
+	/*paddingX = 22.0f*cardSize;
 	elementWidth = 292.0f *cardSize;
 
 	const Font titleFont = Font(montserrat, 20.0*cardSize);
@@ -124,7 +168,7 @@ void Card::updateElementCoords()
 
 	//Texturer kan inte skapas i en renderings loop..?
 	/*titleTex = renderTexture(titleBox);
-	bodyTex = renderTexture(bodyBox);*/
+	bodyTex = renderTexture(bodyBox);*
 
 	float imgY = 22.0f*cardSize;
 	float titleY = 268.0f*cardSize;
@@ -134,40 +178,36 @@ void Card::updateElementCoords()
 	imgCo = vec2(x + paddingX, y + imgY);
 	titleCo = vec2(x + paddingX, y + titleY);
 	bodyCo = vec2(x + paddingX, y + bodyY);
-	tagsCo = vec2(x + paddingX, y + tagsY);
+	tagsCo = vec2(x + paddingX, y + tagsY);*/
 
 }
 
 void Card::update() 
 {
-	updateElementCoords();
+	//updateElementCoords();
 }
 
 void Card::setStyles()
 {
-	object->setBackgroundColor(Color::hex(0xfcfcfc)); // off-white
+	bgColor = Color::hex(0xfcfcfc); // off-white
 	borderColor = Color::hex(0xbcbcbc);
 	borderRadius = 5.0f;
+	borderWidth = 1.0f;
+
+
+	textColor = Color::hex(0x393939);
 }
 
 void Card::renderCard() {
 
-	int cornerSegments = 5;
-
-	gl::color(bgColor);
-
-	gl::drawSolidRoundedRect(rect, borderRadius, cornerSegments);
-
-	gl::color(borderColor);
-
-	gl::drawStrokedRoundedRect(rect, borderRadius, cornerSegments);
-
-	gl::color(Color::white());
-
-	gl::draw(titleTex, titleCo);
-	gl::draw(bodyTex, bodyCo);
 
 
+}
+
+void Card::draw()
+{
+	gl::clear();
+	//gl::draw(titleTexture, {900, 900});
 }
 
 
@@ -181,6 +221,8 @@ void Card::handleTouchBegan(bluecadet::touch::TouchEvent* touchEvent)
 
 	// add touchpoints on began
 	activeTouches.insert(make_pair(touchEvent->touchId, *touchEvent));
+
+	object->moveToFront();
 }
 
 void Card::handleTouchMoved(bluecadet::touch::TouchEvent* touchEvent)
@@ -244,122 +286,3 @@ void Card::handleTouchEnded(bluecadet::touch::TouchEvent* touchEvent)
 {
 	activeTouches.clear();
 }
-/*
-void Card::mouseDrag(MouseEvent event)
-{
-	//set a bool to true when rect.contains is true once. Dont set to false until mouseUp to avoid mouse getting outside the rect
-	if (isClicked)
-	{
-		this->title = "du har dragit på rektangeln";
-		float mx = event.getX();
-		float my = event.getY();
-		float *coords = transform.translate(this->rect.getX1(), this->rect.getY1(), mx, my, isDragged);
-		this->setpos(coords[0], coords[1]);
-		this->rect.set(coords[0], coords[1], coords[0] + rect.getWidth(), coords[1] + rect.getHeight());
-		delete coords;
-		updateElementCoords();
-		isDragged = true;
-	}
-	else
-	{
-		isDragged = false;
-	}
-
-}
-
-void Card::mouseDown(MouseEvent event)
-{
-	if (rect.contains(event.getPos()))
-	{
-		this->isClicked = true;
-		this->isFront = true;
-		this->title = "du har klickat på rektangeln";
-		CI_LOG_I("title: " << title);
-	}
-	else
-	{
-		this->isClicked = false;
-	}
-}
-
-void Card::mouseUp(MouseEvent event)
-{
-	CI_LOG_I("mouseUp");
-	this->isClicked = false;
-	this->isDragged = false;
-}
-*/
-/*
-void Card::touchesBegan(TouchEvent event)
-{
-	for (const auto &touch : event.getTouches()) //event.getTouches()) returns std::vector<Touch>
-	{
-		if (rect.contains(touch.getPos()))
-		{
-			if (this->isClicked == true) // rect contains two touch points // && rect.contains(lastTouch.getPos()
-			{
-				this->twoTouches = true;
-				this->initFingDist = glm::distance(lastTouch.getPos(), touch.getPos());
-				CI_LOG_I("initial finger distance: " << initFingDist);
-			//	CI_LOG_I("vi har två fingrar på rektangeln");
-			}
-			else
-			{
-				this->twoTouches = false;
-				lastTouch = touch;
-			}
-
-			this->isClicked = true;
-			this->isFront = true;
-			this->title = "du har klickat på rektangeln";
-
-			CI_LOG_I("title: " << title);
-		}
-	}
-}
-
-void Card::touchesMoved(TouchEvent event)
-{
-	for (const auto &touch : event.getTouches())
-	{
-		//set a bool to true when rect.contains is true once. Dont set to false until mouseUp to avoid mouse getting outside the rect
-		if (isClicked)
-		{
-			this->title = "du har dragit på rektangeln";
-			float mx = touch.getX();
-			float my = touch.getY();
-
-			float *coords = transform.translate(this->rect.getX1(), this->rect.getY1(), mx, my, isDragged);
-			this->setpos(coords[0], coords[1]);
-			this->rect.set(coords[0], coords[1], coords[0] + rect.getWidth(), coords[1] + rect.getHeight());
-			updateElementCoords();
-
-			delete coords;
-			isDragged = true;
-		}
-
-		if (this->twoTouches) // rect contains two active touch points
-		{
-			float currFingDist = glm::distance(lastTouch.getPos(), touch.getPos());
-			float size = currFingDist / this->initFingDist;
-			this->cardSize = size;
-			CI_LOG_I("size: " << size);
-
-			if (this->rect.getWidth()*size > 300 & this->rect.getWidth()*size < 1500)
-			{
-				this->rect.scaleCentered(size);
-			}
-			//float *coord = transform.rotate();
-		}
-	}
-}
-
-void Card::touchesEnded(TouchEvent event)
-{
-	//CI_LOG_I("touchesEnded");
-	this->isClicked = false;
-	this->isDragged = false;
-	this->twoTouches = false;
-	//this->lastTouch = event.getTouches;
-}
-*/

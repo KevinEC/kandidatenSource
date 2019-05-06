@@ -30,7 +30,7 @@ Cards::~Cards()
 {
 }
 
-vector< pair<string, Cards*> > Cards::categorize(vector<pair<string, string>>* titles, vector<pair<string, string>>* bodyText, vector<string>* categories, vector<vector<string>>* cardCat)
+vector< pair<string, Cards*> > Cards::categorize(vector<pair<string, string>>* titles, vector<pair<string, string>>* bodyText, vector<string>* imgPath, vector<string>* categories, vector<vector<string>>* cardCat)
 {
 	vector<string>::iterator catIt = categories->begin();
 
@@ -43,11 +43,11 @@ vector< pair<string, Cards*> > Cards::categorize(vector<pair<string, string>>* t
 		categorizedCards.push_back( make_pair(*catIt, new Cards(*catIt) ) ); // set the instance var categorie 
 		catIt++;
 	}
-	return *sort(&categorizedCards, cardCat, titles, bodyText); // dereference to create a copy to main
+	return *sort(&categorizedCards, cardCat, titles, bodyText, imgPath); // dereference to create a copy to main
 }
 
 
-vector<pair<string, Cards*>>* Cards::sort(vector< pair<string, Cards*> >* categorizedCards, vector<vector<string>>* cardCat, vector<pair<string, string>>* titles, vector<pair<string, string>>* bodyText)
+vector<pair<string, Cards*>>* Cards::sort(vector< pair<string, Cards*> >* categorizedCards, vector<vector<string>>* cardCat, vector<pair<string, string>>* titles, vector<pair<string, string>>* bodyText, vector<string>* imgPath)
 {
 
 	for (int i = 0; i < categorizedCards->size(); i++)
@@ -58,7 +58,7 @@ vector<pair<string, Cards*>>* Cards::sort(vector< pair<string, Cards*> >* catego
 			if (findCat(cardCat->at(j).begin(), cardCat->at(j).end(), searched)) { // help function to search vector for string
 				float x1 = rand() % 400;
 				float y1 = rand() % 400;
-				categorizedCards->at(i).second->addCard(new Card(x1, y1, titles->at(j).first, bodyText->at(j).first));
+				categorizedCards->at(i).second->addCard(new Card(x1, y1, titles->at(j).first, bodyText->at(j).first, imgPath->at(j)));
 			}
 
 		}
