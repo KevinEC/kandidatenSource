@@ -136,7 +136,7 @@ void kandidatenApp::setup()
 	for(auto bodies : storyimgPath) {
 		++i;
 		if (i <= 3) {
-			story1.
+			//story1.
 		}
 
 	}
