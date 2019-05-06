@@ -125,6 +125,18 @@ void kandidatenApp::setup()
 	CI_LOG_I("sizes: " << categories.size() << " " << titles.size() << " " << bodyText.size() << " " << imgPath.size() << " " << cardCategory.size());
 	CI_LOG_I("test" << storytitles.size() << "storybodies" << storybodies.size() << "storyimgpath" << storyimgPath.size());
     
+	//3 st första, 17 andra story, 8 sista story.
+	int counter = 0;
+	vector < pair <string, Cards*>> story1;
+	vector < pair <string, pair<string, string>>> story2;
+	vector < pair <string, pair<string, string>>> story3;
+	for(auto bodies : storyimgPath) {
+		++i;
+		if (i <= 3) {
+			story1.
+		}
+
+	}
 
     /********************************
     *       FILL MAIN CONTAINER     *
@@ -135,6 +147,7 @@ void kandidatenApp::setup()
 	int enabledCategories[7] = { 1, 0, 0, 0, 0, 0, 0 };
 	selectCategories(enabledCategories);
     /*********************************/
+	
 
 
 	disableFrameRate();
@@ -142,6 +155,7 @@ void kandidatenApp::setup()
 
 	renderCategories();
 }
+
 
 void kandidatenApp::renderCategories()
 {
