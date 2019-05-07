@@ -66,7 +66,7 @@ void kandidatenApp::prepareSettings(ci::app::App::Settings* settings) {
 		manager->mDisplaySize = ivec2(1920, 1080);
 		manager->mConsole = false;
 		manager->mShowMinimap = false;
-		manager->mShowStats = true;
+		manager->mShowStats = false;
 		manager->mShowTouches = true;
 		manager->mMinimizeParams = true;
 	});

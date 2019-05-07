@@ -38,6 +38,7 @@ Card::Card(const float x1, const float y1, std::string title, std::string body, 
 
 	isClicked = false;
 	isDragged = false;
+	flipped = false;
 
 	rect = Rectf(x1, y1, x1 + width, y1 + height);
 
@@ -49,12 +50,6 @@ Card::Card(const float x1, const float y1, std::string title, std::string body, 
 	setStyles();
 	initElements();
 
-}
-
-void Card::setpos(float m, float n)
-{
-	x = m;
-	y = n;
 }
 
 gl::TextureRef Card::renderTexture(StyledTextLayoutRef text)
@@ -74,6 +69,10 @@ void Card::initElements()
 	object->setTransformOrigin(object->getCenter());
 
 	//link touchevents
+	object->getSignalTapped().connect([=](bluecadet::touch::TouchEvent e) {
+		this->handleTouchTapped(&e);
+	});
+
 	object->getSignalTouchBegan().connect([=](bluecadet::touch::TouchEvent e) {
 		this->handleTouchBegan(&e);
 	});
@@ -84,8 +83,10 @@ void Card::initElements()
 		this->handleTouchMoved(&e);
 	});
 
+	/* FIRST SET COMMON VIEWS */
+
 	//create border
-	StrokedRoundedRectViewRef border = make_shared<StrokedRoundedRectView>();
+	border = make_shared<StrokedRoundedRectView>();
 	border->setBackgroundColor(bgColor);
 	border->setStrokeWidth(borderWidth);
 	border->setStrokeColor(borderColor);
@@ -93,92 +94,50 @@ void Card::initElements()
 	border->setSize({ object->getSize() });
 	object->addChild(border);
 
+	//init Font manager
+	FontManager::getInstance()->setup(getAssetPath("fonts/fonts.json"));
+
 	// main content box
 	float size = 0.9f;
 	float padding = (1.0f - size) / 2;
 
-	//create main content box
-	BaseViewRef contentBox = make_shared<BaseView>();
-	contentBox->setSize({ object->getSize() * size });
+	/* CREATE FRONT AND BACK LAYOUTS*/
 
+	//create front layout content box
+	contentBoxFront = make_shared<BaseView>();
+	contentBoxFront->setSize({ object->getSize() * size });
+	contentBoxFront->setPosition({ object->getSize() * padding });
+	object->addChild(contentBoxFront);
 
-	contentBox->setPosition({ object->getSize() * padding });
-	object->addChild(contentBox);
+	//create back layout content box
+	contentBoxBack = make_shared<BaseView>();
+	contentBoxBack->setSize({ object->getSize() * size });
+	contentBoxBack->setPosition({ object->getSize() * padding });
+	object->addChild(contentBoxBack);
 
-
-	//create img
-	float imgHeight = 200.0f;
-
-	ImageViewRef image = make_shared<ImageView>();	
+	//create and load image
+	image = make_shared<ImageView>();
 	DataSourceRef imgUrl = DataSourceUrl::create(Url::Url(imgPath));
 	auto srf = loadImage(imgUrl, ImageSource::Options());
-
 	image->setTexture(gl::Texture::create(srf));
-	image->setWidth(contentBox->getWidth());
-	image->setHeight(imgHeight);
-	image->setScaleMode(bluecadet::views::ImageView::ScaleMode::COVER);
-	//contentBox->addChild(image);
+
+	//init all views
+	roundImgBorder = make_shared<StrokedRoundedRectView>();
+	imgMask = make_shared<MaskView>();
+	title = make_shared<TextView>();
+	body = make_shared<TextView>();
+	colorLayer = make_shared<StrokedRoundedRectView>();
 
 
-	//create img rounded mask 
-	float borderPaddingOffset = 10.0f;
-	vec2 offsetPos = { -borderPaddingOffset / 2, -borderPaddingOffset / 2 };
+	setFrontLayout();
+	setBackLayout();
 
-	StrokedRoundedRectViewRef roundImgBorder = make_shared<StrokedRoundedRectView>();
-	//roundImgBorder->setPosition(offsetPos);
-	roundImgBorder->setWidth(image->getWidth());
-	roundImgBorder->setHeight(image->getHeight());
-	roundImgBorder->setCornerRadius(borderRadius);
-	roundImgBorder->setBackgroundColor(bgColor); // color doesnt matter just set it to enable the background
-	roundImgBorder->setStrokeColor(bgColor);
-	roundImgBorder->setStrokeWidth(borderPaddingOffset);
-	roundImgBorder->setSmoothness(1.0f);
-	//image->addChild(roundImgBorder);
-
-	//create mask
-	MaskViewRef imgMask = make_shared<MaskView>();
-	imgMask->setMaskType(MaskView::MaskType::REVEAL);
-	imgMask->setMask(roundImgBorder);
-	imgMask->addChild(image);
-	contentBox->addChild(imgMask);
+	contentBoxFront->setHidden(true);
+	contentBoxBack->setHidden(false);
 
 
-	//init Font manager
-	FontManager::getInstance()->setup(getAssetPath("fonts/fonts.json"));
-
-	//create title
-	auto title = make_shared<TextView>();
-	title->setText(titleText);
-	title->setTextColor(textColor);
-	title->setFontSize(20.0f);
-	title->setFontFamily("Montserrat");
-	title->setFontWeight(bluecadet::text::FontWeight::Medium);
-	title->setPosition({ 0, 220.0f });
-	title->setWidth(contentBox->getWidth());
-	//title->setBackgroundColor(Color::hex(0x0f2ff3)); // nice for debugging
-
-	contentBox->addChild(title);
-
-	//create body
-	float relativeYpos = title->getPositionConst().y + title->getHeight() + 20.0f;
-	float relativeHeight = contentBox->getHeight() - relativeYpos;
-
-	auto body = make_shared<TextView>();
-	body->setText(bodyText);
-	body->setTextColor(textColor);
-	body->setFontSize(15.0f);
-	body->setFontFamily("Raleway");
-	body->setPosition({ 0, relativeYpos });
-	body->setWidth(contentBox->getWidth());
-	body->setTextAlign(bluecadet::text::TextAlign::Left);
-	//body->setBackgroundColor(Color::hex(0x0fdf43)); // nice for debugging
-	body->setHeight(relativeHeight);
-	contentBox->addChild(body);
-
-	//move the touchView to front to ensure touch is enabled
+	//move the touchView to front to ensure touch is not blocked by chuld views
 	object->moveToFront();
-
-
 }
 
 void Card::setStyles()
@@ -192,18 +151,133 @@ void Card::setStyles()
 	textColor = Color::hex(0x393939);
 }
 
-void Card::renderCard() {
-
-
-
-}
-
-void Card::draw()
+void Card::toggleView() 
 {
-	gl::clear();
-	//gl::draw(titleTexture, {900, 900});
+
+	quat hey = quat(0.0f, 0.0f, -1.0f, 0.0f);
+	//object->getTimeline()->apply(&object->getScale(), vec2(2.0f), 5.0f);
+	object->setTransformOrigin(object->convertGlobalToLocal(object->getCenter()));
+	
+	object->cancelAnimations();
+	/*object->getTimeline()->apply(&object->getRotation(), hey, 0.2f);
+	object->getTimeline()->apply(&object->getRotation(), hey, 0.2f);*/
+
+
+	//front side layout
+	if (!flipped)
+	{
+		flipped = !flipped;
+
+		setFrontLayout();
+		contentBoxBack->setHidden(true);
+		contentBoxFront->setHidden(false);
+	}
+	//back side layout
+	else 
+	{
+		flipped = !flipped;
+
+		setBackLayout();
+		contentBoxBack->setHidden(false);
+		contentBoxFront->setHidden(true);
+	}
+
 }
 
+void Card::setFrontLayout()
+{
+	//set img
+	float imgHeight = 200.0f;
+
+	image->setWidth(contentBoxFront->getWidth());
+	image->setHeight(imgHeight);
+	image->setScaleMode(bluecadet::views::ImageView::ScaleMode::COVER);
+
+
+	//create img rounded mask 
+	float borderPaddingOffset = 10.0f;
+	vec2 offsetPos = { -borderPaddingOffset / 2, -borderPaddingOffset / 2 };
+
+	roundImgBorder->setWidth(image->getWidth());
+	roundImgBorder->setHeight(image->getHeight());
+	roundImgBorder->setCornerRadius(borderRadius);
+	roundImgBorder->setBackgroundColor(bgColor); // color doesnt matter just set it to enable the background
+	roundImgBorder->setStrokeColor(bgColor);
+	roundImgBorder->setStrokeWidth(borderPaddingOffset);
+	roundImgBorder->setSmoothness(1.0f);
+
+	//create mask
+	imgMask->setMaskType(MaskView::MaskType::REVEAL);
+	imgMask->setMask(roundImgBorder);
+	imgMask->addChild(image);
+	contentBoxFront->addChild(imgMask);
+
+	//create title
+	title->setText(titleText);
+	title->setTextColor(textColor);
+	title->setFontSize(20.0f);
+	title->setFontFamily("Montserrat");
+	title->setFontWeight(bluecadet::text::FontWeight::Medium);
+	title->setTextAlign(TextAlign::Left);
+	title->setPosition({ 0, 220.0f });
+	title->setWidth(contentBoxFront->getWidth());
+	//title->setBackgroundColor(Color::hex(0x0f2ff3)); // nice for debugging
+	contentBoxFront->addChild(title);
+
+	//create body
+	float relativeYpos = title->getPositionConst().y + title->getHeight() + 20.0f;
+	float relativeHeight = contentBoxFront->getHeight() - relativeYpos;
+
+	body->setText(bodyText);
+	body->setTextColor(textColor);
+	body->setFontSize(15.0f);
+	body->setFontFamily("Raleway");
+	body->setPosition({ 0, relativeYpos });
+	body->setWidth(contentBoxFront->getWidth());
+	body->setTextAlign(TextAlign::Left);
+	//body->setBackgroundColor(Color::hex(0x0fdf43)); // nice for debugging
+	body->setHeight(relativeHeight);
+	contentBoxFront->addChild(body);
+}
+
+void Card::setBackLayout()
+{
+	// set image 
+	image->setHeight(object->getHeight());
+	image->setWidth(object->getWidth());
+	image->setScaleMode(bluecadet::views::ImageView::ScaleMode::COVER);
+
+	//update mask
+	imgMask->setMask(border);
+	imgMask->addChild(image);
+	object->addChild(imgMask);
+
+	// colorLayer
+	colorLayer->setWidth(object->getWidth());
+	colorLayer->setHeight(object->getHeight());
+	/*colorLayer->setStrokeWidth(18.5f);
+	colorLayer->setStrokeColor(Color::white());*/
+	colorLayer->setCornerRadius(borderRadius);
+	colorLayer->setBackgroundColor(ColorA(0.0f, 0.0f, 0.0f, 0.5f));
+	imgMask->addChild(colorLayer);
+
+	//need to add this again cuz the mask covers it
+	object->addChild(contentBoxBack);
+
+	// title
+	vec2 titlePos = { 0.0f, contentBoxBack->getHeight() / 2 };
+	title->setPosition(titlePos);
+	title->setTextColor(Color::white());
+	title->setTextAlign(TextAlign::Center);
+	title->setWidth(contentBoxBack->getWidth());
+	contentBoxBack->addChild(title);
+
+}
+
+void Card::handleTouchTapped(bluecadet::touch::TouchEvent* touchEvent)
+{
+	toggleView();
+}
 
 void Card::handleTouchBegan(bluecadet::touch::TouchEvent* touchEvent)
 {
@@ -223,6 +297,7 @@ void Card::handleTouchMoved(bluecadet::touch::TouchEvent* touchEvent)
 {
 	// update the touchpoint coord
 	activeTouches.at(touchEvent->touchId) = *touchEvent;
+	
 
 	// reset vars too determine the loongest distance between all active touchpoints
 	maxDist = 0;
