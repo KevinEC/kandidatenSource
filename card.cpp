@@ -105,16 +105,42 @@ void Card::initElements()
 	contentBox->setPosition({ object->getSize() * padding });
 	object->addChild(contentBox);
 
+
 	//create img
-	ImageViewRef image = make_shared<ImageView>();
+	float imgHeight = 200.0f;
+
+	ImageViewRef image = make_shared<ImageView>();	
 	DataSourceRef imgUrl = DataSourceUrl::create(Url::Url(imgPath));
 	auto srf = loadImage(imgUrl, ImageSource::Options());
 
 	image->setTexture(gl::Texture::create(srf));
 	image->setWidth(contentBox->getWidth());
-	image->setHeight(200.0f);
+	image->setHeight(imgHeight);
 	image->setScaleMode(bluecadet::views::ImageView::ScaleMode::COVER);
-	contentBox->addChild(image);
+	//contentBox->addChild(image);
+
+
+	//create img rounded mask 
+	float borderPaddingOffset = 10.0f;
+	vec2 offsetPos = { -borderPaddingOffset / 2, -borderPaddingOffset / 2 };
+
+	StrokedRoundedRectViewRef roundImgBorder = make_shared<StrokedRoundedRectView>();
+	//roundImgBorder->setPosition(offsetPos);
+	roundImgBorder->setWidth(image->getWidth());
+	roundImgBorder->setHeight(image->getHeight());
+	roundImgBorder->setCornerRadius(borderRadius);
+	roundImgBorder->setBackgroundColor(bgColor); // color doesnt matter just set it to enable the background
+	roundImgBorder->setStrokeColor(bgColor);
+	roundImgBorder->setStrokeWidth(borderPaddingOffset);
+	roundImgBorder->setSmoothness(1.0f);
+	//image->addChild(roundImgBorder);
+
+	//create mask
+	MaskViewRef imgMask = make_shared<MaskView>();
+	imgMask->setMaskType(MaskView::MaskType::REVEAL);
+	imgMask->setMask(roundImgBorder);
+	imgMask->addChild(image);
+	contentBox->addChild(imgMask);
 
 
 	//init Font manager
@@ -155,43 +181,11 @@ void Card::initElements()
 
 }
 
-void Card::updateElementCoords()
-{
-	/*paddingX = 22.0f*cardSize;
-	elementWidth = 292.0f *cardSize;
-
-	const Font titleFont = Font(montserrat, 20.0*cardSize);
-	const Font bodyFont = Font(raleway, 14.0*cardSize);
-
-	TextBox titleBox = TextBox().text(title).font(titleFont).color(textColor).size(elementWidth, 30 * cardSize);
-	TextBox bodyBox = TextBox().text(body).font(bodyFont).color(textColor).size(elementWidth, 129 * cardSize);
-
-	//Texturer kan inte skapas i en renderings loop..?
-	/*titleTex = renderTexture(titleBox);
-	bodyTex = renderTexture(bodyBox);*
-
-	float imgY = 22.0f*cardSize;
-	float titleY = 268.0f*cardSize;
-	float bodyY = 320.0f*cardSize;
-	float tagsY = 459.0f*cardSize;
-
-	imgCo = vec2(x + paddingX, y + imgY);
-	titleCo = vec2(x + paddingX, y + titleY);
-	bodyCo = vec2(x + paddingX, y + bodyY);
-	tagsCo = vec2(x + paddingX, y + tagsY);*/
-
-}
-
-void Card::update() 
-{
-	//updateElementCoords();
-}
-
 void Card::setStyles()
 {
 	bgColor = Color::hex(0xfcfcfc); // off-white
 	borderColor = Color::hex(0xbcbcbc);
-	borderRadius = 5.0f;
+	borderRadius = 8.0f;
 	borderWidth = 1.0f;
 
 

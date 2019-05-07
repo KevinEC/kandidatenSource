@@ -17,6 +17,8 @@
 
 #include "bluecadet/core/BaseApp.h"
 #include "bluecadet/views/TouchView.h"
+#include "bluecadet/views/ImageView.h"
+
 
 #include "cinder/Signals.h"
 
@@ -82,7 +84,14 @@ void kandidatenApp::setup()
 
 	CI_LOG_I("MT: " << System::hasMultiTouch() << " Max points: " << System::getMaxMultiTouchPoints());
 
-	background = gl::Texture::create( loadImage(loadAsset("background.png")));
+	//create background image
+	ImageViewRef bg = make_shared<ImageView>();
+	auto srf = loadImage(loadAsset("background.png"));
+	bg->setTexture(gl::Texture::create(srf));
+	bg->setWidth(getRootView()->getWidth());
+	bg->setHeight(getRootView()->getHeight());
+	bg->setScaleMode(bluecadet::views::ImageView::ScaleMode::COVER);
+	getRootView()->addChild(bg);
 
 	i = 0;
 
