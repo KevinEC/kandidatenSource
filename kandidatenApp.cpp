@@ -51,6 +51,8 @@ public:
 
     ivec2 windowSize{ 1920, 1080 };
     vector<bluecadet::touch::TouchEvent> tangibleTouch;
+    vector<bluecadet::touch::TouchEvent> movingTang;
+    bool storyMode = false;
    
     Story cardStory;
     Cards storyCards;
@@ -166,7 +168,6 @@ void kandidatenApp::setup()
 	int enabledCategories[7] = { 1, 0, 0, 0, 0, 0, 0 };
 	selectCategories(enabledCategories);
     /*********************************/
-	
     setUpTang(); // view for tangible objects 
 
 	disableFrameRate();
@@ -218,6 +219,7 @@ void kandidatenApp::setUpTang()
 
      // call touch functions
     tangView->getSignalTouchBegan().connect([=](const bluecadet::touch::TouchEvent& e){ handleTouchBegan(e); });
+    tangView->getSignalTouchMoved().connect([=](const bluecadet::touch::TouchEvent& e) { handleTouchMoved(e); });
     tangView->getSignalTouchEnded().connect([=](const bluecadet::touch::TouchEvent& e) { handleTouchEnded(e); });
 
     // fill story cards & instantiate storymode
@@ -229,17 +231,21 @@ void kandidatenApp::setUpTang()
 
 
       // testing storymode on computer
-
     /*
+    
     {
         addView(cardStory.storyView);
         cardStory.storyView->setHidden(false);
-
-        // translate view of active cards
+        storyMode = true;
+        
+        //updateCardPos()
         for (auto &categorie : allCategories)
         {
+          //  Cards::translateCards( *(categorie.second), cardStory.storyView->getPositionConst() );
+            
             categorie.second->view->setSize(vec2{ 0.5f*windowSize.x, windowSize.y });
             categorie.second->view->setGlobalPosition(ivec2{ 960,0 });
+            categorie.second->view->setTransformOrigin(0.5f * categorie.second->view->getSize());
 
             auto kids = categorie.second->view->getChildren();
             for (auto &kid : kids)
@@ -248,7 +254,7 @@ void kandidatenApp::setUpTang()
             }
         }
     }
-    */
+ */
 }
 
 void kandidatenApp::handleTouchBegan(const bluecadet::touch::TouchEvent& touchEvent) 
@@ -317,13 +323,15 @@ void kandidatenApp::handleTouchBegan(const bluecadet::touch::TouchEvent& touchEv
             {
                 cardStory.storyView->setPosition(storyPos);   // set position of story mode at puck's position
                 addView(cardStory.storyView);
+                storyMode = true;
                 cardStory.storyView->setHidden(false);
 
-                // translate view of active cards
+                //updateCardPos()
                 for (auto &categorie : allCategories)
                 {
                     categorie.second->view->setSize(vec2{ 0.5f*windowSize.x, windowSize.y });
                     categorie.second->view->setGlobalPosition(ivec2{ 960,0 });
+                    categorie.second->view->setTransformOrigin(0.5f * categorie.second->view->getSize());
 
                     auto kids = categorie.second->view->getChildren();
                     for (auto &kid : kids)
@@ -336,7 +344,26 @@ void kandidatenApp::handleTouchBegan(const bluecadet::touch::TouchEvent& touchEv
     }
 }
 
-void kandidatenApp::handleTouchMoved(const bluecadet::touch::TouchEvent& touchEvent) {}
+void kandidatenApp::handleTouchMoved(const bluecadet::touch::TouchEvent& touchEvent) 
+{
+    if (storyMode)
+    {
+        // fill array to check if touches are a tangible object
+        if (movingTang.size() < 4)
+            movingTang.push_back(touchEvent);
+        else
+        {
+            movingTang.push_back(touchEvent);
+            movingTang.erase(movingTang.begin());
+        }
+
+        if (movingTang.size() == 4)
+        {
+            cardStory.storyView->setPosition(movingTang[0].globalPosition);   // set position of story mode at puck's position
+            //updateCardPos()
+        }
+    }
+}
 
 void kandidatenApp::handleTouchEnded(const bluecadet::touch::TouchEvent& touchEvent)
 {
@@ -347,14 +374,17 @@ void kandidatenApp::handleTouchEnded(const bluecadet::touch::TouchEvent& touchEv
     }
     
     // puck is lifted 
-    if (tangibleTouch.empty())
+    if (storyMode && tangibleTouch.empty())
     {
+        storyMode = false;
         cardStory.storyView->setHidden(true);
+        movingTang.clear();
 
         for (auto &categorie : allCategories) // make active cards fullscreen
         {
             categorie.second->view->setSize(windowSize);
             categorie.second->view->setGlobalPosition(ivec2{ 0,0 });
+            categorie.second->view->setTransformOrigin(0.5f * categorie.second->view->getSize());
 
             auto kids = categorie.second->view->getChildren();
             for (auto &kid : kids)

@@ -61,7 +61,21 @@ Story::Story(Cards cards) : storyCards(cards)
     storyView->getSignalTouchMoved().connect([=](const bluecadet::touch::TouchEvent& e) 
     { 
         // card swipe animation
-        e.touchTarget->setDragThreshold(500);   // length of touch drag
+        e.touchTarget->setDragThreshold(150);   // length of touch drag
+        
+        auto prev = e.touchTarget->getPrevGlobalTouchPos().y;
+        auto curr = e.touchTarget->getGlobalTouchPos().y;
+
+        if ((curr - prev) > 0)
+        {
+            // swipe up
+        }
+        else
+        {
+            // swipe down 
+        }
+        
+
         if (e.touchTarget->hasReachedDragThreshold())
         {
             e.touchTarget->cancelTouches();
@@ -74,7 +88,7 @@ Story::Story(Cards cards) : storyCards(cards)
             /* TOP CARD TRANSFORMATIONS */
 
             // move up card
-            e.target->getChildren().back()->getTimeline()->appendTo(&e.target->getChildren().back()->getPosition(), vec2{50,-350}, 0.2f, easeInExpo);
+            e.target->getChildren().back()->getTimeline()->appendTo(&e.target->getChildren().back()->getPosition(), vec2{50,-300}, 0.2f, easeInExpo);
             
             // scale card        
             e.target->getChildren().back()->getTimeline()->appendTo(&e.target->getChildren().back()->getScale(), vec2(0.8f), 0.2f, easeInQuad)
@@ -154,7 +168,7 @@ Story::Story(Cards cards) : storyCards(cards)
     storyView->getChildren().back()->setBackgroundColor(Color::hex(0xFF0000));
     cardPos = storyView->getChildren().front()->getPositionConst();
 
-    CI_LOG_I("kids: " << storyView->getNumChildren());
+    //CI_LOG_I("kids: " << storyView->getNumChildren());
 }
 
 Story::~Story(){}

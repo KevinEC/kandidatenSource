@@ -11,8 +11,8 @@ using namespace bluecadet::text;
 
 Card::Card()
 {
-	x = 200;
-	y = 100;
+	x = 200.0f;
+	y = 100.0f;
 	titleText = "Hej Hilma";
 }
 
