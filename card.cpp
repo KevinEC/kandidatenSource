@@ -1,4 +1,9 @@
 #include "card.h"
+#include "bluecadet/core/BaseApp.h"
+#include "bluecadet/views/TouchView.h"
+#include "bluecadet/views/TextView.h"
+#include "bluecadet/views/ImageView.h"
+#include "cinder/Signals.h"
 
 using namespace ci;
 using namespace ci::app;
@@ -14,6 +19,8 @@ Card::Card()
 	x = 200;
 	y = 100;
 	title = "Hej Hilma";
+	angle = 0;
+	//currentpos = 0;
 }
 
 Card::~Card()
@@ -42,6 +49,7 @@ Card::Card(const float x1, const float y1, std::string title, std::string body)
 	twoTouches = false;
 	initDist = 0;
 	currDist = 0;
+	angle = 0;
 
 	transform = Transform();
 	initElements();
@@ -87,9 +95,13 @@ void Card::initElements()
 	object = make_shared<TouchView>();
 	object->setSize({ 336.0f*cardSize, 500.0f*cardSize });
 	object->setPosition({ x,y });
+	object->moveToFront();
+	object->setBackgroundColor(Color::white());
+	object->setDebugDrawTouchPath(true);
 	object->setDragEnabled(true);
 	object->setMultiTouchEnabled(true);
 	object->setTransformOrigin(object->getCenter());
+	object->setHidden(false);
 
 	//link touchevents
 	object->getSignalTouchBegan().connect([=](bluecadet::touch::TouchEvent e) {
@@ -108,7 +120,30 @@ void Card::initElements()
 	border->setStrokeColor(borderColor);
 	border->setCornerRadius(borderRadius);
 	border->setSize({ object->getSize() });
-	object->addChild(border);
+	object->addChild(border); 
+
+	/*auto labelView = make_shared<TextView>();
+	//labelView->setBackgroundColor(ColorA(0, 0, 0, 0.25f));
+	labelView->setPadding(10, 10);
+	labelView->setWidth(object->getWidth());
+	labelView->setFontSize(50.0f);
+	labelView->setTextColor(Color::black());
+	labelView->setTextAlign(bluecadet::text::TextAlign::Center);
+	labelView->setText("hej detta är ett test");
+	object->addChild(labelView);*/
+
+	auto labelView = make_shared<TextView>();
+	labelView->setPadding(10, 10);
+	labelView->setWidth(object->getWidth());
+	labelView->setFontSize(50.0f);
+	labelView->setTextColor(Color::black());
+	labelView->setTextAlign(bluecadet::text::TextAlign::Center);
+
+	labelView->setText("This is a test");
+
+	object->addChild(labelView);
+	
+
 }
 
 void Card::updateElementCoords()
@@ -180,13 +215,15 @@ void Card::handleTouchBegan(bluecadet::touch::TouchEvent* touchEvent)
 	initDist = -1;
 
 	// add touchpoints on began
-	activeTouches.insert(make_pair(touchEvent->touchId, *touchEvent));
+	activeTouches.insert(activeTouches.begin(), *touchEvent);
+	currentpos.insert(currentpos.begin(), touchEvent->globalPosition);
 }
 
 void Card::handleTouchMoved(bluecadet::touch::TouchEvent* touchEvent)
 {
 	// update the touchpoint coord
-	activeTouches.at(touchEvent->touchId) = *touchEvent;
+	//activeTouches.push_back(*touchEvent);
+	//activeTouches.at(touchEvent->touchId) = *touchEvent;
 
 	// reset vars too determine the loongest distance between all active touchpoints
 	maxDist = 0;
@@ -194,55 +231,113 @@ void Card::handleTouchMoved(bluecadet::touch::TouchEvent* touchEvent)
 
 	float sumX = 0;
 	float sumY = 0;
-
-	if ( object->getNumTouches() >= 2 )
+	vec2 a1, b1, a2, b2, c1, c2;
+	for (int i = 0; i < activeTouches.size(); i++)
 	{
-		//find longest dist
-		for (auto touch : activeTouches)
-		{
-			//save the first touch point id
-			if (firstTouchPoint) {
-				firstTouchId = touch.first;
-				firstTouchPoint = false;
-			}
+
+		if (activeTouches[i].touchId == touchEvent->touchId) {
+			CI_LOG_I("vi hittade samma touch som flyttas: " << activeTouches.size());
+			//currentpos[i] = activeTouches[i].globalPosition;
+			currentpos.insert(currentpos.begin(), activeTouches[i].globalPosition);
+			activeTouches[i] = *touchEvent;
+
+		}
+	}
+
+	if (object->getNumTouches() >= 2 && object->hasMovingTouches())
+	{
+		
+		a1 = currentpos[0];
+		b1 = currentpos[1];
+		a2 = activeTouches[0].globalPosition;
+		b2 = activeTouches[1].globalPosition;
+			
+			CI_LOG_I("activetouches: " << activeTouches.size());
+			//CI_LOG_I(touch.second.globalPosition)
 
 			// measure the distance from the first touchpoint on the card to each individual touchpoint
-			currDist = abs(glm::distance(activeTouches.at(firstTouchId).globalPosition, touch.second.globalPosition));
-
-			// determine the longest distance
-			if (currDist > maxDist) maxDist = currDist;
-
-			sumX += touch.second.globalPosition.x;
-			sumY += touch.second.globalPosition.y;
-
+			//currDist = abs(glm::distance(a2, b2));
+			//int prevdist = abs(glm::distance(a1, b1));
 			
-		}
+			float c1x = (a1.x + b1.x) / 2;
+			float c1y = (a1.y + b1.y) / 2;
+			float c2x = (a2.x + b2.x) / 2;
+			float c2y = (a2.y + b2.y) / 2;
 
-		// fool lösning too save the inital distance
-		if (initDist == -1) initDist = maxDist;
-		cardSize = maxDist / initDist;
+
+
+			currDist = sqrt(pow(a2.x - b2.x, 2) + pow(a2.y - b2.y, 2));
+			float prevDist = sqrt(pow(a1.x - b1.x, 2) + pow(a1.y - b1.y, 2));
+
+
+			c1 = vec2(c1x, c1y);
+			c2 = vec2(c2x, c2y);
+
+			vec2 v2 = b1 - a1;
+			vec2 v1 = b2 - a2;
+			v1 = glm::normalize(v1);
+			v2 = glm::normalize(v2);
+			vec2 temp = object->getCenter() - c1;
+
+
+			float deltaAngle = atan2(v2.y, v2.x) - atan2(v1.y, v1.x);
+			//float deltaAngle = glm::orientedAngle(v1, v2);
+			//CI_LOG_I("touch.second: " << touch.second.globalPosition.x << "active: " << activeTouches.at(firstTouchId).globalPosition.x << "currentpos: " << currentpos[0]);
+			CI_LOG_I("a:2 " << a2 << "b:2 " << b2 << "a1: " << a1 << "b1: "<< b1);
+
+			temp = rotate(temp, deltaAngle);
+
+			angle += deltaAngle;
+			
+			//if (angle > M_PI || angle < -M_PI) angle = 0;
+			CI_LOG_I("angle: " << glm::degrees(angle));
+
+			if (prevDist != 0 && prevDist == prevDist) {
+				temp = temp * (currDist / prevDist);
+				cardSize *= currDist / prevDist;
+			}
+			
+		
+		mat2 R = mat2(cos(angle), -sin(angle), sin(angle), cos(angle));
+
 
 		// determine mid point
 		float midX = sumX / activeTouches.size();
 		float midY = sumY / activeTouches.size();
-		vec2 midPos = { midX, midY };
-
-
-		object->setTransformOrigin(midPos - object->getCenter());
-		if (cardSize > 0.2 && cardSize < 1.5) {
+		//vec2 midPos = { midX, midY };
+		
+		vec2 p2 = c2 + (R*(object->getCenter() - c1))*cardSize;
+		
+		
+		
+		object->setTransformOrigin(c2 - object->getCenter());
+		//object->setTransformOrigin(object->convertGlobalToLocal(object->getCenter()));
+		//object->setTransformOrigin(object->getCenter());
+		//object->setTransformOrigin(p2);
+		if (cardSize > 0.4 && cardSize < 1.5) {
+			CI_LOG_I("cardSize: " << cardSize << "angle: " << angle << "p2: " << p2);
 			object->setScale(cardSize);
+			object->setPosition(temp + c2);
+			object->setRotation(angle);
 		}
-		vec2 newPos = midPos - object->getCenter();
 
-		//object->setPosition(newPos);
 
 	}
+	//object->setDragEnabled(true);
 
 }
 
 void Card::handleTouchEnded(bluecadet::touch::TouchEvent* touchEvent)
 {
-	activeTouches.clear();
+	for (int i = 0; i < activeTouches.size(); ++i) {
+		if (activeTouches[i].touchId == touchEvent->touchId) {
+			activeTouches.erase(activeTouches.begin() + i);
+			//currentpos.erase(currentpos.begin() + i);
+			
+			
+		}
+	}
+	
 }
 /*
 void Card::mouseDrag(MouseEvent event)

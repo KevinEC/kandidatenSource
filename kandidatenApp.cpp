@@ -67,6 +67,8 @@ void kandidatenApp::prepareSettings(ci::app::App::Settings* settings) {
 		manager->mShowStats = true;
 		manager->mShowTouches = true;
 		manager->mMinimizeParams = true;
+
+		manager->mNativeTouchEnabled = false;
 	});
 }
 
