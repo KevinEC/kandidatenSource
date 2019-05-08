@@ -104,6 +104,7 @@ void kandidatenApp::setup()
     vector<pair<string, string>> bodyText;
     vector<string> imgPath;
     vector<vector<string> > cardCategory;
+    // stories
 	vector<string> storytitles;
 	vector<pair<string, string>> storybodies;
 	vector<string> storyimgPath;
@@ -130,10 +131,12 @@ void kandidatenApp::setup()
     
 	//3 st första, 17 andra story, 8 sista story.
 	int counter = 0;
-	vector < pair <string, Cards*>> story1;
-	vector < pair <string, pair<string, string>>> story2;
-	vector < pair <string, pair<string, string>>> story3;
-	
+	vector < pair <string, Cards*>> story(3);
+    story[0].first = storytitles[0];
+    story[1].first = storytitles[1];
+    story[2].first = storytitles[2];
+        
+
     for(auto bodies : storyimgPath) 
     {
 		++i;
@@ -217,6 +220,8 @@ void kandidatenApp::setUpTang()
 
 
       // testing storymode on computer
+
+    /*
     {
         addView(cardStory.storyView);
         cardStory.storyView->setHidden(false);
@@ -234,6 +239,7 @@ void kandidatenApp::setUpTang()
             }
         }
     }
+    */
 }
 
 void kandidatenApp::handleTouchBegan(const bluecadet::touch::TouchEvent& touchEvent) 
