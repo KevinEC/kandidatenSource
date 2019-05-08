@@ -231,7 +231,6 @@ void kandidatenApp::setUpTang()
 
 
       // testing storymode on computer
-    /*
     
     {
         addView(cardStory.storyView);
@@ -254,7 +253,7 @@ void kandidatenApp::setUpTang()
             }
         }
     }
- */
+ 
 }
 
 void kandidatenApp::handleTouchBegan(const bluecadet::touch::TouchEvent& touchEvent) 
