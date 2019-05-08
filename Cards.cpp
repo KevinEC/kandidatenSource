@@ -92,6 +92,7 @@ bool Cards::findCat(vector<string>::iterator first, vector<string>::iterator las
 	return false;
 }
 
+    
 void Cards::collision()
 {
 }
