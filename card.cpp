@@ -9,7 +9,6 @@ using namespace bluecadet::views;
 using namespace bluecadet::touch;
 using namespace bluecadet::text;
 
-
 Card::Card()
 {
 	x = 200;
@@ -23,7 +22,6 @@ Card::~Card()
 
 Card::Card(const float x1, const float y1, std::string title, std::string body, std::string imgPath)
 {
-
 	x = x1;
 	y = y1;
 
@@ -35,19 +33,16 @@ Card::Card(const float x1, const float y1, std::string title, std::string body, 
 	this->bodyText = body;
 	this->imgPath = imgPath;
 
-
 	isClicked = false;
 	isDragged = false;
 	flipped = false;
 
 	twoTouches = false;
-	initDist = 0;
-	currDist = 0;
+	initFingDist = 0;
 
 	transform = Transform();
 	setStyles();
 	initElements();
-
 }
 
 gl::TextureRef Card::renderTexture(StyledTextLayoutRef text)
@@ -80,6 +75,7 @@ void Card::initElements()
 	object->getSignalTouchEnded().connect([=](bluecadet::touch::TouchEvent e) {
 		this->handleTouchMoved(&e);
 	});
+
 
 	/* FIRST SET COMMON VIEWS */
 
@@ -358,8 +354,4 @@ void Card::handleTouchEnded(bluecadet::touch::TouchEvent* touchEvent)
 {
 	activeTouches.clear();
 }
-
-
-
-
 
