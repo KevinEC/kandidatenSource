@@ -51,15 +51,12 @@ public:
     ivec2 windowSize{ 1920, 1080 };
     vector<bluecadet::touch::TouchEvent> tangibleTouch;
    
-    Story inst;
     Story cardStory;
     Cards storyCards;
 
 	gl::Texture2dRef texture;
 	gl::Texture2dRef background;
 
-	vec2 mMouseLoc;
-	vec2 lastclick;
 	int i;
 	dataBaseController dbc;
 	dataBaseController dbcstory;
@@ -146,6 +143,7 @@ void kandidatenApp::setup()
 		}
 
 	}
+    //storyCards = story1[0].second;
 
     /********************************
     *       FILL MAIN CONTAINER     *
@@ -210,21 +208,42 @@ void kandidatenApp::setUpTang()
     tangView->getSignalTouchBegan().connect([=](const bluecadet::touch::TouchEvent& e){ handleTouchBegan(e); });
     tangView->getSignalTouchEnded().connect([=](const bluecadet::touch::TouchEvent& e) { handleTouchEnded(e); });
 
-    // fill story cards
+    // fill story cards & instantiate storymode
     storyCards = *allCategories[0].second;
     cardStory = Story(storyCards);
 
     addView(tangView); // add tang touch view to root
+
+
+
+      // testing storymode on computer
+    {
+        addView(cardStory.storyView);
+        cardStory.storyView->setHidden(false);
+
+        // translate view of active cards
+        for (auto &categorie : allCategories)
+        {
+            categorie.second->view->setSize(vec2{ 0.5f*windowSize.x, windowSize.y });
+            categorie.second->view->setGlobalPosition(ivec2{ 960,0 });
+
+            auto kids = categorie.second->view->getChildren();
+            for (auto &kid : kids)
+            {
+                if (!(kid->isHidden())) kid->setScale(0.5); // scale kid
+            }
+        }
+    }
 }
 
 void kandidatenApp::handleTouchBegan(const bluecadet::touch::TouchEvent& touchEvent) 
 {
     bool istangible = false;
+    vec2 storyPos{ 0,0 };
 
     // fill array to check if touches are a tangible object
     if (tangibleTouch.size() < 4) 
         tangibleTouch.push_back(touchEvent);
-   
     else 
     {
         tangibleTouch.push_back(touchEvent);
@@ -234,7 +253,6 @@ void kandidatenApp::handleTouchBegan(const bluecadet::touch::TouchEvent& touchEv
     // when array could contain tangible object
     if (tangibleTouch.size() == 4) 
     {
-
         // make sure touchIDs are a sequence
         for (int i = 0; i < 4; ++i) 
         {
@@ -248,51 +266,54 @@ void kandidatenApp::handleTouchBegan(const bluecadet::touch::TouchEvent& touchEv
         int mindist = 1000;
         //int maxdist;
         int dist;
-        //float angle;
         bool big = false;
 
-        if(istangible){
-            
+        if (istangible) 
+        {
             // find min dist between spikes to ID puck
-            for (int j = 0; j < tangibleTouch.size(); ++j) 
+            for (int j = 0; j < tangibleTouch.size(); ++j)
             {
-                for (int i = 0; i < tangibleTouch.size(); ++i) 
+                for (int i = 0; i < tangibleTouch.size(); ++i)
                 {
                     dist = glm::distance(tangibleTouch[j].localPosition, tangibleTouch[i].localPosition);
-                    //angle = glm::degrees(atan2(abs(tangibleTouch[j].localPosition.x - tangibleTouch[i].localPosition.x), abs(tangibleTouch[j].localPosition.y - tangibleTouch[i].localPosition.y)));
 
                     // save minimum distance
-                    if (dist != 0) 
+                    if (dist != 0)
                     {
                         if (dist < mindist && dist > 20) mindist = dist;
                         if (dist > 250) big = true;
                     }
 
                     // edge distances
-                    if (dist > 80 && dist < 150) count++;
+                    if (dist > 80 && dist < 150)
+                    {
+                        count++;
+                        storyPos = tangibleTouch[j].globalPosition;
+                    }
                 }
             }
-            
-            // tangible object found 
-            if (count != 0 && count >= 8 && !big) 
+        }
+
+        // tangible object found 
+        if (count != 0 && count >= 8 && !big) 
+        {
+            // add storymode view
+            if (mindist < 60 && mindist > 30) 
             {
-                // storymode
-                if (mindist < 60 && mindist > 30) 
+                cardStory.storyView->setPosition(storyPos);   // set position of story mode at puck's position
+                addView(cardStory.storyView);
+                cardStory.storyView->setHidden(false);
+
+                // translate view of active cards
+                for (auto &categorie : allCategories)
                 {
-                    addView(cardStory.storyView);
-                    cardStory.storyView->setHidden(false);
+                    categorie.second->view->setSize(vec2{ 0.5f*windowSize.x, windowSize.y });
+                    categorie.second->view->setGlobalPosition(ivec2{ 960,0 });
 
-                    // translate view of active cards
-                    for (auto &categorie : allCategories)
+                    auto kids = categorie.second->view->getChildren();
+                    for (auto &kid : kids)
                     {
-                        categorie.second->view->setSize(vec2{ 0.5f*windowSize.x, windowSize.y });
-                        categorie.second->view->setGlobalPosition(ivec2{ 960,0 });
-
-                        auto kids = categorie.second->view->getChildren();
-                        for (auto &kid : kids)
-                        {
-                            if (!(kid->isHidden())) kid->setScale(0.5); // scale kid
-                        }
+                        if (!(kid->isHidden())) kid->setScale(0.5); // scale kid
                     }
                 }
             }
