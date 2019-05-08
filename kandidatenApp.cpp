@@ -92,7 +92,10 @@ void kandidatenApp::addView(BaseViewRef view)
 
 void kandidatenApp::setup()
 {
+	// general setup settings
 	BaseApp::setup();
+	disableFrameRate();
+	gl::enableVerticalSync(true);
 
 	CI_LOG_I("MT: " << System::hasMultiTouch() << " Max points: " << System::getMaxMultiTouchPoints());
 
@@ -140,24 +143,6 @@ void kandidatenApp::setup()
 	CI_LOG_I("sizes: " << categories.size() << " " << titles.size() << " " << bodyText.size() << " " << imgPath.size() << " " << cardCategory.size());
 	CI_LOG_I("test" << storytitles.size() << "storybodies" << storybodies.size() << "storyimgpath" << storyimgPath.size());
     
-	//3 st första, 17 andra story, 8 sista story.
-	int counter = 0;
-	vector < pair <string, Cards*>> story(3);
-    story[0].first = storytitles[0];
-    story[1].first = storytitles[1];
-    story[2].first = storytitles[2];
-        
-
-    for(auto bodies : storyimgPath) 
-    {
-		++i;
-		if (i <= 3) 
-        {
-			//story1.
-		}
-
-	}
-    //storyCards = story1[0].second;
 
     /********************************
     *       FILL MAIN CONTAINER     *
@@ -167,11 +152,17 @@ void kandidatenApp::setup()
 
 	int enabledCategories[7] = { 1, 0, 0, 0, 0, 0, 0 };
 	selectCategories(enabledCategories);
-    /*********************************/
-    setUpTang(); // view for tangible objects 
 
-	disableFrameRate();
-	gl::enableVerticalSync(true);
+	/********************************
+	*		FILL STORY CONTAINER    *
+	********************************/
+
+	//3 st första, 17 andra story, 8 sista story.
+	int counter = 0;
+	vector<pair<string, Cards*>> stories(3);
+	Story allStories = Story();
+	stories = allStories.sort(&storytitles, &storybodies, &storyimgPath);
+    setUpTang(); // view for tangible objects 
 
 	renderCategories();
 }

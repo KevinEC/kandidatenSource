@@ -173,6 +173,38 @@ Story::Story(Cards cards) : storyCards(cards)
 
 Story::~Story(){}
 
+vector<pair<string, Cards*>> Story::sort(vector<string>* titles, vector<pair<string, string>>* bodies, vector<string>* imgPaths)
+{
+	vector<pair<string, Cards*>> allStories;
 
+	pair<string, string> noTitle = make_pair("ingen titel", "no title");
 
+	// set story names
+	for (int i = 0; i < titles->size(); i++)
+	{
+		allStories.push_back( make_pair(titles->at(i), new Cards(titles->at(i))) );
+	}
 
+	// separate the different body texts by their Story
+	for (int i = 0; i < bodies->size(); i++)
+	{
+		// the database sucks so we hard coded the intervals for the story bodies
+		// in order for better organization and actual code modularity keys needs to be implemented in the database
+
+		if (i < 3)
+		{
+			allStories.at(0).second->addCard(new Card(storyView->getGlobalPosition().x, storyView->getGlobalPosition().y, noTitle, bodies->at(i), imgPaths->at(i)));
+		}
+		else if (i < 17)
+		{
+			allStories.at(1).second->addCard(new Card(storyView->getGlobalPosition().x, storyView->getGlobalPosition().y, noTitle, bodies->at(i), imgPaths->at(i)));
+
+		}
+		else {
+			allStories.at(2).second->addCard(new Card(storyView->getGlobalPosition().x, storyView->getGlobalPosition().y, noTitle, bodies->at(i), imgPaths->at(i)));
+
+		}
+	}
+
+	return allStories;
+}
