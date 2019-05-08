@@ -17,6 +17,8 @@
 
 #include "bluecadet/core/BaseApp.h"
 #include "bluecadet/views/TouchView.h"
+#include "bluecadet/views/ImageView.h"
+
 
 #include "cinder/Signals.h"
 
@@ -64,7 +66,7 @@ void kandidatenApp::prepareSettings(ci::app::App::Settings* settings) {
 		manager->mDisplaySize = ivec2(1920, 1080);
 		manager->mConsole = false;
 		manager->mShowMinimap = false;
-		manager->mShowStats = true;
+		manager->mShowStats = false;
 		manager->mShowTouches = true;
 		manager->mMinimizeParams = true;
         manager->mNativeTouchEnabled = true;    // true for table
@@ -83,12 +85,19 @@ void kandidatenApp::setup()
 
 	CI_LOG_I("MT: " << System::hasMultiTouch() << " Max points: " << System::getMaxMultiTouchPoints());
 
-	background = gl::Texture::create( loadImage(loadAsset("background.png")));
+	//create background image
+	ImageViewRef bg = make_shared<ImageView>();
+	auto srf = loadImage(loadAsset("background.png"));
+	bg->setTexture(gl::Texture::create(srf));
+	bg->setWidth(getRootView()->getWidth());
+	bg->setHeight(getRootView()->getHeight());
+	bg->setScaleMode(bluecadet::views::ImageView::ScaleMode::COVER);
+	getRootView()->addChild(bg);
 
 	i = 0;
 
 	/*- connect to data base -*/
-	dbc = dataBaseController("online", "xml", "http://www.student.itn.liu.se/~chrad171/databas/databas/media/write.xml");
+	dbc = dataBaseController("online", "xml", "http://www.student.itn.liu.se/~chrad171/databas/databas/media/noVid.xml");
 	// CI_LOG_I("db: " << db.tree);
 
 	/*- extract categories -*/
@@ -115,7 +124,7 @@ void kandidatenApp::setup()
 	
 
 	Cards allCards = Cards();
-	allCategories = allCards.categorize(&titles, &bodyText, &categories, &cardCategory);
+	allCategories = allCards.categorize(&titles, &bodyText, &imgPath, &categories, &cardCategory);
 
 	int enabledCategories[7] = { 1, 0, 0, 0, 0, 0, 0 };
 	selectCategories(enabledCategories);
