@@ -157,8 +157,7 @@ Story::Story(Cards cards) : storyCards(cards)
     CI_LOG_I("kids: " << storyView->getNumChildren());
 }
 
-Story::~Story()
-{}
+Story::~Story(){}
 
 
 
