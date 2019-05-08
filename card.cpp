@@ -151,34 +151,20 @@ void Card::setStyles()
 
 void Card::toggleView() 
 {
-
-	quat flipRot = quat(0.0f, 0.0f, -1.0f, 0.0f);
-	quat zeroRot = quat(0.0f, 0.0f, 0.0f, 0.0f);
-
-	// Quaternion math time
-	vec3 rotAxis = vec3(0.0, -1.0f, 0.0f);
-	float theta = M_PI / 2.0f;
-	float smallTheta = 0.001f;
-
-	quat flipHalfThere = quat(cos(theta / 2.0f), sin(theta / 2.0f)*rotAxis.x, sin(theta / 2.0)*rotAxis.y, sin(theta / 2.0)*rotAxis.z);
-	quat flipAlmostBack = quat(cos(smallTheta), sin(smallTheta)*rotAxis.x, sin(smallTheta)*rotAxis.y, sin(smallTheta)*rotAxis.z);
-	
 	// set transformorigin 
 	object->setTransformOrigin(object->convertGlobalToLocal(object->getCenter()));
 
-	//reset rotation
-	object->setRotation(zeroRot);
+	// reset scale
 	object->setScale(1.0f);
 	
-	//animate me
+	// animate me
 	object->cancelAnimations();
-	/*object->getTimeline()->apply(&object->getRotation(), flipHalfThere, 0.2f, EaseInExpo());
-	object->getTimeline()->appendTo(&object->getRotation(), flipAlmostBack, 0.4f, EaseOutBack());*/
+	// --> scale up
 	object->getTimeline()->apply(&object->getScale(), vec2(object->getScale() + 0.05f), 0.1f, EaseOutExpo());
-	object->getTimeline()->appendTo(&object->getScale(), vec2(object->getScale()), 0.16f, EaseOutBack(2.0f));
 
+	// --> change content
 
-	//front side layout
+	// front side layout
 	if (!flipped)
 	{
 		flipped = !flipped;
@@ -187,7 +173,7 @@ void Card::toggleView()
 		contentBoxBack->setHidden(true);
 		contentBoxFront->setHidden(false);
 	}
-	//back side layout
+	// back side layout
 	else 
 	{
 		flipped = !flipped;
@@ -196,6 +182,9 @@ void Card::toggleView()
 		contentBoxBack->setHidden(false);
 		contentBoxFront->setHidden(true);
 	}
+
+	// scale back to finish animation
+	object->getTimeline()->appendTo(&object->getScale(), vec2(object->getScale()), 0.16f, EaseOutBack(2.0f));
 
 }
 
