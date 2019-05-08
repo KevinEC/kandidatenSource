@@ -20,7 +20,7 @@ Card::~Card()
 {
 }
 
-Card::Card(const float x1, const float y1, std::string title, std::string body, std::string imgPath)
+Card::Card(const float x1, const float y1, pair<string, string> title, pair<string, string> body, string imgPath)
 {
 	x = x1;
 	y = y1;
@@ -29,8 +29,8 @@ Card::Card(const float x1, const float y1, std::string title, std::string body, 
 	width = 336.0f*cardSize;
 	height = 500.0f*cardSize;
 
-	this->titleText = title;
-	this->bodyText = body;
+	this->titleText = title.first;
+	this->bodyText = body.first;
 	this->imgPath = imgPath;
 
 	isClicked = false;
@@ -129,7 +129,7 @@ void Card::initElements()
 	contentBoxBack->setHidden(false);
 
 
-	//move the touchView to front to ensure touch is not blocked by chuld views
+	//move the touchView to front to ensure touch is not blocked by child views
 	object->moveToFront();
 }
 
@@ -146,20 +146,18 @@ void Card::setStyles()
 
 void Card::toggleView() 
 {
+
 	// set transformorigin 
 	object->setTransformOrigin(object->convertGlobalToLocal(object->getCenter()));
-
-	// reset scale
-	object->setScale(1.0f);
 	
-	// animate me
+	//animate me
 	object->cancelAnimations();
 	// --> scale up
 	object->getTimeline()->apply(&object->getScale(), vec2(object->getScale() + 0.05f), 0.1f, EaseOutExpo());
 
 	// --> change content
 
-	// front side layout
+	//front side layout
 	if (!flipped)
 	{
 		flipped = !flipped;
@@ -168,7 +166,7 @@ void Card::toggleView()
 		contentBoxBack->setHidden(true);
 		contentBoxFront->setHidden(false);
 	}
-	// back side layout
+	//back side layout
 	else 
 	{
 		flipped = !flipped;
@@ -275,6 +273,7 @@ void Card::setBackLayout()
 
 void Card::handleTouchTapped(bluecadet::touch::TouchEvent* touchEvent)
 {
+	object->setTransformOrigin(object->convertGlobalToLocal(object->getCenter()));
 	toggleView();
 }
 

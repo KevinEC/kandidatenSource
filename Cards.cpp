@@ -55,7 +55,7 @@ vector<pair<string, Cards*>>* Cards::sort(vector< pair<string, Cards*> >* catego
 			if (findCat(cardCat->at(j).begin(), cardCat->at(j).end(), searched)) { // help function to search vector for string
 				float x1 = rand() % 400;
 				float y1 = rand() % 400;
-				categorizedCards->at(i).second->addCard(new Card(x1, y1, titles->at(j).first, bodyText->at(j).first, imgPath->at(j)));
+				categorizedCards->at(i).second->addCard(new Card(x1, y1, titles->at(j), bodyText->at(j), imgPath->at(j)));
 			}
 		}
 	}
@@ -68,7 +68,6 @@ void Cards::renderCards()
 	if (render) {
 		for (int i = 0; i < allcards.size(); i++)
 		{
-			//allcards[i]->renderCard();
 			addView(allcards[i]->object);
 		}
 	}
