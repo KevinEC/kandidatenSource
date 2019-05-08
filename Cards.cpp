@@ -33,7 +33,6 @@ Cards::~Cards()
 vector< pair<string, Cards*> > Cards::categorize(vector<pair<string, string>>* titles, vector<pair<string, string>>* bodyText, vector<string>* imgPath, vector<string>* categories, vector<vector<string>>* cardCat)
 {
 	vector<string>::iterator catIt = categories->begin();
-
 	vector< pair<string, Cards*> > categorizedCards;
 	categorizedCards.reserve(8);
 
@@ -46,10 +45,8 @@ vector< pair<string, Cards*> > Cards::categorize(vector<pair<string, string>>* t
 	return *sort(&categorizedCards, cardCat, titles, bodyText, imgPath); // dereference to create a copy to main
 }
 
-
 vector<pair<string, Cards*>>* Cards::sort(vector< pair<string, Cards*> >* categorizedCards, vector<vector<string>>* cardCat, vector<pair<string, string>>* titles, vector<pair<string, string>>* bodyText, vector<string>* imgPath)
 {
-
 	for (int i = 0; i < categorizedCards->size(); i++)
 	{
 		for (int j = 0; j < cardCat->size(); j++)
@@ -60,10 +57,8 @@ vector<pair<string, Cards*>>* Cards::sort(vector< pair<string, Cards*> >* catego
 				float y1 = rand() % 400;
 				categorizedCards->at(i).second->addCard(new Card(x1, y1, titles->at(j).first, bodyText->at(j).first, imgPath->at(j)));
 			}
-
 		}
 	}
-
 	return categorizedCards; // return pointer to avoid making an extra copy locally in Cards
 }
 
@@ -77,7 +72,6 @@ void Cards::renderCards()
 			addView(allcards[i]->object);
 		}
 	}
-
 }
 
 void Cards::addView(BaseViewRef view)
@@ -93,9 +87,8 @@ void Cards::addCard(Card *card)
 bool Cards::findCat(vector<string>::iterator first, vector<string>::iterator last, string searched)
 {
 	for (; first != last; ++first)
-	{
 		if (*first == searched) return true;
-	}
+	
 	return false;
 }
 
@@ -110,39 +103,3 @@ void Cards::setPath(Card &inst)
 void Cards::search()
 {
 }
-/*
-void Cards::mouseDown(MouseEvent event)
-{
-	if (render)
-	{
-		for (int i = 0; i < allcards.size(); i++)
-		{
-			allcards[i]->mouseDown(event);
-		}
-	}
-
-}
-
-void Cards::mouseDrag(MouseEvent event)
-{
-	if (render)
-	{
-		for (int i = 0; i < allcards.size(); i++)
-		{
-			allcards[i]->mouseDrag(event);
-		}
-	}
-
-}
-
-void Cards::mouseUp(MouseEvent event)
-{
-	if (render)
-	{
-		for (int i = 0; i < allcards.size(); i++)
-		{
-			allcards[i]->mouseUp(event);
-		}
-	}
-
-}*/
