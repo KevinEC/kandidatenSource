@@ -16,7 +16,8 @@ Card::Card()
 }
 
 Card::~Card()
-{}
+{
+}
 
 Card::Card(const float x1, const float y1, std::string title, std::string body) 
 {
@@ -36,8 +37,7 @@ Card::Card(const float x1, const float y1, std::string title, std::string body)
 	rect = Rectf(x1, y1, x1 + width, y1 + height);
 
 	twoTouches = false;
-	initDist = 0;
-	currDist = 0;
+	initFingDist = 0;
 
 	transform = Transform();
 	initElements();
@@ -64,12 +64,6 @@ void Card::initElements()
 	object->setPosition({ x,y });
 	object->setDragEnabled(true);
 	object->setMultiTouchEnabled(true);
-	object->setTransformOrigin(object->getCenter());
-
-	//link touchevents
-	object->getSignalTouchBegan().connect([=](bluecadet::touch::TouchEvent e) {this->handleTouchBegan(&e);});
-	object->getSignalTouchMoved().connect([=](bluecadet::touch::TouchEvent e) {this->handleTouchMoved(&e);});
-	object->getSignalTouchEnded().connect([=](bluecadet::touch::TouchEvent e) {this->handleTouchMoved(&e);});
 
 	//create border
 	StrokedRoundedRectViewRef border = make_shared<StrokedRoundedRectView>();
@@ -118,109 +112,6 @@ void Card::setStyles()
 	borderRadius = 5.0f;
 }
 
-void Card::renderCard() {
-
-	int cornerSegments = 5;
-
-	gl::color(bgColor);
-
-	gl::drawSolidRoundedRect(rect, borderRadius, cornerSegments);
-
-	gl::color(borderColor);
-
-	gl::drawStrokedRoundedRect(rect, borderRadius, cornerSegments);
-
-	gl::color(Color::white());
-
-	gl::draw(titleTex, titleCo);
-	gl::draw(bodyTex, bodyCo);
-
-
-}
-
-
-void Card::handleTouchBegan(bluecadet::touch::TouchEvent* touchEvent)
-{
-	// init vars for conditional handling of touchpoints
-	firstTouchPoint = true;
-	firstTouchId = 0;
-	maxDist = 0;
-	initDist = -1;
-
-	// add touchpoints on began
-	activeTouches.insert(make_pair(touchEvent->touchId, *touchEvent));
-}
-
-void Card::handleTouchMoved(bluecadet::touch::TouchEvent* touchEvent)
-{
-	// update the touchpoint coord
-	activeTouches.at(touchEvent->touchId) = *touchEvent;
-
-	// reset vars too determine the loongest distance between all active touchpoints
-	maxDist = 0;
-	currDist = 0;
-
-	float sumX = 0;
-	float sumY = 0;
-
-	if ( object->getNumTouches() >= 2 )
-	{
-		//find longest dist
-		for (auto touch : activeTouches)
-		{
-			//save the first touch point id
-			if (firstTouchPoint) {
-				firstTouchId = touch.first;
-				firstTouchPoint = false;
-			}
-
-			// measure the distance from the first touchpoint on the card to each individual touchpoint
-			currDist = abs(glm::distance(activeTouches.at(firstTouchId).globalPosition, touch.second.globalPosition));
-
-			// determine the longest distance
-			if (currDist > maxDist) maxDist = currDist;
-
-			sumX += touch.second.globalPosition.x;
-			sumY += touch.second.globalPosition.y;
-		}
-
-		// fool lösning too save the inital distance
-		if (initDist == -1) initDist = maxDist;
-		cardSize = maxDist / initDist;
-
-		// determine mid point
-		float midX = sumX / activeTouches.size();
-		float midY = sumY / activeTouches.size();
-		vec2 midPos = { midX, midY };
-
-
-		object->setTransformOrigin(midPos - object->getCenter());
-		if (cardSize > 0.2 && cardSize < 1.5) {
-			object->setScale(cardSize);
-		}
-		vec2 newPos = midPos - object->getCenter();
-
-		//object->setPosition(newPos);
-	}
-}
-
-void Card::handleTouchEnded(bluecadet::touch::TouchEvent* touchEvent)
-{
-	activeTouches.clear();
-}
-
-void Card::update() 
-{
-	updateElementCoords();
-}
-
-void Card::setStyles()
-{
-	object->setBackgroundColor(Color::hex(0xfcfcfc)); // off-white
-	borderColor = Color::hex(0xbcbcbc);
-	borderRadius = 5.0f;
-}
-
 void Card::renderCard() 
 {
 	gl::color(bgColor);
@@ -235,4 +126,3 @@ void Card::renderCard()
 	gl::draw(bodyTex, bodyCo);
 
 }
-
