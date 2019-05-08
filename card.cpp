@@ -151,20 +151,21 @@ void Card::setStyles()
 
 void Card::toggleView() 
 {
+
 	// set transformorigin 
 	object->setTransformOrigin(object->convertGlobalToLocal(object->getCenter()));
 
-	// reset scale
+	//reset scale
 	object->setScale(1.0f);
 	
-	// animate me
+	//animate me
 	object->cancelAnimations();
 	// --> scale up
 	object->getTimeline()->apply(&object->getScale(), vec2(object->getScale() + 0.05f), 0.1f, EaseOutExpo());
 
 	// --> change content
 
-	// front side layout
+	//front side layout
 	if (!flipped)
 	{
 		flipped = !flipped;
@@ -173,7 +174,7 @@ void Card::toggleView()
 		contentBoxBack->setHidden(true);
 		contentBoxFront->setHidden(false);
 	}
-	// back side layout
+	//back side layout
 	else 
 	{
 		flipped = !flipped;
