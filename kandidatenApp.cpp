@@ -80,7 +80,7 @@ void kandidatenApp::prepareSettings(ci::app::App::Settings* settings) {
 		manager->mShowStats = false;
 		manager->mShowTouches = true;
 		manager->mMinimizeParams = true;
-        manager->mNativeTouchEnabled = true;    // true for table
+        manager->mNativeTouchEnabled = false;    // true for table
 	});
 }
 
