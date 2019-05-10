@@ -1,4 +1,8 @@
 #include "Story.h"
+#include <chrono>
+#include <thread>
+using namespace std::this_thread; // sleep_for, sleep_until
+using namespace std::chrono; // nanoseconds, system_clock, seconds
 
 /* TO DO
     - Content
@@ -72,6 +76,7 @@ Story::Story(Cards cards) : storyCards(cards)
             /* SWIPE DOWN = GO TO LAST STORY CARD */
             if ((curr - prev) > 0)
             {
+				
                 // swipe down
                 CI_LOG_I("down we go!");
                 bool scaled = false;
@@ -94,16 +99,20 @@ Story::Story(Cards cards) : storyCards(cards)
                     // - lord send help
                 
                 // move card to front of stack
-                e.target->getChildren().front()->moveToFront();
-
+				//sleep_for(milliseconds(500));
+				e.target->getChildren().front()->moveToFront();
                 // move full stack of cards down :)
-                for (auto &kid : kids)
-                    kid->setPosition(vec2{ kid->getPositionConst().x, kid->getPositionConst().y + 3 });
+				for (auto &kid : kids) {
+					kid->setPosition(vec2{ kid->getPositionConst().x, kid->getPositionConst().y + 3 });
+				}
+                    
 
+				
                 // move card up     - slow
                 e.target->getChildren().back()->getTimeline()->appendTo(&e.target->getChildren().back()->getPosition(), vec2{ cardPos.x, cardPos.y }, 1.0f)
                     .startTime(e.target->getChildren().back()->getTimeline()->getCurrentTime() + 2.5f);
-            }
+				
+			}
 
             /* SWIPE UP = GO TO NEXT STORY CARD */
             else
@@ -129,12 +138,14 @@ Story::Story(Cards cards) : storyCards(cards)
                 // make sure scaling is complete
                     // - lord send help
 
-                // move card to bottom of stack
-                e.target->getChildren().back()->moveToBack();
+				//sleep_until(system_clock::now() + seconds(1));
 
                 // move card down   - slow
                 e.target->getChildren().front()->getTimeline()->appendTo(&e.target->getChildren().front()->getPosition(), vec2{ cardPos.x, cardPos.y }, 1.0f)
                     .startTime(e.target->getChildren().front()->getTimeline()->getCurrentTime() + 1.0f);
+				
+				// move card to bottom of stack
+				e.target->getChildren().back()->moveToBack();
 
                 // scale back       - not to be seen
                 e.target->getChildren().front()->getTimeline()->appendTo(&e.target->getChildren().front()->getScale(), vec2(1.0f), 0.2f)
@@ -178,7 +189,7 @@ Story::Story(Cards cards) : storyCards(cards)
             auto bodyView = make_shared<TextView>();
             bodyView->setPadding(20, 20);
             bodyView->setWidth(0.5f*cardView->getWidth());
-            //bodyView->setPosition(vec2{});
+            bodyView->setPosition(vec2{});
             bodyView->setCenter(vec2{ cardView->getCenter().x - 0.2f*cardView->getWidth(), headerView->getCenter().y + headerView->getHeight() });
             headerView->setTransformOrigin(0.5f * headerView->getSize());
             bodyView->setFontSize(20.0f);
@@ -192,7 +203,7 @@ Story::Story(Cards cards) : storyCards(cards)
             imageView->setWidth(0.2f*cardView->getWidth());
             imageView->setTransformOrigin(0.5f * imageView->getSize());
             imageView->setCenter(vec2{ cardView->getCenter().x + 0.5*cardView->getWidth(), headerView->getCenter().y + headerView->getHeight() });
-            //imageView->setBackgroundColor(Color::white());
+            imageView->setBackgroundColor(Color::white());
 
         cardView->addChild(headerView);
         cardView->addChild(bodyView);

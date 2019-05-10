@@ -235,7 +235,7 @@ void kandidatenApp::setUpTang()
             
             categorie.second->view->setSize(vec2{ 0.5f*windowSize.x, windowSize.y });
             categorie.second->view->setGlobalPosition(ivec2{ 960,0 });
-            categorie.second->view->setTransformOrigin(0.5f * categorie.second->view->getSize());
+          //  categorie.second->view->setTransformOrigin(0.5f * categorie.second->view->getSize());
 
             auto kids = categorie.second->view->getChildren();
             for (auto &kid : kids)
@@ -244,7 +244,7 @@ void kandidatenApp::setUpTang()
             }
         }
     }
- */
+ //*/
 }
 
 void kandidatenApp::handleTouchBegan(const bluecadet::touch::TouchEvent& touchEvent) 
