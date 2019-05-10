@@ -1,4 +1,8 @@
 #include "Story.h"
+#include <chrono>
+#include <thread>
+using namespace std::this_thread; // sleep_for, sleep_until
+using namespace std::chrono; // nanoseconds, system_clock, seconds
 
 /* TO DO
     - Content
@@ -57,6 +61,7 @@ Story::Story(Cards* cards) : storyCards(cards)
     storyView->getSignalTouchBegan().connect([=](const bluecadet::touch::TouchEvent& e) { });
     storyView->getSignalTouchMoved().connect([=](const bluecadet::touch::TouchEvent& e) { handleTouchMoved(&e); });
     storyView->getSignalTouchEnded().connect([=](const bluecadet::touch::TouchEvent& e) { });
+
 
     // set up views for card content
     int offset = 0;
