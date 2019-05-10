@@ -1,4 +1,8 @@
 #include "Story.h"
+#include <chrono>
+#include <thread>
+using namespace std::this_thread; // sleep_for, sleep_until
+using namespace std::chrono; // nanoseconds, system_clock, seconds
 
 /* TO DO
     - Content
@@ -57,6 +61,7 @@ Story::Story(Cards* cards) : storyCards(cards)
     storyView->getSignalTouchBegan().connect([=](const bluecadet::touch::TouchEvent e) {  });
 
     // touches moved
+
     storyView->getSignalTouchMoved().connect([=](const bluecadet::touch::TouchEvent e) { handleTouchMoved(&e); });
 
     // touches ended - might not be needed
@@ -94,7 +99,7 @@ Story::Story(Cards* cards) : storyCards(cards)
             auto bodyView = make_shared<TextView>();
             bodyView->setPadding(20, 20);
             bodyView->setWidth(0.5f*cardView->getWidth());
-            //bodyView->setPosition(vec2{});
+            bodyView->setPosition(vec2{});
             bodyView->setCenter(vec2{ cardView->getCenter().x - 0.2f*cardView->getWidth(), headerView->getCenter().y + headerView->getHeight() });
             headerView->setTransformOrigin(0.5f * headerView->getSize());
             bodyView->setFontSize(20.0f);
@@ -108,7 +113,7 @@ Story::Story(Cards* cards) : storyCards(cards)
             imageView->setWidth(0.2f*cardView->getWidth());
             //imageView->setTransformOrigin(0.5f * imageView->getSize());
             imageView->setCenter(vec2{ cardView->getCenter().x + 0.5*cardView->getWidth(), headerView->getCenter().y + headerView->getHeight() });
-            //imageView->setBackgroundColor(Color::white());
+            imageView->setBackgroundColor(Color::white());
 
         cardView->addChild(headerView);
         cardView->addChild(bodyView);
