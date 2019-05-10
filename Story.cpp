@@ -2,11 +2,12 @@
 
 /* TO DO
     - Content
-    - Move after a touch point in puck
+    - delay moveToFront/Back
 */
 
 
-vec2 cardPos;
+vec2 frontPos;  // top-card position
+vec2 backPos;   // bottom-card position
 
 // default constructor
 Story::Story()
@@ -41,8 +42,7 @@ Story::Story()
 // constructor
 Story::Story(Cards* cards) : storyCards(cards)
 {
-    
-    // story mode view 
+    // story mode main view with touch
     vec2 windowSize{ 1920, 1080 };
     storyView = make_shared<TouchView>();
     storyView->moveToFront();
@@ -53,135 +53,183 @@ Story::Story(Cards* cards) : storyCards(cards)
     storyView->setTransformOrigin(0.5f * storyView->getSize());
     storyView->setHidden(false);
 
-    // touches began - might not be needed
-    storyView->getSignalTouchBegan().connect([=](const bluecadet::touch::TouchEvent e) {  });
-
-    // touches moved
-    storyView->getSignalTouchMoved().connect([=](const bluecadet::touch::TouchEvent e) { handleTouchMoved(&e); });
-
-    // touches ended - might not be needed
-    storyView->getSignalTouchEnded().connect([=](const bluecadet::touch::TouchEvent e) {  });
-
-    int offset = 0;
+    // connect touch functions
+    storyView->getSignalTouchBegan().connect([=](const bluecadet::touch::TouchEvent& e) { });
+    storyView->getSignalTouchMoved().connect([=](const bluecadet::touch::TouchEvent& e) { handleTouchMoved(&e); });
+    storyView->getSignalTouchEnded().connect([=](const bluecadet::touch::TouchEvent& e) { });
 
     // set up views for card content
-    for(auto card : cards->allcards)
+    int offset = 0;
+    for(auto &card : cards->allcards)
     {
-        // container view for card
-        auto cardView = make_shared<StrokedRoundedRectView>();
-        cardView->setSize(vec2{ 0.8f*storyView->getHeight(), 0.6f*storyView->getWidth() });
-        cardView->setTransformOrigin(0.5f * cardView->getSize());
-        cardView->setBackgroundColor(Color::hex(0x1d1d1d));
-        cardView->setStrokeColor(Color::white());
-        cardView->setCornerRadius(5.0f);
-        cardView->moveToFront();
-        cardView->setCenter(vec2{storyView->getCenter().x, (storyView->getCenter().y - offset)}); // offset card position
+        setUpCard(storyView, &offset);
         offset += 3;
-
-            // header view
-            auto headerView = make_shared<TextView>();
-            headerView->setPadding(20,20);
-            headerView->setWidth(0.7f*cardView->getWidth());
-            headerView->setTransformOrigin(0.5f * headerView->getSize());
-            headerView->setCenter(vec2{ cardView->getCenter().x, cardView->getCenter().y - 0.7f*cardView->getHeight() });
-            headerView->setFontSize(50.0f); 
-            headerView->setBackgroundColor(Color::white());
-            headerView->setTextColor(Color::black());
-            headerView->setTextAlign(bluecadet::text::TextAlign::Center);
-            headerView->setText("STORYMODE YAY");
-       
-            // body view
-            auto bodyView = make_shared<TextView>();
-            bodyView->setPadding(20, 20);
-            bodyView->setWidth(0.5f*cardView->getWidth());
-            //bodyView->setPosition(vec2{});
-            bodyView->setCenter(vec2{ cardView->getCenter().x - 0.2f*cardView->getWidth(), headerView->getCenter().y + headerView->getHeight() });
-            headerView->setTransformOrigin(0.5f * headerView->getSize());
-            bodyView->setFontSize(20.0f);
-            bodyView->setBackgroundColor(Color::white());
-            bodyView->setTextColor(Color::black());
-            bodyView->setTextAlign(bluecadet::text::TextAlign::Center);
-            bodyView->setText("a little longer text about rainbows and unicorns, clouds and other shit. some text some text some text some text some text some text some text some text yaaay");
-
-            // image view -- god send help
-            auto imageView = make_shared<ImageView>();
-            imageView->setWidth(0.2f*cardView->getWidth());
-            //imageView->setTransformOrigin(0.5f * imageView->getSize());
-            imageView->setCenter(vec2{ cardView->getCenter().x + 0.5*cardView->getWidth(), headerView->getCenter().y + headerView->getHeight() });
-            //imageView->setBackgroundColor(Color::white());
-
-        cardView->addChild(headerView);
-        cardView->addChild(bodyView);
-        cardView->addChild(imageView);
-        storyView->addChild(cardView);
     }
 
     // make top card red 
     storyView->getChildren().back()->setBackgroundColor(Color::hex(0xFF0000));
-    cardPos = storyView->getChildren().front()->getPositionConst();
 
-    //CI_LOG_I("kids: " << storyView->getNumChildren());
+    // fixed position for top- and bottom-card
+    frontPos = storyView->getChildren().back()->getPositionConst();
+    backPos = storyView->getChildren().front()->getPositionConst();
 }
 
 Story::~Story(){}
+void Story::setUpCard(TouchViewRef view, int *offset)
+{
+    // container view for card
+    auto cardView = make_shared<StrokedRoundedRectView>();
+    cardView->setSize(vec2{ 0.8f*storyView->getHeight(), 0.6f*storyView->getWidth() });
+    cardView->setTransformOrigin(0.5f * cardView->getSize());
+    cardView->setBackgroundColor(Color::hex(0x1d1d1d));
+    cardView->setStrokeColor(Color::white());
+    cardView->setCornerRadius(5.0f);
+    cardView->moveToFront(); // newest loaded card on top
+    cardView->setCenter(vec2{ storyView->getCenter().x, (storyView->getCenter().y - *offset) }); // offset card position
+
+    // set up content views
+    setUpHeader(cardView); // header text view
+    setUpBody(cardView); // body text view
+    setUpImage(cardView); // image view -- god send help
+    
+    view->addChild(cardView);
+}
+
+void Story::setUpHeader(StrokedRoundedRectViewRef view)
+{
+    auto headerView = make_shared<TextView>();
+    headerView->setPadding(20, 20);
+    headerView->setWidth(0.7f*view->getWidth());
+    headerView->setTransformOrigin(0.5f * headerView->getSize());
+    headerView->setCenter(vec2{ view->getCenter().x - 50, view->getCenter().y - 0.7f*view->getHeight() });
+    headerView->setFontSize(50.0f);
+    headerView->setBackgroundColor(Color::white());
+    headerView->setTextColor(Color::black());
+    headerView->setTextAlign(bluecadet::text::TextAlign::Center);
+    headerView->setText("STORYMODE YAY");
+
+    view->addChild(headerView);
+}
+
+void Story::setUpBody(StrokedRoundedRectViewRef view)
+{
+    auto bodyView = make_shared<TextView>();
+    bodyView->setPadding(20, 20);
+    bodyView->setWidth(0.5f*view->getWidth());
+    //bodyView->setPosition(vec2{});
+    bodyView->setCenter(vec2{ view->getCenter().x - 50 , view->getCenter().y - 0.5f*view->getHeight() });
+    bodyView->setTransformOrigin(0.5f * bodyView->getSize());
+    bodyView->setFontSize(20.0f);
+    bodyView->setBackgroundColor(Color::white());
+    bodyView->setTextColor(Color::black());
+    bodyView->setTextAlign(bluecadet::text::TextAlign::Center);
+    bodyView->setText("a little longer text about rainbows and unicorns, clouds and other shit. some text some text some text some text some text some text some text some text yaaay");
+
+    view->addChild(bodyView);
+}
+
+void Story::setUpImage(StrokedRoundedRectViewRef view)
+{
+    auto imageView = make_shared<ImageView>();
+    imageView->setWidth(0.2f*view->getWidth());
+    imageView->setTransformOrigin(0.5f * imageView->getSize());
+    imageView->setCenter(vec2{ view->getCenter().x + 0.5*view->getWidth(), view->getCenter().y + view->getHeight() });
+    //imageView->setBackgroundColor(Color::white());
+
+    view->addChild(imageView);
+}
+
+/*
+bool handleMoveToFront(&BaseView kid)
+{
+    kid->moveToFront();
+    return true;
+}
+*/
 
 void Story::handleTouchBegan(const bluecadet::touch::TouchEvent* e)
-{
-}
+{}
 
 void Story::handleTouchMoved(const bluecadet::touch::TouchEvent* e)
 {
-	// card swipe animation
-	e->touchTarget->setDragThreshold(150);   // length of touch drag
+    storyView->setDragThreshold(150);   // length of touch drag    
 
-	auto prev = e->touchTarget->getPrevGlobalTouchPos().y;
-	auto curr = e->touchTarget->getGlobalTouchPos().y;
+    auto prev = storyView->getPrevGlobalTouchPos().y;
+    auto curr = storyView->getGlobalTouchPos().y;
 
-	if ((curr - prev) > 0)
-	{
-		// swipe up
-	}
-	else
-	{
-		// swipe down 
-	}
-	float hey;
-	storyCards->tangLayout(storyView->getGlobalPosition(), storyView->getBounds());
+    storyCards->tangLayout(storyView->getGlobalPosition(), storyView->getBounds());
+    
+    // card swipe animation
+    if (storyView->hasReachedDragThreshold())
+    {
+        storyView->cancelTouches();
 
-	if (e->touchTarget->hasReachedDragThreshold())
-	{
-	    e->touchTarget->cancelTouches();
-	    
-	    // move full stack of cards up :)
-	    auto kids = e->target->getChildren();
-	    for (auto &kid : kids)
-	        kid->setPosition(vec2{ kid->getPositionConst().x, kid->getPositionConst().y - 3 });
+        if ((curr - prev) > 0)          /* SWIPE DOWN = GO TO PREVIOUS STORY CARD = BRING BOTTOM CARD TO FRONT */
+        {
+            // scale card        - not to be seen
+            storyView->getChildren().front()->getTimeline()->appendTo(&storyView->getChildren().front()->getScale(), vec2(0.8f), 0.2f, easeInQuad);
 
-	    /* TOP CARD TRANSFORMATIONS */
+            // move card down   - fast
+            storyView->getChildren().front()->getTimeline()->appendTo(&storyView->getChildren().front()->getPosition(), vec2{ 50,800 }, 0.4f, easeInExpo)
+                .startTime(storyView->getChildren().front()->getTimeline()->getCurrentTime() + 0.4f);
 
-	    // move up card
-	    e->target->getChildren().back()->getTimeline()->appendTo(&e->target->getChildren().back()->getPosition(), vec2{50,-300}, 0.2f, easeInExpo);
-	    
-	    // scale card        
-	    e->target->getChildren().back()->getTimeline()->appendTo(&e->target->getChildren().back()->getScale(), vec2(0.8f), 0.2f, easeInQuad)
-	        .startTime(e->target->getChildren().back()->getTimeline()->getCurrentTime() + 0.4f);
-	    
-	    // move card to bottom of stack
-	    e->target->getChildren().back()->moveToBack();
-	    
-	    // move card down
-	    e->target->getChildren().front()->getTimeline()->appendTo(&e->target->getChildren().front()->getPosition(), vec2{ cardPos.x, cardPos.y }, 1.0f)
-	        .startTime(e->target->getChildren().front()->getTimeline()->getCurrentTime() + 1.0f);
+            // scale back       - medium
+            storyView->getChildren().front()->getTimeline()->appendTo(&storyView->getChildren().front()->getScale(), vec2(1.0f), 0.2f)
+                .startTime(storyView->getChildren().front()->getTimeline()->getCurrentTime() + 1.0f);
 
-	    // scale back
-	    e->target->getChildren().front()->getTimeline()->appendTo(&e->target->getChildren().front()->getScale(), vec2(1.0f), 0.2f)
-	        .startTime(e->target->getChildren().front()->getTimeline()->getCurrentTime() + 2.5f);
-	}
+            storyView->getChildren().front()->getTimeline()->appendTo(&storyView->getChildren().front()->getAlpha(), 0.0f, 0.8f)
+                .startTime(storyView->getChildren().front()->getTimeline()->getCurrentTime() + 1.5f);
+
+            // make sure scaling is done b4 moving view                
+            //      - lord send help
+
+            //if(scaled)
+            // storyView->getChildren().front()->moveToFront(); // move card to front of stack
+
+
+
+            // move full stack of cards down to restore offset :)
+            auto kids = storyView->getChildren();
+            for (auto &kid : kids)
+                kid->setPosition(vec2{ kid->getPositionConst().x, kid->getPositionConst().y + 3 });
+
+            // move card up     - slow
+            storyView->getChildren().back()->getTimeline()->appendTo(&storyView->getChildren().back()->getPosition(), vec2{ frontPos.x, frontPos.y }, 1.0f)
+                .startTime(storyView->getChildren().back()->getTimeline()->getCurrentTime() + 2.5f);
+        }
+        else                        /* SWIPE UP = GO TO NEXT STORY CARD = MOVE TOP CARD TO BACK */
+        {
+            // move full stack of cards up to restore offset :)
+            auto kids = storyView->getChildren();
+            for (auto &kid : kids)
+                kid->setPosition(vec2{ kid->getPositionConst().x, kid->getPositionConst().y - 3 });
+
+            // move up card     - fast
+            storyView->getChildren().back()->getTimeline()->appendTo(&storyView->getChildren().back()->getPosition(), vec2{ 50,-300 }, 0.2f, easeInExpo);
+
+            // scale card       - medium
+            storyView->getChildren().back()->getTimeline()->appendTo(&storyView->getChildren().back()->getScale(), vec2(0.8f), 0.2f, easeInQuad)
+                .startTime(storyView->getChildren().back()->getTimeline()->getCurrentTime() + 0.4f);
+
+            // make sure scaling is complete
+                // - lord send help
+
+            // move card to bottom of stack 
+            storyView->getChildren().back()->moveToBack();
+
+            // move card down   - slow
+            storyView->getChildren().front()->getTimeline()->appendTo(&storyView->getChildren().front()->getPosition(), vec2{ backPos.x, backPos.y }, 1.0f)
+                .startTime(storyView->getChildren().front()->getTimeline()->getCurrentTime() + 1.0f);
+
+            // scale back       - not to be seen
+            storyView->getChildren().front()->getTimeline()->appendTo(&storyView->getChildren().front()->getScale(), vec2(1.0f), 0.2f)
+                .startTime(storyView->getChildren().front()->getTimeline()->getCurrentTime() + 2.5f);
+        }
+    }
 }
 
 void Story::handleTouchEnded(const bluecadet::touch::TouchEvent* e)
-{
-}
+{}
 
 vector<pair<string, Cards*>> Story::sort(vector<string>* titles, vector<pair<string, string>>* bodies, vector<string>* imgPaths)
 {

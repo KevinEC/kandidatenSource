@@ -167,7 +167,6 @@ void kandidatenApp::setup()
 	renderCategories();
 }
 
-
 void kandidatenApp::renderCategories()
 {
 	for (auto &categorie : allCategories)
@@ -219,14 +218,13 @@ void kandidatenApp::setUpTang()
     addView(tangView); // add tang touch view to root
 
 
-
       // testing storymode on computer
     {
         addView(Story1->storyView);
 		Story1->storyView->setHidden(false);
         storyMode = true;
     }
- 
+
 }
 
 void kandidatenApp::tangLayout(const vec2 xy, const Rectf rect)
@@ -237,8 +235,6 @@ void kandidatenApp::tangLayout(const vec2 xy, const Rectf rect)
 			categorie.second->tangLayout(xy, rect);
 	}
 }
-
-
 
 void kandidatenApp::handleTouchBegan(const bluecadet::touch::TouchEvent& touchEvent) 
 {
