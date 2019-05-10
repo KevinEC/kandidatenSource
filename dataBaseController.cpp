@@ -198,7 +198,7 @@ void dataBaseController::extractstoryBodies(std::vector<std::pair<std::string, s
 	for (XmlTree::Iter iter2 = headertree.begin(); iter2 != headertree.end(); ++iter2) // loop through all media-tags
 	{			
 		if (iter2->hasChild("media"))
-			{
+		{
 			for (XmlTree::Iter iter3 = iter2->begin(); iter3 != iter2->end(); ++iter3) // loop through inside media-tag
 			{
 				if (iter3->hasChild("se")) {
@@ -215,16 +215,18 @@ void dataBaseController::extractstoryBodies(std::vector<std::pair<std::string, s
 							temp.second = (iter4->getChild("text").getValue());								
 							//CI_LOG_I("engelsk text: " << iter4->getChild("text").getValue());
 						}
-						storybodies.push_back(temp);
-						temp.first.clear();
-						temp.second.clear();
-						}
 					}
+
+					// push when se and en tags have been looped
+					storybodies.push_back(temp);
+					temp.first.clear();
+					temp.second.clear();
 				}
 			}
-					
 		}
+					
 	}
+}
 		
 
 void dataBaseController::extractstoryImgPaths(std::vector<std::string> & imgPath)
@@ -239,7 +241,7 @@ void dataBaseController::extractstoryImgPaths(std::vector<std::string> & imgPath
 			for (XmlTree::Iter iter3 = iter2->begin(); iter3 != iter2->end(); ++iter3) // loop through inside media-tag
 			{
 				//if(iter3->hasAttribute("path"))
-					imgPath.push_back("http://www.student.itn.liu.se/~chrad171/databas/databas" + iter3->getAttributeValue<std::string>("path"));
+					imgPath.push_back("http://www.student.itn.liu.se/~chrad171/databas/databas/" + iter3->getAttributeValue<std::string>("path"));
 			}
 		}
 	}
