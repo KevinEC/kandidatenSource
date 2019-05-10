@@ -55,7 +55,7 @@ void Card::initElements()
 {
 	//create bluecadet touchview
 	object = make_shared<TouchView>();
-	object->setSize({ 336.0f, 500.0f });
+	object->setSize({ width, height });
 	object->setPosition({ x,y });
 	object->setDragEnabled(true);
 	object->setMultiTouchEnabled(true);
@@ -73,7 +73,7 @@ void Card::initElements()
 		this->handleTouchMoved(&e);
 	});
 	object->getSignalTouchEnded().connect([=](bluecadet::touch::TouchEvent e) {
-		this->handleTouchMoved(&e);
+		this->handleTouchEnded(&e);
 	});
 
 
@@ -269,6 +269,11 @@ void Card::setBackLayout()
 	title->setWidth(contentBoxBack->getWidth());
 	contentBoxBack->addChild(title);
 
+}
+
+void Card::animateTranslate(const vec2 pos)
+{
+	object->getTimeline()->apply(&object->getPosition(), pos , 2.0f, EaseOutExpo());
 }
 
 void Card::handleTouchTapped(bluecadet::touch::TouchEvent* touchEvent)

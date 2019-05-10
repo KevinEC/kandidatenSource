@@ -44,6 +44,7 @@ public:
 	void	renderCategories();
 	void	selectCategories(int enable[]);
     void    setUpTang();
+	void	tangLayout(const vec2 xy, const Rectf rect);
 
     void	handleTouchBegan(const bluecadet::touch::TouchEvent& touchEvent);
     void	handleTouchMoved(const bluecadet::touch::TouchEvent& touchEvent);
@@ -54,8 +55,8 @@ public:
     vector<bluecadet::touch::TouchEvent> movingTang;
     bool storyMode = false;
    
-    Story cardStory;
-    Cards storyCards;
+    Story* Story1;
+	vector<pair<string, Cards*>> stories;
 
 	gl::Texture2dRef texture;
 	gl::Texture2dRef background;
@@ -159,7 +160,6 @@ void kandidatenApp::setup()
 
 	//3 st första, 17 andra story, 8 sista story.
 	int counter = 0;
-	vector<pair<string, Cards*>> stories(3);
 	Story allStories = Story();
 	stories = allStories.sort(&storytitles, &storybodies, &storyimgPath);
     setUpTang(); // view for tangible objects 
@@ -214,42 +214,38 @@ void kandidatenApp::setUpTang()
     tangView->getSignalTouchEnded().connect([=](const bluecadet::touch::TouchEvent& e) { handleTouchEnded(e); });
 
     // fill story cards & instantiate storymode
-    storyCards = *allCategories[0].second;
-    cardStory = Story(storyCards);
+    Story1 = new Story(stories.at(2).second );
 
     addView(tangView); // add tang touch view to root
 
 
 
       // testing storymode on computer
-    /*
+    
     
     {
-        addView(cardStory.storyView);
-        cardStory.storyView->setHidden(false);
+        addView(Story1->storyView);
+		Story1->storyView->setHidden(false);
         storyMode = true;
-        
-        //updateCardPos()
-        for (auto &categorie : allCategories)
-        {
-          //  Cards::translateCards( *(categorie.second), cardStory.storyView->getPositionConst() );
-            
-            categorie.second->view->setSize(vec2{ 0.5f*windowSize.x, windowSize.y });
-            categorie.second->view->setGlobalPosition(ivec2{ 960,0 });
-            categorie.second->view->setTransformOrigin(0.5f * categorie.second->view->getSize());
-
-            auto kids = categorie.second->view->getChildren();
-            for (auto &kid : kids)
-            {
-                if (!(kid->isHidden())) kid->setScale(0.5); // scale kid
-            }
-        }
     }
- */
+ 
 }
+
+void kandidatenApp::tangLayout(const vec2 xy, const Rectf rect)
+{
+	for (auto &categorie : allCategories)
+	{
+		if(categorie.second->render)
+			categorie.second->tangLayout(xy, rect);
+	}
+}
+
+
 
 void kandidatenApp::handleTouchBegan(const bluecadet::touch::TouchEvent& touchEvent) 
 {
+	//tangLayout(cardStory.storyView->getGlobalPosition(), cardStory.storyView->getBounds());
+
     bool istangible = false;
     vec2 storyPos{ 0,0 };
 
@@ -261,7 +257,7 @@ void kandidatenApp::handleTouchBegan(const bluecadet::touch::TouchEvent& touchEv
         tangibleTouch.push_back(touchEvent);
         tangibleTouch.erase(tangibleTouch.begin());
     }
-
+	
     // when array could contain tangible object
     if (tangibleTouch.size() == 4) 
     {
@@ -312,24 +308,11 @@ void kandidatenApp::handleTouchBegan(const bluecadet::touch::TouchEvent& touchEv
             // add storymode view
             if (mindist < 60 && mindist > 30) 
             {
-                cardStory.storyView->setPosition(storyPos);   // set position of story mode at puck's position
-                addView(cardStory.storyView);
+                Story1->storyView->setPosition(storyPos);   // set position of story mode at puck's position
+                addView(Story1->storyView);
                 storyMode = true;
-                cardStory.storyView->setHidden(false);
-
-                //updateCardPos()
-                for (auto &categorie : allCategories)
-                {
-                    categorie.second->view->setSize(vec2{ 0.5f*windowSize.x, windowSize.y });
-                    categorie.second->view->setGlobalPosition(ivec2{ 960,0 });
-                    categorie.second->view->setTransformOrigin(0.5f * categorie.second->view->getSize());
-
-                    auto kids = categorie.second->view->getChildren();
-                    for (auto &kid : kids)
-                    {
-                        if (!(kid->isHidden())) kid->setScale(0.5); // scale kid
-                    }
-                }
+				Story1->storyView->setHidden(false);
+				//tangLayout(cardStory.storyView->getGlobalPosition(), cardStory.storyView->getBounds() );
             }
         }
     }
@@ -337,6 +320,8 @@ void kandidatenApp::handleTouchBegan(const bluecadet::touch::TouchEvent& touchEv
 
 void kandidatenApp::handleTouchMoved(const bluecadet::touch::TouchEvent& touchEvent) 
 {
+	//tangLayout(cardStory.storyView->getGlobalPosition(), cardStory.storyView->getBounds());
+
     if (storyMode)
     {
         // fill array to check if touches are a tangible object
@@ -350,7 +335,7 @@ void kandidatenApp::handleTouchMoved(const bluecadet::touch::TouchEvent& touchEv
 
         if (movingTang.size() == 4)
         {
-            cardStory.storyView->setPosition(movingTang[0].globalPosition);   // set position of story mode at puck's position
+			Story1->storyView->setPosition(movingTang[0].globalPosition);   // set position of story mode at puck's position
             //updateCardPos()
         }
     }
@@ -365,25 +350,25 @@ void kandidatenApp::handleTouchEnded(const bluecadet::touch::TouchEvent& touchEv
     }
     
     // puck is lifted 
-    if (storyMode && tangibleTouch.empty())
-    {
-        storyMode = false;
-        cardStory.storyView->setHidden(true);
-        movingTang.clear();
+    //if (storyMode && tangibleTouch.empty())
+    //{
+    //    storyMode = false;
+    //    cardStory.storyView->setHidden(true);
+    //    movingTang.clear();
 
-        for (auto &categorie : allCategories) // make active cards fullscreen
-        {
-            categorie.second->view->setSize(windowSize);
-            categorie.second->view->setGlobalPosition(ivec2{ 0,0 });
-            categorie.second->view->setTransformOrigin(0.5f * categorie.second->view->getSize());
+    //    for (auto &categorie : allCategories) // make active cards fullscreen
+    //    {
+    //        categorie.second->view->setSize(windowSize);
+    //        categorie.second->view->setGlobalPosition(ivec2{ 0,0 });
+    //        categorie.second->view->setTransformOrigin(0.5f * categorie.second->view->getSize());
 
-            auto kids = categorie.second->view->getChildren();
-            for (auto &kid : kids)
-            {
-                if (!(kid->isHidden())) kid->setScale(1); // scale kid back
-            }
-        }
-    }
+    //        auto kids = categorie.second->view->getChildren();
+    //        for (auto &kid : kids)
+    //        {
+    //            if (!(kid->isHidden())) kid->setScale(1); // scale kid back
+    //        }
+    //    }
+    //}
 }
 
 
