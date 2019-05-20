@@ -73,7 +73,7 @@ void kandidatenApp::prepareSettings(ci::app::App::Settings* settings) {
 	settings->setHighDensityDisplayEnabled(true);
 
 	SettingsManager::getInstance()->setup(settings, ci::app::getAssetPath("../assets/settings.json"), [](SettingsManager * manager) {
-		manager->mFullscreen = false;
+		manager->mFullscreen = true;
 		manager->mWindowSize = ivec2(1920, 1080);
 		manager->mDisplaySize = ivec2(1920, 1080);
 		manager->mConsole = false;
@@ -239,7 +239,7 @@ void kandidatenApp::tangLayout(const vec2 xy, const Rectf rect)
 
 void kandidatenApp::handleTouchBegan(const bluecadet::touch::TouchEvent& touchEvent) 
 {
-	//tangLayout(cardStory.storyView->getGlobalPosition(), cardStory.storyView->getBounds());
+	tangLayout(Story1->storyView->getGlobalPosition(), Story1->storyView->getBounds());
 
     bool istangible = false;
     vec2 storyPos{ 0,0 };
@@ -351,18 +351,18 @@ void kandidatenApp::handleTouchEnded(const bluecadet::touch::TouchEvent& touchEv
         Story1->storyView->setHidden(true);
         movingTang.clear();
 
-        for (auto &categorie : allCategories) // make active cards fullscreen
-        {
-            categorie.second->view->setSize(windowSize);
-            categorie.second->view->setGlobalPosition(ivec2{ 0,0 });
-            categorie.second->view->setTransformOrigin(0.5f * categorie.second->view->getSize());
+        //for (auto &categorie : allCategories) // make active cards fullscreen
+        //{
+        //    categorie.second->view->setSize(windowSize);
+        //    categorie.second->view->setGlobalPosition(ivec2{ 0,0 });
+        //    categorie.second->view->setTransformOrigin(0.5f * categorie.second->view->getSize());
 
-            auto kids = categorie.second->view->getChildren();
-            for (auto &kid : kids)
-            {
-                if (!(kid->isHidden())) kid->setScale(1); // scale kid back
-            }
-        }
+        //    auto kids = categorie.second->view->getChildren();
+        //    for (auto &kid : kids)
+        //    {
+        //        if (!(kid->isHidden())) kid->setScale(1); // scale kid back
+        //    }
+        //}
     }
 }
 
