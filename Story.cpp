@@ -46,7 +46,7 @@ Story::Story(Cards* cards) : storyCards(cards)
     vec2 windowSize{ 1920, 1080 };
     storyView = make_shared<TouchView>();
     storyView->moveToFront();
-    storyView->setDragEnabled(true);
+    storyView->setDragEnabled(false);
     storyView->setBackgroundColor(Color::white());
     storyView->setMultiTouchEnabled(true);
     storyView->setSize(vec2{ 0.5f*windowSize.x, windowSize.y });

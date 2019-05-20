@@ -223,13 +223,13 @@ void kandidatenApp::setUpTang()
 
 
 
-      // testing storymode on computer
- //   {
- //       addView(Story1->storyView);
-	//	Story1->storyView->setHidden(false);
- //       storyMode = true;
-	//	//tangLayout(Story1->storyView->getGlobalPosition(), Story1->storyView->getBounds());
-	//}
+    //testing storymode on computer
+    {
+        addView(Story1->storyView);
+		Story1->storyView->setHidden(false);
+        storyMode = true;
+		//tanglayout(story1->storyview->getglobalposition(), story1->storyview->getbounds());
+	}
  
 }
 
@@ -313,7 +313,7 @@ void kandidatenApp::handleTouchBegan(const bluecadet::touch::TouchEvent& touchEv
                 addView(Story1->storyView);
                 storyMode = true;
 				Story1->storyView->setHidden(false);
-				tangLayout(Story1->storyView->getGlobalPosition(), Story1->storyView->getBounds() );
+				//tangLayout(Story1->storyView->getGlobalPosition(), Story1->storyView->getBounds() );
             }
         }
     }
@@ -324,6 +324,8 @@ void kandidatenApp::handleTouchMoved(const bluecadet::touch::TouchEvent& touchEv
 
     if (storyMode)
     {
+		tangLayout(Story1->storyView->getGlobalPosition(), Story1->storyView->getBounds());
+
         // fill array to check if touches are a tangible object
         if (movingTang.size() < 4)
             movingTang.push_back(touchEvent);
