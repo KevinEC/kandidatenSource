@@ -4,6 +4,10 @@
 using namespace std::this_thread; // sleep_for, sleep_until
 using namespace std::chrono; // nanoseconds, system_clock, seconds
 
+using namespace bluecadet::core;
+using namespace bluecadet::views;
+using namespace bluecadet::touch;
+
 /* TO DO
     - Content
     - delay moveToFront/Back
@@ -144,13 +148,51 @@ void Story::setUpImage(StrokedRoundedRectViewRef view)
     view->addChild(imageView);
 }
 
-/*
-bool handleMoveToFront(&BaseView kid)
-{
-    kid->moveToFront();
-    return true;
-}
-*/
+
+//bool handleMoveToFront(&BaseView kid)
+//{
+//    kid->moveToFront();
+//    return true;
+//	if ((curr - prev) > 0)
+//	{
+//		// swipe up
+//	}
+//	else
+//	{
+//		// swipe down 
+//	}
+//
+	//if (e->touchTarget->hasReachedDragThreshold())
+	//{
+	//    e->touchTarget->cancelTouches();
+	//    
+	//    // move full stack of cards up :)
+	//    auto kids = e->target->getChildren();
+	//    for (auto &kid : kids)
+	//        kid->setPosition(vec2{ kid->getPositionConst().x, kid->getPositionConst().y - 3 });
+
+	//    /* TOP CARD TRANSFORMATIONS */
+
+	//    // move up card
+	//    e->target->getChildren().back()->getTimeline()->appendTo(&e->target->getChildren().back()->getPosition(), vec2{50,-300}, 0.2f, easeInExpo);
+	//    
+	//    // scale card        
+	//    e->target->getChildren().back()->getTimeline()->appendTo(&e->target->getChildren().back()->getScale(), vec2(0.8f), 0.2f, easeInQuad)
+	//        .startTime(e->target->getChildren().back()->getTimeline()->getCurrentTime() + 0.4f);
+	//    
+	//    // move card to bottom of stack
+	//    e->target->getChildren().back()->moveToBack();
+	//    
+	//    // move card down
+	//    e->target->getChildren().front()->getTimeline()->appendTo(&e->target->getChildren().front()->getPosition(), vec2{ cardPos.x, cardPos.y }, 1.0f)
+	//        .startTime(e->target->getChildren().front()->getTimeline()->getCurrentTime() + 1.0f);
+
+	//    // scale back
+	//    e->target->getChildren().front()->getTimeline()->appendTo(&e->target->getChildren().front()->getScale(), vec2(1.0f), 0.2f)
+	//        .startTime(e->target->getChildren().front()->getTimeline()->getCurrentTime() + 2.5f);
+	//}
+//}
+
 
 void Story::handleTouchBegan(const bluecadet::touch::TouchEvent* e)
 {}
