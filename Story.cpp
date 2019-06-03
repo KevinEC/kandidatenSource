@@ -1,4 +1,8 @@
 #include "Story.h"
+#include <chrono>
+#include <thread>
+using namespace std::this_thread; // sleep_for, sleep_until
+using namespace std::chrono; // nanoseconds, system_clock, seconds
 
 /* TO DO
     - Content
@@ -40,7 +44,7 @@ Story::Story()
 }
 
 // constructor
-Story::Story(Cards cards) : storyCards(cards)
+Story::Story(Cards* cards) : storyCards(cards)
 {
     // story mode main view with touch
     vec2 windowSize{ 1920, 1080 };
@@ -48,7 +52,6 @@ Story::Story(Cards cards) : storyCards(cards)
     storyView->moveToFront();
     storyView->setDragEnabled(false);
     storyView->setBackgroundColor(Color::white());
-    storyView->setDebugDrawTouchPath(true);
     storyView->setMultiTouchEnabled(true);
     storyView->setSize(vec2{ 0.5f*windowSize.x, windowSize.y });
     storyView->setTransformOrigin(0.5f * storyView->getSize());
@@ -56,12 +59,13 @@ Story::Story(Cards cards) : storyCards(cards)
 
     // connect touch functions
     storyView->getSignalTouchBegan().connect([=](const bluecadet::touch::TouchEvent& e) { });
-    storyView->getSignalTouchMoved().connect([=](const bluecadet::touch::TouchEvent& e) { handleTouchesMoved(e); });
+    storyView->getSignalTouchMoved().connect([=](const bluecadet::touch::TouchEvent& e) { handleTouchMoved(&e); });
     storyView->getSignalTouchEnded().connect([=](const bluecadet::touch::TouchEvent& e) { });
+
 
     // set up views for card content
     int offset = 0;
-    for(auto &card : cards.allcards)
+    for(auto &card : cards->allcards)
     {
         setUpCard(storyView, &offset);
         offset += 3;
@@ -149,85 +153,89 @@ bool handleMoveToFront(&BaseView kid)
 }
 */
 
-void Story::handleTouchesMoved(const bluecadet::touch::TouchEvent& touchEvent) 
-{
-    // card swipe animation
-    touchEvent.touchTarget->setDragThreshold(150);   // length of touch drag      
-    auto prev = touchEvent.touchTarget->getPrevGlobalTouchPos().y;
-    auto curr = touchEvent.touchTarget->getGlobalTouchPos().y;
+void Story::handleTouchBegan(const bluecadet::touch::TouchEvent* e)
+{}
 
-    if (touchEvent.touchTarget->hasReachedDragThreshold())
+void Story::handleTouchMoved(const bluecadet::touch::TouchEvent* e)
+{
+    storyView->setDragThreshold(150);   // length of touch drag    
+
+    auto prev = storyView->getPrevGlobalTouchPos().y;
+    auto curr = storyView->getGlobalTouchPos().y;
+
+    storyCards->tangLayout(storyView->getGlobalPosition(), storyView->getBounds());
+    
+    // card swipe animation
+    if (storyView->hasReachedDragThreshold())
     {
-        touchEvent.touchTarget->cancelTouches();
-                                        
+        storyView->cancelTouches();
+
         if ((curr - prev) > 0)          /* SWIPE DOWN = GO TO PREVIOUS STORY CARD = BRING BOTTOM CARD TO FRONT */
         {
-           // scale card        - not to be seen
-            touchEvent.target->getChildren().front()->getTimeline()->appendTo(&touchEvent.target->getChildren().front()->getScale(), vec2(0.8f), 0.2f, easeInQuad);
+            // scale card        - not to be seen
+            storyView->getChildren().front()->getTimeline()->appendTo(&storyView->getChildren().front()->getScale(), vec2(0.8f), 0.2f, easeInQuad);
 
             // move card down   - fast
-            touchEvent.target->getChildren().front()->getTimeline()->appendTo(&touchEvent.target->getChildren().front()->getPosition(), vec2{ 50,800 }, 0.4f, easeInExpo)
-                .startTime(touchEvent.target->getChildren().front()->getTimeline()->getCurrentTime() + 0.4f);
+            storyView->getChildren().front()->getTimeline()->appendTo(&storyView->getChildren().front()->getPosition(), vec2{ 50,800 }, 0.4f, easeInExpo)
+                .startTime(storyView->getChildren().front()->getTimeline()->getCurrentTime() + 0.4f);
 
             // scale back       - medium
-            touchEvent.target->getChildren().front()->getTimeline()->appendTo(&touchEvent.target->getChildren().front()->getScale(), vec2(1.0f), 0.2f)
-                .startTime(touchEvent.target->getChildren().front()->getTimeline()->getCurrentTime() + 1.0f);
+            storyView->getChildren().front()->getTimeline()->appendTo(&storyView->getChildren().front()->getScale(), vec2(1.0f), 0.2f)
+                .startTime(storyView->getChildren().front()->getTimeline()->getCurrentTime() + 1.0f);
+
+            storyView->getChildren().front()->getTimeline()->appendTo(&storyView->getChildren().front()->getAlpha(), 0.0f, 0.8f)
+                .startTime(storyView->getChildren().front()->getTimeline()->getCurrentTime() + 1.5f);
 
             // make sure scaling is done b4 moving view                
             //      - lord send help
 
-            /*timer.setInterval([&]() {
-                cout << "Hey.. After each 1s..." << endl;
-            }, 1000);
-
-            timer.setTimeout([&]() {
-                cout << "Hey.. After 5.2s. But I will stop the timer!" << endl;
-                timer.stop();
-            }, 5200);
-            */
-
             //if(scaled)
-            touchEvent.target->getChildren().front()->moveToFront(); // move card to front of stack
+            // storyView->getChildren().front()->moveToFront(); // move card to front of stack
+
+
 
             // move full stack of cards down to restore offset :)
-            auto kids = touchEvent.target->getChildren();
+            auto kids = storyView->getChildren();
             for (auto &kid : kids)
                 kid->setPosition(vec2{ kid->getPositionConst().x, kid->getPositionConst().y + 3 });
 
             // move card up     - slow
-            touchEvent.target->getChildren().back()->getTimeline()->appendTo(&touchEvent.target->getChildren().back()->getPosition(), vec2{ frontPos.x, frontPos.y }, 1.0f)
-                .startTime(touchEvent.target->getChildren().back()->getTimeline()->getCurrentTime() + 2.5f);
+            storyView->getChildren().back()->getTimeline()->appendTo(&storyView->getChildren().back()->getPosition(), vec2{ frontPos.x, frontPos.y }, 1.0f)
+                .startTime(storyView->getChildren().back()->getTimeline()->getCurrentTime() + 2.5f);
         }
         else                        /* SWIPE UP = GO TO NEXT STORY CARD = MOVE TOP CARD TO BACK */
-        {           
+        {
             // move full stack of cards up to restore offset :)
-            auto kids = touchEvent.target->getChildren();
+            auto kids = storyView->getChildren();
             for (auto &kid : kids)
                 kid->setPosition(vec2{ kid->getPositionConst().x, kid->getPositionConst().y - 3 });
 
             // move up card     - fast
-            touchEvent.target->getChildren().back()->getTimeline()->appendTo(&touchEvent.target->getChildren().back()->getPosition(), vec2{ 50,-300 }, 0.2f, easeInExpo);
+            storyView->getChildren().back()->getTimeline()->appendTo(&storyView->getChildren().back()->getPosition(), vec2{ 50,-300 }, 0.2f, easeInExpo);
 
             // scale card       - medium
-            touchEvent.target->getChildren().back()->getTimeline()->appendTo(&touchEvent.target->getChildren().back()->getScale(), vec2(0.8f), 0.2f, easeInQuad)
-                .startTime(touchEvent.target->getChildren().back()->getTimeline()->getCurrentTime() + 0.4f);
+            storyView->getChildren().back()->getTimeline()->appendTo(&storyView->getChildren().back()->getScale(), vec2(0.8f), 0.2f, easeInQuad)
+                .startTime(storyView->getChildren().back()->getTimeline()->getCurrentTime() + 0.4f);
 
             // make sure scaling is complete
                 // - lord send help
 
             // move card to bottom of stack 
-            touchEvent.target->getChildren().back()->moveToBack();
+            storyView->getChildren().back()->moveToBack();
 
             // move card down   - slow
-            touchEvent.target->getChildren().front()->getTimeline()->appendTo(&touchEvent.target->getChildren().front()->getPosition(), vec2{ backPos.x, backPos.y }, 1.0f)
-                .startTime(touchEvent.target->getChildren().front()->getTimeline()->getCurrentTime() + 1.0f);
+            storyView->getChildren().front()->getTimeline()->appendTo(&storyView->getChildren().front()->getPosition(), vec2{ backPos.x, backPos.y }, 1.0f)
+                .startTime(storyView->getChildren().front()->getTimeline()->getCurrentTime() + 1.0f);
 
             // scale back       - not to be seen
-            touchEvent.target->getChildren().front()->getTimeline()->appendTo(&touchEvent.target->getChildren().front()->getScale(), vec2(1.0f), 0.2f)
-                .startTime(touchEvent.target->getChildren().front()->getTimeline()->getCurrentTime() + 2.5f);
+            storyView->getChildren().front()->getTimeline()->appendTo(&storyView->getChildren().front()->getScale(), vec2(1.0f), 0.2f)
+                .startTime(storyView->getChildren().front()->getTimeline()->getCurrentTime() + 2.5f);
         }
     }
 }
+
+void Story::handleTouchEnded(const bluecadet::touch::TouchEvent* e)
+{}
 
 vector<pair<string, Cards*>> Story::sort(vector<string>* titles, vector<pair<string, string>>* bodies, vector<string>* imgPaths)
 {

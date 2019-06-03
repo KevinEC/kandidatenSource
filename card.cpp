@@ -14,6 +14,8 @@ Card::Card()
 	x = 200.0f;
 	y = 100.0f;
 	titleText = "Hej Hilma";
+	angle = 0;
+	lastanglechange = 0;
 }
 
 Card::~Card()
@@ -24,6 +26,8 @@ Card::Card(const float x1, const float y1, pair<string, string> title, pair<stri
 {
 	x = x1;
 	y = y1;
+	angle = 0;
+	lastanglechange = 0;
 
 	cardSize = 1.0f;
 	width = 336.0f*cardSize;
@@ -55,25 +59,37 @@ void Card::initElements()
 {
 	//create bluecadet touchview
 	object = make_shared<TouchView>();
-	object->setSize({ 336.0f, 500.0f });
+	object->setSize({ width, height });
 	object->setPosition({ x,y });
-	object->setDragEnabled(true);
+	//object->moveToFront();
+	object->setBackgroundColor(Color::white());
+	object->setDebugDrawTouchPath(false);
+	object->setDragEnabled(false);
 	object->setMultiTouchEnabled(true);
-	object->setTransformOrigin(object->getCenter());
+	object->setHidden(false);
+	//object->setTransformOrigin(object->getPosition());
 
 	//link touchevents
-	object->getSignalTapped().connect([=](bluecadet::touch::TouchEvent e) {
-		this->handleTouchTapped(&e);
-	});
-
 	object->getSignalTouchBegan().connect([=](bluecadet::touch::TouchEvent e) {
 		this->handleTouchBegan(&e);
+		//hasbeentransformed = false;
+		//hasbeentransformed = true;
+		//object->setDragEnabled(false);
 	});
 	object->getSignalTouchMoved().connect([=](bluecadet::touch::TouchEvent e) {
 		this->handleTouchMoved(&e);
+		//hasbeentransformed = false;
+		//object->setDragEnabled(false);
 	});
 	object->getSignalTouchEnded().connect([=](bluecadet::touch::TouchEvent e) {
-		this->handleTouchMoved(&e);
+		this->handleTouchEnded(&e);
+
+
+		//hasbeentransformed = true;
+		//object->setDragEnabled(false);
+	});
+	object->getSignalTapped().connect([=](bluecadet::touch::TouchEvent e) {
+		this->handleTouchTapped(&e);
 	});
 
 
@@ -88,6 +104,7 @@ void Card::initElements()
 	border->setSize({ object->getSize() });
 	object->addChild(border);
 
+	
 	//init Font manager
 	FontManager::getInstance()->setup(getAssetPath("fonts/fonts.json"));
 
@@ -96,7 +113,7 @@ void Card::initElements()
 	float padding = (1.0f - size) / 2;
 
 	/* CREATE FRONT AND BACK LAYOUTS*/
-
+	
 	//create front layout content box
 	contentBoxFront = make_shared<BaseView>();
 	contentBoxFront->setSize({ object->getSize() * size });
@@ -128,9 +145,10 @@ void Card::initElements()
 	contentBoxFront->setHidden(true);
 	contentBoxBack->setHidden(false);
 
-
+	
 	//move the touchView to front to ensure touch is not blocked by child views
 	object->moveToFront();
+	
 }
 
 void Card::setStyles()
@@ -144,12 +162,12 @@ void Card::setStyles()
 	textColor = Color::hex(0x393939);
 }
 
-void Card::toggleView() 
+void Card::toggleView()
 {
 
 	// set transformorigin 
-	object->setTransformOrigin(object->convertGlobalToLocal(object->getCenter()));
-	
+	//object->setTransformOrigin(object->convertGlobalToLocal(object->getCenter()));
+
 	//animate me
 	object->cancelAnimations();
 	// --> scale up
@@ -167,7 +185,7 @@ void Card::toggleView()
 		contentBoxFront->setHidden(false);
 	}
 	//back side layout
-	else 
+	else
 	{
 		flipped = !flipped;
 
@@ -271,86 +289,137 @@ void Card::setBackLayout()
 
 }
 
+
+void Card::animateTranslate(const vec2 pos)
+{
+	object->getTimeline()->apply(&object->getPosition(), pos , 2.0f, EaseOutExpo());
+}
+
 void Card::handleTouchTapped(bluecadet::touch::TouchEvent* touchEvent)
 {
-	object->setTransformOrigin(object->convertGlobalToLocal(object->getCenter()));
+	//object->setTransformOrigin(object->convertGlobalToLocal(object->getCenter()));
+	object->moveToFront();
 	toggleView();
 }
 
+
+void Card::inserttouchevent(bluecadet::touch::TouchEvent* touchEvent) {
+
+	for (int i = 0; i < activeTouches.size(); i++)
+	{
+		if (activeTouches[i].touchId == touchEvent->touchId) {
+			currentpos[i] = activeTouches[i].globalPosition;
+			activeTouches[i] = *touchEvent;
+			activeTouches[i].touchId = touchEvent->touchId;
+
+		}
+	}
+}
 void Card::handleTouchBegan(bluecadet::touch::TouchEvent* touchEvent)
-{
-	// init vars for conditional handling of touchpoints
-	firstTouchPoint = true;
-	firstTouchId = 0;
-	maxDist = 0;
-	initDist = -1;
-
-	// add touchpoints on began
-	activeTouches.insert(make_pair(touchEvent->touchId, *touchEvent));
-
+{	
 	object->moveToFront();
+	activeTouches.insert(activeTouches.begin(), *touchEvent);
+	currentpos.insert(currentpos.begin(), touchEvent->globalPosition);
+
 }
 
 void Card::handleTouchMoved(bluecadet::touch::TouchEvent* touchEvent)
 {
-	// update the touchpoint coord
-	activeTouches.at(touchEvent->touchId) = *touchEvent;
-	
+	inserttouchevent(touchEvent);
 
-	// reset vars too determine the loongest distance between all active touchpoints
-	maxDist = 0;
-	currDist = 0;
+	vec2 a1, b1, a2, b2, c1, c2;
 
-	float sumX = 0;
-	float sumY = 0;
-
-	if ( object->getNumTouches() >= 2 )
+	//drag object with 1 touch
+	if (object->getNumTouches() == 1 && activeTouches.size() != 2) {
+		ci::vec2 newPosition = object->getPosition();
+		newPosition.x += activeTouches[0].globalPosition.x - currentpos[0].x;
+		newPosition.y += activeTouches[0].globalPosition.y - currentpos[0].y;
+		object->setPosition(newPosition);
+	}
+	//ROTATION AND SCALING
+	if (object->getNumTouches() == 2 && activeTouches.size() == 2)
 	{
-		//find longest dist
-		for (auto touch : activeTouches)
-		{
-			//save the first touch point id
-			if (firstTouchPoint) {
-				firstTouchId = touch.first;
-				firstTouchPoint = false;
-			}
+		//if we have done any other transformorigin
+		//object->setTransformOrigin(vec2(0, 0));
+		object->setDragEnabled(false);
+		a1 = currentpos[0];
+		b1 = currentpos[1];
+		a2 = activeTouches[1].globalPosition;
+		b2 = activeTouches[0].globalPosition;
 
-			// measure the distance from the first touchpoint on the card to each individual touchpoint
-			currDist = abs(glm::distance(activeTouches.at(firstTouchId).globalPosition, touch.second.globalPosition));
+		auto c1 = (a1 + b1)*0.5f;
+		auto c2 = (a2 + b2)*0.5f;
 
-			// determine the longest distance
-			if (currDist > maxDist) maxDist = currDist;
+		//measure the distance
+		currDist = sqrt(pow(a2.x - b2.x, 2) + pow(a2.y - b2.y, 2));
+		float prevDist = sqrt(pow(a1.x - b1.x, 2) + pow(a1.y - b1.y, 2));
 
-			sumX += touch.second.globalPosition.x;
-			sumY += touch.second.globalPosition.y;
-
-			
-		}
-
-		// fool lösning too save the inital distance
-		if (initDist == -1) initDist = maxDist;
-		cardSize = maxDist / initDist;
-
-		// determine mid point
-		float midX = sumX / activeTouches.size();
-		float midY = sumY / activeTouches.size();
-		vec2 midPos = { midX, midY };
+		vec2 v1 = b1 - a1;
+		vec2 v2 = b2 - a2;
+		v1 = glm::normalize(v1);
+		v2 = glm::normalize(v2);
+		vec2 p1 = object->getPosition();
 
 
-		object->setTransformOrigin(midPos - object->getCenter());
-		if (cardSize > 0.2 && cardSize < 1.5) {
-			object->setScale(cardSize);
-		}
-		vec2 newPos = midPos - object->getCenter();
+		float deltaAngle = atan2(v2.y, v2.x) - atan2(v1.y, v1.x);
+		CI_LOG_I(glm::degrees(deltaAngle));
+		
+		angle += deltaAngle;
+		
 
-		//object->setPosition(newPos);
+		cardSize *= currDist / prevDist;
+
+		mat2 R = mat2(cos(deltaAngle), sin(deltaAngle), -sin(deltaAngle), cos(deltaAngle));
+
+
+		CI_LOG_I("test: " << abs((glm::degrees(lastanglechange) - glm::degrees(deltaAngle))));
+		
+		vec2 p2 = c2 + R * (p1 - c1)*(currDist / prevDist);
+		//tried to make logic for not transforming when 1 touch is ended.
+		//if (!hasbeentransformed){
+			//&& ((lastanglechange == 0) || ( abs((glm::degrees(lastanglechange) - glm::degrees(deltaAngle))) < 90))){	
+		object->setScale(cardSize);
+		object->setPosition(p2);
+		object->setRotation(angle);
+
+		//lastanglechange = deltaAngle;
+
+
+		//hasbeentransformed = true;
+		//}
 
 	}
-
+	//if we have more then 2 touches on the object, only translate with the first touchpoint on the object.
+	else if (object->getNumTouches() > 2) {
+		ci::vec2 newPosition = object->getPosition();
+		newPosition.x += activeTouches[activeTouches.size() - 1].globalPosition.x - currentpos[currentpos.size() - 1].x;
+		newPosition.y += activeTouches[activeTouches.size() - 1].globalPosition.y - currentpos[currentpos.size() - 1].y;
+		object->setPosition(newPosition);
+	}
+	
 }
 
 void Card::handleTouchEnded(bluecadet::touch::TouchEvent* touchEvent)
 {
+	//call for remove touch event. 
+	//maybe add a timer where we wait for set amount of time before deleting, might solve the problem with rotation when removing 1 finger and not 2. 
+	//calling for function for removing the touchevent from our vectors.
+	removetouchevent(touchEvent);
+	/*for (int i = 0; i < activeTouches.size(); ++i) {
+
 	activeTouches.clear();
+	*/
+
 }
 
+void Card::removetouchevent(bluecadet::touch::TouchEvent* touchEvent) {
+
+	for (int i = 0; i < activeTouches.size(); ++i) {
+
+		if (activeTouches[i].touchId == touchEvent->touchId) {
+			//CI_LOG_I("activetouches size: " << activeTouches.size());
+			activeTouches.erase(activeTouches.begin() + i);
+			currentpos.erase(currentpos.begin() + i);
+		}
+	}
+}
