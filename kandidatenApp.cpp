@@ -219,12 +219,14 @@ void kandidatenApp::setUpTang()
 
 
       // testing storymode on computer
+    /*
     {
         addView(Story1->storyView);
 		Story1->storyView->setHidden(false);
         storyMode = true;
 
     }
+    */
 
 }
 
@@ -259,6 +261,7 @@ void kandidatenApp::handleTouchBegan(const bluecadet::touch::TouchEvent& touchEv
         // make sure touchIDs are a sequence
         for (int i = 0; i < 4; ++i) 
         {
+        
             if (tangibleTouch[i].touchId == touchEvent.touchId - 3 + i) 
                 istangible = true;   
 
