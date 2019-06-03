@@ -12,7 +12,7 @@ using namespace std::chrono; // nanoseconds, system_clock, seconds
 vec2 frontPos;  // top-card position
 vec2 backPos;   // bottom-card position
 
-int front, back;
+int front, back; // index to front/back card 
 
 // default constructor
 Story::Story()
@@ -47,8 +47,8 @@ Story::Story()
 // constructor
 Story::Story(Cards* cards) : storyCards(cards)
 {
-    int front = 0;
-    int back = storyCards->allcards.size() - 1;
+    front = 0;
+    back = storyCards->allcards.size() - 1;
 
     // story mode main view with touch
     vec2 windowSize{ 1920, 1080 };
@@ -76,7 +76,7 @@ Story::Story(Cards* cards) : storyCards(cards)
 
     // make top card red 
     storyView->getChildren().back()->setBackgroundColor(Color::hex(0xFF0000));
-    storyCards->allcards.back()->object->setBackgroundColor(Color::hex(0xD1D2D3));
+    storyCards->allcards.back()->object->setBackgroundColor(Color::hex(0xD1D2D3));      // funkar inte
 
     // fixed position for top- and bottom-card
     frontPos = storyView->getChildren().back()->getPositionConst();
@@ -107,18 +107,21 @@ void Story::setUpCard(TouchViewRef view, int *offset, Card *card)
 
 void Story::setUpHeader(StrokedRoundedRectViewRef view, Card *card)
 {
-    auto headerView = make_shared<TextView>();
-    headerView->setPadding(20, 20);
-    headerView->setWidth(0.7f*view->getWidth());
-    headerView->setTransformOrigin(0.5f * headerView->getSize());
-    headerView->setCenter(vec2{ view->getCenter().x - 50, view->getCenter().y - 0.7f*view->getHeight() });
-    headerView->setFontSize(50.0f);
-    headerView->setBackgroundColor(Color::white());
-    headerView->setTextColor(Color::black());
-    headerView->setTextAlign(bluecadet::text::TextAlign::Center);
-    headerView->setText(card->titleText);
+    if (card->titleText.compare("ingen titel") != 0)
+    {
+        auto headerView = make_shared<TextView>();
+        headerView->setPadding(20, 20);
+        headerView->setWidth(0.7f*view->getWidth());
+        headerView->setTransformOrigin(0.5f * headerView->getSize());
+        headerView->setCenter(vec2{ view->getCenter().x - 50, view->getCenter().y - 0.7f*view->getHeight() });
+        headerView->setFontSize(50.0f);
+        headerView->setBackgroundColor(Color::white());
+        headerView->setTextColor(Color::black());
+        headerView->setTextAlign(bluecadet::text::TextAlign::Center);
+        headerView->setText(card->titleText);
 
-    view->addChild(headerView);
+        view->addChild(headerView);
+    }
 }
 
 void Story::setUpBody(StrokedRoundedRectViewRef view, Card *card)
@@ -149,14 +152,6 @@ void Story::setUpImage(StrokedRoundedRectViewRef view, Card *card)
     view->addChild(imageView);
 }
 
-/*
-bool handleMoveToFront(&BaseView kid)
-{
-    kid->moveToFront();
-    return true;
-}
-*/
-
 void Story::handleTouchBegan(const bluecadet::touch::TouchEvent* e)
 {}
 
@@ -185,7 +180,7 @@ void Story::handleTouchMoved(const bluecadet::touch::TouchEvent* e)
 void Story::handleTouchEnded(const bluecadet::touch::TouchEvent* e)
 {}
 
-void Story::swipeUp()
+void Story::swipeUp()        // translate, scale and alpha out allcards[front] 
 {
     //      view    ==  storyCards->allcards.front()->object->
 
@@ -205,11 +200,9 @@ void Story::swipeUp()
         .startTime(storyView->getChildren().back()->getTimeline()->getCurrentTime() + 0.4f);
 
 
-   // storyCards->allcards[front]->object->getTimeline()->appendTo(&storyCards->allcards[front]->object->getAlpha(), 0.0f, 0.8f);
-    storyCards->allcards[front]->object->getTimeline()->appendTo(&storyCards->allcards[front]->object->getScale(), vec2(2.0f), 0.8f);
+   // storyCards->allcards[front]->object->getTimeline()->appendTo(&storyCards->allcards[front]->object->getAlpha(), 0.0f, 0.8f);           // funkar inte
+   // storyCards->allcards[front]->object->getTimeline()->appendTo(&storyCards->allcards[front]->object->getScale(), vec2(2.0f), 0.8f);     // funkar inte
 
-    // make sure scaling is complete
-        // - lord send help
 
     // move card to bottom of stack 
     storyView->getChildren().back()->moveToBack();
@@ -223,7 +216,7 @@ void Story::swipeUp()
         .startTime(storyView->getChildren().front()->getTimeline()->getCurrentTime() + 2.5f);
 }
 
-void Story::swipeDown() 
+void Story::swipeDown()         // scale, alpha in and translate allcards[back] 
 {
     // scale card        - not to be seen
     storyView->getChildren().front()->getTimeline()->appendTo(&storyView->getChildren().front()->getScale(), vec2(0.8f), 0.2f, easeInQuad);
@@ -240,12 +233,8 @@ void Story::swipeDown()
     storyView->getChildren().front()->getTimeline()->appendTo(&storyView->getChildren().front()->getAlpha(), 0.0f, 0.8f)
         .startTime(storyView->getChildren().front()->getTimeline()->getCurrentTime() + 1.5f);
 
-    // make sure scaling is done b4 moving view                
-    //      - lord send help
 
-    //if(scaled)
     // storyView->getChildren().front()->moveToFront(); // move card to front of stack
-
 
 
     // move full stack of cards down to restore offset :)
