@@ -142,7 +142,7 @@ void kandidatenApp::setup()
 
 	// 7 83 83 83 83
 	CI_LOG_I("sizes: " << categories.size() << " " << titles.size() << " " << bodyText.size() << " " << imgPath.size() << " " << cardCategory.size());
-	CI_LOG_I("test" << storytitles.size() << "storybodies" << storybodies.size() << "storyimgpath" << storyimgPath.size());
+	CI_LOG_I("story-sizes: " << storytitles.size() << "storybodies: " << storybodies.size() << "storyimgpath: " << storyimgPath.size());
     
 
     /********************************
@@ -219,6 +219,7 @@ void kandidatenApp::setUpTang()
 
 
       // testing storymode on computer
+
     /*
     {
         addView(Story1->storyView);
