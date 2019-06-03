@@ -144,7 +144,7 @@ void kandidatenApp::setup()
 
 	// 7 83 83 83 83
 	CI_LOG_I("sizes: " << categories.size() << " " << titles.size() << " " << bodyText.size() << " " << imgPath.size() << " " << cardCategory.size());
-	CI_LOG_I("test" << storytitles.size() << "storybodies" << storybodies.size() << "storyimgpath" << storyimgPath.size());
+	CI_LOG_I("story-sizes: " << storytitles.size() << "storybodies: " << storybodies.size() << "storyimgpath: " << storyimgPath.size());
     
 
     /********************************
@@ -215,11 +215,10 @@ void kandidatenApp::setUpTang()
     tangView->getSignalTouchEnded().connect([=](const bluecadet::touch::TouchEvent& e) { handleTouchEnded(e); });
 
     // fill story cards & instantiate storymode
-    Story1 = new Story(stories.at(2).second );
+    Story1 = new Story(stories.at(2).first ,stories.at(2).second );
 	//Story1->storyView->getEventSignal(); listen to the move
 	Story1->storyView->getSignalTouchMoved().connect([=](const bluecadet::touch::TouchEvent& e) { handleStoryTouchMoved(e); });
     addView(tangView); // add tang touch view to root
-
 
 
     //testing storymode on computer
@@ -228,7 +227,10 @@ void kandidatenApp::setUpTang()
 		Story1->storyView->setHidden(false);
         storyMode = true;
 
+		tangLayout(Story1->storyView->getGlobalPosition(), Story1->storyView->getBounds());
+
     }
+    
 }
 
 void kandidatenApp::tangLayout(const vec2 xy, const Rectf rect)
@@ -262,6 +264,7 @@ void kandidatenApp::handleTouchBegan(const bluecadet::touch::TouchEvent& touchEv
         // make sure touchIDs are a sequence
         for (int i = 0; i < 4; ++i) 
         {
+        
             if (tangibleTouch[i].touchId == touchEvent.touchId - 3 + i) 
                 istangible = true;   
 

@@ -13,7 +13,7 @@ Card::Card()
 {
 	x = 200.0f;
 	y = 100.0f;
-	titleText = "Hej Hilma";
+	titleText = "empty";
 	angle = 0;
 	lastanglechange = 0;
 }

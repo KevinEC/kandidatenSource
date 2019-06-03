@@ -22,3 +22,16 @@ git commit -m "kommentar" //Lägg till kommentar om filen
 git push // Ladda upp
 
 esc: WQ
+
+-------------------
+MERGE LOKAL BRANCH MED MASTER
+
+	git checkout branch
+		* git add .
+		* git commit -m "kommentar"
+	git checkout master
+		* git pull
+		* git merge branch-name
+
+	* lös merge conflicts
+	* add + commit + push solved conflict
