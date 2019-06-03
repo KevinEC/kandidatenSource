@@ -76,6 +76,7 @@ Story::Story(Cards cards) : storyCards(cards)
 }
 
 Story::~Story(){}
+
 void Story::setUpCard(TouchViewRef view, int *offset)
 {
     // container view for card

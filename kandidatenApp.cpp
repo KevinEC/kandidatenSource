@@ -223,7 +223,6 @@ void kandidatenApp::setUpTang()
 
       // testing storymode on computer
 
-
     {
         addView(cardStory.storyView);
         cardStory.storyView->setHidden(false);
