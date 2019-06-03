@@ -228,7 +228,7 @@ void kandidatenApp::setUpTang()
         storyMode = true;
 
 		tangLayout(Story1->storyView->getGlobalPosition(), Story1->storyView->getBounds());
-
+		Story1->storyViews;
     }
     
 }

@@ -123,7 +123,7 @@ void Story::setUpCard(TouchViewRef view, int *offset, Card *card, string name, C
 		setUpBody(cardView, card);
 		setUpImage(cardView, card);
 	}
-    
+	storyViews.push_back(cardView);
     view->addChild(cardView);
 }
 
