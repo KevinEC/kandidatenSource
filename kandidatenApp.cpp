@@ -75,7 +75,7 @@ void kandidatenApp::prepareSettings(ci::app::App::Settings* settings) {
 	settings->setHighDensityDisplayEnabled(true);
 
 	SettingsManager::getInstance()->setup(settings, ci::app::getAssetPath("../assets/settings.json"), [](SettingsManager * manager) {
-		manager->mFullscreen = true;
+		manager->mFullscreen = false;
 		manager->mWindowSize = ivec2(1920, 1080);
 		manager->mDisplaySize = ivec2(1920, 1080);
 		manager->mConsole = false;
@@ -83,7 +83,7 @@ void kandidatenApp::prepareSettings(ci::app::App::Settings* settings) {
 		manager->mShowStats = false;
 		manager->mShowTouches = true;
 		manager->mMinimizeParams = true;
-        manager->mNativeTouchEnabled = false;    // true for table
+        manager->mNativeTouchEnabled = true;    // true for table
 	});
 }
 
@@ -222,14 +222,14 @@ void kandidatenApp::setUpTang()
 
 
     //testing storymode on computer
-    {
-        addView(Story1->storyView);
-		Story1->storyView->setHidden(false);
-        storyMode = true;
+  //  {
+  //      addView(Story1->storyView);
+		//Story1->storyView->setHidden(false);
+  //      storyMode = true;
 
-		tangLayout(Story1->storyView->getGlobalPosition(), Story1->storyView->getBounds());
-		Story1->storyViews;
-    }
+		//tangLayout(Story1->storyView->getGlobalPosition(), Story1->storyView->getBounds());
+		//Story1->storyViews;
+  //  }
     
 }
 
@@ -297,7 +297,7 @@ void kandidatenApp::handleTouchBegan(const bluecadet::touch::TouchEvent& touchEv
                     if (dist > 80 && dist < 150)
                     {
                         count++;
-                        storyPos = tangibleTouch[j].globalPosition;
+                        storyPos = vec2(tangibleTouch[j].globalPosition.x - 200.0f, tangibleTouch[j].globalPosition.y - 320.0f);
                     }
                 }
             }
@@ -319,6 +319,7 @@ void kandidatenApp::handleTouchBegan(const bluecadet::touch::TouchEvent& touchEv
     }
 }
 
+
 void kandidatenApp::handleTouchMoved(const bluecadet::touch::TouchEvent& touchEvent) 
 {
 
@@ -337,7 +338,7 @@ void kandidatenApp::handleTouchMoved(const bluecadet::touch::TouchEvent& touchEv
 
         if (movingTang.size() == 4)
         {
-			Story1->storyView->setPosition(movingTang[0].globalPosition);   // set position of story mode at puck's position
+			Story1->storyView->setPosition(vec2(movingTang[0].globalPosition.x-200.0f, movingTang[0].globalPosition.y - 320.0f) );   // set position of story mode at puck's position
 			//tangLayout(Story1->storyView->getGlobalPosition(), Story1->storyView->getBounds());
         }
     }
@@ -352,25 +353,25 @@ void kandidatenApp::handleTouchEnded(const bluecadet::touch::TouchEvent& touchEv
     }
     
      //puck is lifted 
-    //if (storyMode && tangibleTouch.empty())
-    //{
-    //    storyMode = false;
-    //    Story1->storyView->setHidden(true);
-    //    movingTang.clear();
+    if (storyMode && tangibleTouch.empty())
+    {
+        storyMode = false;
+        Story1->storyView->setHidden(true);
+        movingTang.clear();
 
-    //    for (auto &categorie : allCategories) // make active cards fullscreen
-    //    {
-    //        categorie.second->view->setSize(windowSize);
-    //        categorie.second->view->setGlobalPosition(ivec2{ 0,0 });
-    //        categorie.second->view->setTransformOrigin(0.5f * categorie.second->view->getSize());
+        for (auto &categorie : allCategories) // make active cards fullscreen
+        {
+            categorie.second->view->setSize(windowSize);
+            categorie.second->view->setGlobalPosition(ivec2{ 0,0 });
+            categorie.second->view->setTransformOrigin(0.5f * categorie.second->view->getSize());
 
-    //        auto kids = categorie.second->view->getChildren();
-    //        for (auto &kid : kids)
-    //        {
-    //            if (!(kid->isHidden())) kid->setScale(1); // scale kid back
-    //        }
-    //    }
-    //}
+            auto kids = categorie.second->view->getChildren();
+            for (auto &kid : kids)
+            {
+                if (!(kid->isHidden())) kid->setScale(1); // scale kid back
+            }
+        }
+    }
 }
 
 void kandidatenApp::handleStoryTouchMoved(const bluecadet::touch::TouchEvent & touchEvent)

@@ -302,11 +302,6 @@ void Story::swipeUp()        // translate, scale and alpha out allcards[front]
     storyView->getChildren().back()->getTimeline()->appendTo(&storyView->getChildren().back()->getScale(), vec2(0.8f), 0.2f, easeInQuad)
         .startTime(storyView->getChildren().back()->getTimeline()->getCurrentTime() + 0.4f);
 
-
-   // storyCards->allcards[front]->object->getTimeline()->appendTo(&storyCards->allcards[front]->object->getAlpha(), 0.0f, 0.8f);           // funkar inte
-   // storyCards->allcards[front]->object->getTimeline()->appendTo(&storyCards->allcards[front]->object->getScale(), vec2(2.0f), 0.8f);     // funkar inte
-
-
     // move card to bottom of stack 
     storyView->getChildren().back()->moveToBack();
 
@@ -322,22 +317,22 @@ void Story::swipeUp()        // translate, scale and alpha out allcards[front]
 void Story::swipeDown()         // scale, alpha in and translate allcards[back] 
 {
     // scale card        - not to be seen
-    storyView->getChildren().front()->getTimeline()->appendTo(&storyView->getChildren().front()->getScale(), vec2(0.8f), 0.2f, easeInQuad);
+    //storyView->getChildren().front()->getTimeline()->appendTo(&storyView->getChildren().front()->getScale(), vec2(0.8f), 0.2f, easeInQuad);
 
     // move card down   - fast
-    storyView->getChildren().front()->getTimeline()->appendTo(&storyView->getChildren().front()->getPosition(), vec2{ 50,800 }, 0.4f, easeInExpo)
-        .startTime(storyView->getChildren().front()->getTimeline()->getCurrentTime() + 0.4f);
+    storyView->getChildren().front()->getTimeline()->appendTo(&storyView->getChildren().front()->getPosition(), vec2{ 50,800 }, 0.4f, easeInExpo);
+    //    .startTime(storyView->getChildren().front()->getTimeline()->getCurrentTime() + 0.4f);
 
 
     // scale back       - medium
-    storyView->getChildren().front()->getTimeline()->appendTo(&storyView->getChildren().front()->getScale(), vec2(1.0f), 0.2f)
-        .startTime(storyView->getChildren().front()->getTimeline()->getCurrentTime() + 1.0f);
+    //storyView->getChildren().front()->getTimeline()->appendTo(&storyView->getChildren().front()->getScale(), vec2(1.0f), 0.2f)
+      //  .startTime(storyView->getChildren().front()->getTimeline()->getCurrentTime() + 1.0f);
 
-    storyView->getChildren().front()->getTimeline()->appendTo(&storyView->getChildren().front()->getAlpha(), 0.0f, 0.8f)
-        .startTime(storyView->getChildren().front()->getTimeline()->getCurrentTime() + 1.5f);
+    /*storyView->getChildren().front()->getTimeline()->appendTo(&storyView->getChildren().front()->getAlpha(), 0.0f, 0.8f)
+        .startTime(storyView->getChildren().front()->getTimeline()->getCurrentTime() + 1.5f);*/
 
 
-    // storyView->getChildren().front()->moveToFront(); // move card to front of stack
+     storyView->getChildren().front()->moveToFront(); // move card to front of stack
 
 
     // move full stack of cards down to restore offset :)
@@ -347,7 +342,7 @@ void Story::swipeDown()         // scale, alpha in and translate allcards[back]
 
     // move card up     - slow
     storyView->getChildren().back()->getTimeline()->appendTo(&storyView->getChildren().back()->getPosition(), vec2{ frontPos.x, frontPos.y }, 1.0f)
-        .startTime(storyView->getChildren().back()->getTimeline()->getCurrentTime() + 2.5f);
+        .startTime(storyView->getChildren().back()->getTimeline()->getCurrentTime() + 0.5f);
 }
 
 vector<pair<string, Cards*>> Story::sort(vector<string>* titles, vector<pair<string, string>>* bodies, vector<string>* imgPaths)
